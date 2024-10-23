@@ -23,6 +23,8 @@ class User extends Authenticatable
         'lastname',
         'email',
         'password',
+        'role_id',       // Menambahkan role_id
+        'status',        // Menambahkan status
         'address',
         'city',
         'country',
@@ -53,10 +55,18 @@ class User extends Authenticatable
      * Always encrypt the password when it is updated.
      *
      * @param $value
-    * @return string
-    */
+     * @return string
+     */
     public function setPasswordAttribute($value)
     {
         $this->attributes['password'] = bcrypt($value);
+    }
+
+    /**
+     * Relationship with Role model.
+     */
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
     }
 }
