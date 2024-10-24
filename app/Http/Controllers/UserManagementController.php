@@ -33,7 +33,7 @@ class UserManagementController extends Controller
             'firstname' => $request->firstname,
             'lastname' => $request->lastname,
             'email' => $request->email,
-            'password' => bcrypt($request->password),
+            'password' => $request->password,
             'role_id' => $request->role_id,
             'status' => 'active',
         ]);
@@ -50,7 +50,7 @@ class UserManagementController extends Controller
             'lastname' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
             'role_id' => 'required|exists:roles,id',
-            'password' => 'nullable|string|min:8', // Tambahkan ini untuk password
+            'password' => 'nullable|string|min:8',
         ]);
 
         $data = [
@@ -60,9 +60,8 @@ class UserManagementController extends Controller
             'role_id' => $request->role_id,
         ];
 
-        // Jika password diisi, hash dan tambahkan ke data
         if ($request->filled('password')) {
-            $data['password'] = bcrypt($request->password);
+            $data['password'] = $request->password;
         }
 
         $user->update($data);
