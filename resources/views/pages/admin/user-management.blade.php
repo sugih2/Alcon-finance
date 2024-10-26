@@ -17,33 +17,34 @@
                         <table class="table align-items-center mb-0">
                             <thead>
                                 <tr>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">No</th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Role Name</th>
-                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Action</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">No
+                                    </th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                        Role Name</th>
+                                    <th
+                                        class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                        Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @php $index = 1; @endphp
-                                @foreach($roles as $role)
+                                @foreach ($roles as $role)
                                     <tr>
-                                        <td><p class="text-sm font-weight-bold mb-0">{{ $index++ }}</p></td>
-                                        <td><p class="text-sm font-weight-bold mb-0">{{ $role->name }}</p></td>
+                                        <td>
+                                            <p class="text-sm font-weight-bold mb-0">{{ $index++ }}</p>
+                                        </td>
+                                        <td>
+                                            <p class="text-sm font-weight-bold mb-0">{{ $role->name }}</p>
+                                        </td>
                                         <td class="align-middle text-end">
                                             <div class="d-flex px-3 py-1 justify-content-center align-items-center">
-                                                <button 
-                                                    type="button" 
-                                                    class="btn btn-link text-primary mb-0" 
-                                                    data-bs-toggle="modal" 
-                                                    data-bs-target="#editRoleModal"
-                                                    data-name="{{ $role->name }}"
-                                                    data-id="{{ $role->id }}">
+                                                <button type="button" class="btn btn-link text-primary mb-0"
+                                                    data-bs-toggle="modal" data-bs-target="#editRoleModal"
+                                                    data-name="{{ $role->name }}" data-id="{{ $role->id }}">
                                                     Edit
                                                 </button>
-                                                <button 
-                                                    type="button" 
-                                                    class="btn btn-link text-danger mb-0" 
-                                                    data-bs-toggle="modal" 
-                                                    data-bs-target="#deleteRoleModal"
+                                                <button type="button" class="btn btn-link text-danger mb-0"
+                                                    data-bs-toggle="modal" data-bs-target="#deleteRoleModal"
                                                     data-id="{{ $role->id }}">
                                                     Delete
                                                 </button>
@@ -51,13 +52,13 @@
                                         </td>
                                     </tr>
                                 @endforeach
-                            </tbody>                                                                                                           
-                        </table>                        
-                    </div>                    
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
-    
+
         <div class="col-md-8">
             <div class="card mb-4">
                 <div class="card-header pb-0 d-flex justify-content-between align-items-center">
@@ -71,22 +72,30 @@
                         <table class="table align-items-center mb-0">
                             <thead>
                                 <tr>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Name</th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Role</th>
-                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Create Date</th>
-                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Action</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Name
+                                    </th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                        Role</th>
+                                    <th
+                                        class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                        Create Date</th>
+                                    <th
+                                        class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                        Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($users as $user)
+                                @foreach ($users as $user)
                                     <tr>
                                         <td>
                                             <div class="d-flex px-3 py-1">
                                                 <div>
-                                                    <img src="./img/team-{{ $user->id }}.jpg" class="avatar me-3" alt="image">
+                                                    <img src="./img/team-{{ $user->id }}.jpg" class="avatar me-3"
+                                                        alt="image">
                                                 </div>
                                                 <div class="d-flex flex-column justify-content-center">
-                                                    <h6 class="mb-0 text-sm">{{ $user->firstname }} {{ $user->lastname }}</h6>
+                                                    <h6 class="mb-0 text-sm">{{ $user->firstname }} {{ $user->lastname }}
+                                                    </h6>
                                                 </div>
                                             </div>
                                         </td>
@@ -94,20 +103,21 @@
                                             <p class="text-sm font-weight-bold mb-0">{{ $user->role->name }}</p>
                                         </td>
                                         <td class="align-middle text-center text-sm">
-                                            <p class="text-sm font-weight-bold mb-0">{{ $user->created_at->format('d/m/Y') }}</p>
+                                            <p class="text-sm font-weight-bold mb-0">
+                                                {{ $user->created_at->format('d/m/Y') }}</p>
                                         </td>
                                         <td class="align-middle text-end">
                                             <div class="d-flex px-3 py-1 justify-content-center align-items-center">
-                                                <button class="btn btn-link text-primary mb-0" data-bs-toggle="modal" data-bs-target="#editUserModal" onclick="fillEditUserModal({{ $user }})">Edit</button>
-                                                <button 
-                                                    class="btn btn-link text-danger mb-0" 
-                                                    data-bs-toggle="modal" 
+                                                <button class="btn btn-link text-primary mb-0" data-bs-toggle="modal"
+                                                    data-bs-target="#editUserModal"
+                                                    onclick="fillEditUserModal({{ $user }})">Edit</button>
+                                                <button class="btn btn-link text-danger mb-0" data-bs-toggle="modal"
                                                     data-bs-target="#deleteUserModal"
                                                     onclick="setDeleteFormAction('{{ route('users.destroy', $user) }}')">
                                                     Delete
                                                 </button>
                                             </div>
-                                        </td>                                       
+                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -116,7 +126,7 @@
                 </div>
             </div>
         </div>
-    </div>    
+    </div>
     <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -129,28 +139,33 @@
                         @csrf
                         <div class="mb-3">
                             <label for="username" class="form-label">Username</label>
-                            <input type="text" class="form-control" id="username" name="username" placeholder="Username" required>
+                            <input type="text" class="form-control" id="username" name="username" placeholder="Username"
+                                required>
                         </div>
                         <div class="mb-3">
                             <label for="firstname" class="form-label">Firstname</label>
-                            <input type="text" class="form-control" id="firstname" name="firstname" placeholder="Firstname" required>
+                            <input type="text" class="form-control" id="firstname" name="firstname"
+                                placeholder="Firstname" required>
                         </div>
                         <div class="mb-3">
                             <label for="lastname" class="form-label">Lastname</label>
-                            <input type="text" class="form-control" id="lastname" name="lastname" placeholder="Lastname" required>
+                            <input type="text" class="form-control" id="lastname" name="lastname"
+                                placeholder="Lastname" required>
                         </div>
                         <div class="mb-3">
                             <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" name="email" placeholder="example@email.com" required>
+                            <input type="email" class="form-control" id="email" name="email"
+                                placeholder="example@email.com" required>
                         </div>
                         <div class="mb-3">
                             <label for="password" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
+                            <input type="password" class="form-control" id="password" name="password"
+                                placeholder="Password" required>
                         </div>
                         <div class="mb-3">
                             <label for="role_id" class="form-label">Role</label>
                             <select class="form-select" id="role_id" name="role_id" required>
-                                @foreach($roles as $role)
+                                @foreach ($roles as $role)
                                     <option value="{{ $role->id }}">{{ $role->name }}</option>
                                 @endforeach
                             </select>
@@ -195,7 +210,7 @@
                         <div class="mb-3">
                             <label for="edit_role_id" class="form-label">Role</label>
                             <select class="form-select" id="edit_role_id" name="role_id" required>
-                                @foreach($roles as $role)
+                                @foreach ($roles as $role)
                                     <option value="{{ $role->id }}">{{ $role->name }}</option>
                                 @endforeach
                             </select>
@@ -206,7 +221,8 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
+    <div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -226,7 +242,7 @@
                 </div>
             </div>
         </div>
-    </div>    
+    </div>
     <div class="modal fade" id="addRoleModal" tabindex="-1" aria-labelledby="addRoleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -239,7 +255,8 @@
                         @csrf
                         <div class="mb-3">
                             <label for="name" class="form-label">Role Name</label>
-                            <input type="text" class="form-control" id="addRoleName" name="name" placeholder="Role Name" required>
+                            <input type="text" class="form-control" id="addRoleName" name="name"
+                                placeholder="Role Name" required>
                         </div>
                         <button type="submit" class="btn btn-primary">Simpan</button>
                     </form>
@@ -268,7 +285,8 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" id="deleteRoleModal" tabindex="-1" aria-labelledby="deleteRoleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="deleteRoleModal" tabindex="-1" aria-labelledby="deleteRoleModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -288,42 +306,42 @@
                 </div>
             </div>
         </div>
-    </div>      
+    </div>
     <script>
         function fillEditUserModal(user) {
-            document.getElementById('editUserForm').action = `/user-management/users/${user.id}`; // Ubah URL sesuai rute Anda
+            document.getElementById('editUserForm').action =
+            `/user-management/users/${user.id}`; // Ubah URL sesuai rute Anda
             document.getElementById('edit_username').value = user.username;
             document.getElementById('edit_firstname').value = user.firstname;
             document.getElementById('edit_lastname').value = user.lastname;
             document.getElementById('edit_email').value = user.email;
             document.getElementById('edit_role_id').value = user.role_id;
         }
+
         function setDeleteFormAction(action) {
             document.getElementById('delete-form').action = action;
         }
         var editRoleModal = document.getElementById('editRoleModal');
-        editRoleModal.addEventListener('show.bs.modal', function (event) {
+        editRoleModal.addEventListener('show.bs.modal', function(event) {
             var button = event.relatedTarget; // Tombol yang mengaktifkan modal
             var roleName = button.getAttribute('data-name');
             var roleId = button.getAttribute('data-id');
-    
+
             var modalTitle = editRoleModal.querySelector('.modal-title');
             var roleInput = editRoleModal.querySelector('#role-name');
             var form = editRoleModal.querySelector('form');
-    
+
             modalTitle.textContent = 'Edit Role';
             roleInput.value = roleName;
-            form.action = '{{ url("user-management/roles") }}' + '/' + roleId; // Ganti action form
+            form.action = '{{ url('user-management/roles') }}' + '/' + roleId; // Ganti action form
         });
         var deleteRoleModal = document.getElementById('deleteRoleModal');
-        deleteRoleModal.addEventListener('show.bs.modal', function (event) {
+        deleteRoleModal.addEventListener('show.bs.modal', function(event) {
             var button = event.relatedTarget; // Tombol yang mengaktifkan modal
             var roleId = button.getAttribute('data-id');
-            
+
             var form = deleteRoleModal.querySelector('#deleteRoleForm');
-            form.action = '{{ url("user-management/roles") }}/' + roleId; // Ganti action form
+            form.action = '{{ url('user-management/roles') }}/' + roleId; // Ganti action form
         });
     </script>
-    
-       
 @endsection
