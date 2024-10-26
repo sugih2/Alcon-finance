@@ -27,6 +27,7 @@ use App\Http\Controllers\ChangePassword;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;           
 use App\Http\Controllers\UserManagementController;
+use App\Http\Controllers\ParamPositionController;
 
 Route::group(['prefix' => 'user-management', 'middleware' => 'auth'], function () {
     Route::get('/', [UserManagementController::class, 'index'])->middleware('auth')->name('user-management.index');
@@ -58,4 +59,8 @@ Route::group(['middleware' => 'auth'], function () {
 	Route::get('/sign-up-static', [PageController::class, 'signup'])->name('sign-up-static'); 
 	Route::get('/{page}', [PageController::class, 'index'])->name('page');
 	Route::post('logout', [LoginController::class, 'logout'])->name('logout');
+
+	Route::get('/example', [ParamPositionController::class, 'index'])->name('example');
+	Route::post('/paramposition/store', [ParamPositionController::class, 'store'])->name('paramposition.store');
+
 });
