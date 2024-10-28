@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Alert;
 use App\Models\User;
 use App\Models\Role;
+use Yajra\DataTables\DataTables;
 use Illuminate\Http\Request;
 
 
@@ -15,6 +16,20 @@ class UserManagementController extends Controller
         $users = User::with('role')->get();
         $roles = Role::all();
         return view('pages.admin.user-management', compact('users', 'roles'));
+    }
+
+    public function getDataUser()
+    {
+        $users = User::with('role')->select('users.*');
+
+        return DataTables::of($users)
+            ->addColumn('name', function ($user) {
+                return $user->firstname . ' ' . $user->lastname;
+            })
+            ->addColumn('delete_url', function ($user) {
+                return route('users.destroy', $user->id);
+            })
+            ->make(true);
     }
 
     public function storeUser(Request $request)

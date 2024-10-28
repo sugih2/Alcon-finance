@@ -19,6 +19,14 @@
     <link href="assets/css/nucleo-svg.css" rel="stylesheet" />
     <!-- CSS Files -->
     <link id="pagestyle" href="assets/css/argon-dashboard.css" rel="stylesheet" />
+    {{-- <link rel="stylesheet" href="assets/datatables/jquery.dataTables.min.css">
+    <script src="assets/jquery/jquery.min.js"></script>
+    <script src="assets/datatables/jquery.dataTables.min.js"></script>
+    <script src="assets/moment/moment.min.js"></script> --}}
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+
 </head>
 
 <body class="{{ $class ?? '' }}">
@@ -64,6 +72,7 @@
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
     <script src="assets/js/argon-dashboard.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
     @stack('js');
 </body>
 

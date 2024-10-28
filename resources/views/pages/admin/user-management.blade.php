@@ -126,7 +126,87 @@
                 </div>
             </div>
         </div>
+        {{-- <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header pb-0 d-flex justify-content-between align-items-center">
+                    <h6>Users</h6>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                        Tambah
+                    </button>
+                </div>
+                <div class="card-body px-0 pt-0 pb-2">
+                    <div class="table-responsive p-0">
+                        <table id="usersTable" class="table align-items-center mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Name</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Role</th>
+                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Create Date</th>
+                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Action</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <script>
+            $(document).ready(function() {
+            $('#usersTable').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: '{{ route('users.data') }}', // Pastikan ini benar
+                columns: [
+                    {
+                        data: 'name',
+                        render: function(data, type, row) {
+                            return `
+                                <div class="d-flex px-3 py-1">
+                                    <div>
+                                        <img src="./img/team-${row.id}.jpg" class="avatar me-3" alt="image">
+                                    </div>
+                                    <div class="d-flex flex-column justify-content-center">
+                                        <h6 class="mb-0 text-sm">${row.firstname} ${row.lastname}</h6>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    },
+                    { data: 'role.name', name: 'role.name' },
+                    { 
+                        data: 'created_at', 
+                        name: 'created_at',
+                        render: function(data) {
+                            return moment(data).format('DD/MM/YYYY'); // Pastikan moment.js sudah diimpor
+                        }
+                    },
+                    {
+                        data: null,
+                        render: function(data, type, row) {
+                            return `
+                                <div class="d-flex px-3 py-1 justify-content-center align-items-center">
+                                    <button class="btn btn-link text-primary mb-0" data-bs-toggle="modal"
+                                        data-bs-target="#editUserModal"
+                                        onclick="fillEditUserModal(${JSON.stringify(row)})">Edit</button>
+                                    <button class="btn btn-link text-danger mb-0" data-bs-toggle="modal"
+                                        data-bs-target="#deleteUserModal"
+                                        onclick="setDeleteFormAction('${row.delete_url}')">
+                                        Delete
+                                    </button>
+                                </div>
+                            `;
+                        }
+                    }
+                ],
+                language: {
+                    processing: '<div class="spinner-border" role="status"><span class="sr-only">Loading...</span></div>'
+                }
+            });
+        });
+        </script> --}}
     </div>
+    
     <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">

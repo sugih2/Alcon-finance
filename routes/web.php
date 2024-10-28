@@ -29,8 +29,11 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\ParamPositionController;
 
+Route::get('/data', [ExampleController::class, 'getData'])->middleware('auth')->name('data.index');
+
 Route::group(['prefix' => 'user-management', 'middleware' => 'auth'], function () {
     Route::get('/', [UserManagementController::class, 'index'])->middleware('auth')->name('user-management.index');
+    Route::get('/users', [UserManagementController::class, 'getDataUser'])->name('users.data');
     Route::post('/users', [UserManagementController::class, 'storeUser'])->name('users.store');
     Route::put('/users/{user}', [UserManagementController::class, 'updateUser'])->name('users.update');
     Route::delete('/users/{user}', [UserManagementController::class, 'destroyUser'])->name('users.destroy');
