@@ -17,7 +17,7 @@
                         <table class="table align-items-center mb-0">
                             <thead>
                                 <tr>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">No
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">No
                                     </th>
                                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                         Role Name</th>
@@ -46,6 +46,63 @@
                                                 <button type="button" class="btn btn-link text-danger mb-0"
                                                     data-bs-toggle="modal" data-bs-target="#deleteRoleModal"
                                                     data-id="{{ $role->id }}">
+                                                    Delete
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="card mb-4">
+                <div class="card-header pb-0 d-flex justify-content-between align-items-center">
+                    <h6>Menu</h6>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMenuModal">
+                        Tambah
+                    </button>
+                </div>
+                <div class="card-body px-0 pt-0 pb-2">
+                    <div class="table-responsive p-0">
+                        <table class="table align-items-center mb-0" id="menuTable">
+                            <thead>
+                                <tr>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">No
+                                    </th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                        Nama Menu</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                        Url</th>
+                                    <th
+                                        class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                        Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @php $index = 1; @endphp
+                                @foreach ($menus as $menu)
+                                    <tr>
+                                        <td class="align-middle text-center">
+                                            <p class="text-sm font-weight-bold mb-0">{{ $index++ }}</p>
+                                        </td>
+                                        <td>
+                                            <p class="text-sm font-weight-bold mb-0">{{ $menu->name }}</p>
+                                        </td>
+                                        <td>
+                                            <p class="text-sm font-weight-bold mb-0">{{ $menu->url }}</p>
+                                        </td>
+                                        <td class="align-middle text-end">
+                                            <div class="d-flex px-3 py-1 justify-content-center align-items-center">
+                                                <button type="button" class="btn btn-link text-primary mb-0"
+                                                    data-bs-toggle="modal" data-bs-target="#editMenuModal"
+                                                    data-name="{{ $menu->name }}" data-id="{{ $menu->id }}">
+                                                    Edit
+                                                </button>
+                                                <button type="button" class="btn btn-link text-danger mb-0"
+                                                    data-bs-toggle="modal" data-bs-target="#deleteMenuModal"
+                                                    data-id="{{ $menu->id }}">
                                                     Delete
                                                 </button>
                                             </div>
@@ -387,6 +444,305 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="addMenuModal" tabindex="-1" aria-labelledby="addMenuModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addMenuModalLabel">Tambah Menu</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="menuForm">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Nama Menu</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="url" class="form-label">URL</label>
+                            <input type="text" class="form-control" id="url" name="url" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="parent_id" class="form-label">Parent ID</label>
+                            <input type="text" class="form-control" id="parent_id" name="parent_id">
+                        </div>
+                        <div class="mb-3">
+                            <label for="urutan" class="form-label">Urutan</label>
+                            <input type="number" class="form-control" id="urutan" name="urutan" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="icon" class="form-label">Ikon</label>
+                            <input type="text" class="form-control" id="icon" name="icon">
+                        </div>
+                        <div class="mb-3">
+                            <label for="status" class="form-label">Status</label>
+                            <select class="form-select" id="status" name="status" required>
+                                <option value="1">Aktif</option>
+                                <option value="0">Tidak Aktif</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Simpan</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="editMenuModal" tabindex="-1" aria-labelledby="editMenuModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editMenuModalLabel">Edit Menu</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editMenuForm">
+                        <input type="hidden" id="editMenuId" name="id">
+                        <div class="mb-3">
+                            <label for="editName" class="form-label">Nama Menu</label>
+                            <input type="text" class="form-control" id="editName" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editUrl" class="form-label">URL</label>
+                            <input type="text" class="form-control" id="editUrl" name="url" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editParentId" class="form-label">Parent ID</label>
+                            <input type="text" class="form-control" id="editParentId" name="parent_id">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editUrutan" class="form-label">Urutan</label>
+                            <input type="number" class="form-control" id="editUrutan" name="urutan" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editIcon" class="form-label">Ikon</label>
+                            <input type="text" class="form-control" id="editIcon" name="icon">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editStatus" class="form-label">Status</label>
+                            <select class="form-select" id="editStatus" name="status" required>
+                                <option value="1">Aktif</option>
+                                <option value="0">Tidak Aktif</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Perbarui</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="deleteMenuModal" tabindex="-1" aria-labelledby="deleteMenuModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteMenuModalLabel">Konfirmasi Hapus Menu</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Apakah Anda yakin ingin menghapus menu ini?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" id="confirmDeleteButton" class="btn btn-danger">Hapus</button>
+                </div>
+            </div>
+        </div>
+    </div>        
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('menuForm');
+            const editForm = document.getElementById('editMenuForm');
+            const tableBody = document.querySelector('#menuTable tbody');
+            const deleteButton = document.getElementById('confirmDeleteButton');
+            let deleteMenuId;
+    
+            // Event listener untuk submit form menambah menu
+            form.addEventListener('submit', function(event) {
+                event.preventDefault(); // Mencegah reload halaman
+    
+                const formData = new FormData(form); // Mengambil data dari formulir
+    
+                fetch('/user-management/menus', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}' // Sertakan token CSRF
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Tambahkan baris baru ke tabel
+                    const row = `
+                        <tr>
+                            <td class="align-middle text-center">
+                                <p class="text-sm font-weight-bold mb-0">${tableBody.children.length + 1}</p>
+                            </td>
+                            <td>
+                                <p class="text-sm font-weight-bold mb-0">${data.name}</p>
+                            </td>
+                            <td>
+                                <p class="text-sm font-weight-bold mb-0">${data.url}</p>
+                            </td>
+                            <td class="align-middle text-end">
+                                <div class="d-flex px-3 py-1 justify-content-center align-items-center">
+                                    <button type="button" class="btn btn-link text-primary mb-0"
+                                        data-bs-toggle="modal" data-bs-target="#editMenuModal"
+                                        data-name="${data.name}" data-id="${data.id}">
+                                        Edit
+                                    </button>
+                                    <button type="button" class="btn btn-link text-danger mb-0"
+                                        data-bs-toggle="modal" data-bs-target="#deleteMenuModal"
+                                        data-id="${data.id}">
+                                        Delete
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                    tableBody.insertAdjacentHTML('beforeend', row);
+                    // Tutup modal dan reset form
+                    $('#addMenuModal').modal('hide');
+                    form.reset();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            });
+    
+            // Fetch dan render data menu
+            fetchMenuData();
+    
+            function fetchMenuData() {
+                fetch('/user-management/menus')
+                    .then(response => response.json())
+                    .then(data => {
+                        window.menuData = data;
+                        renderMenuTable();
+                    })
+                    .catch(error => {
+                        console.error('Error fetching menu data:', error);
+                    });
+            }
+    
+            function renderMenuTable() {
+                tableBody.innerHTML = ''; // Clear the table body
+    
+                window.menuData.forEach((menu, index) => {
+                    const row = `
+                        <tr>
+                            <td class="align-middle text-center">
+                                <p class="text-sm font-weight-bold mb-0">${index + 1}</p>
+                            </td>
+                            <td>
+                                <p class="text-sm font-weight-bold mb-0">${menu.name}</p>
+                            </td>
+                            <td>
+                                <p class="text-sm font-weight-bold mb-0">${menu.url}</p>
+                            </td>
+                            <td class="align-middle text-end">
+                                <div class="d-flex px-3 py-1 justify-content-center align-items-center">
+                                    <button type="button" class="btn btn-link text-primary mb-0"
+                                        data-bs-toggle="modal" data-bs-target="#editMenuModal"
+                                        data-id="${menu.id}">
+                                        Edit
+                                    </button>
+                                    <button type="button" class="btn btn-link text-danger mb-0"
+                                        data-bs-toggle="modal" data-bs-target="#deleteMenuModal"
+                                        data-id="${menu.id}">
+                                        Delete
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                    tableBody.insertAdjacentHTML('beforeend', row);
+                });
+    
+                // Set event listeners untuk tombol edit dan delete setelah tabel dirender
+                setEditButtonListeners();
+                setDeleteButtonListeners();
+            }
+    
+            function setEditButtonListeners() {
+                document.querySelectorAll('.btn-link.text-primary').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const menuId = this.getAttribute('data-id');
+                        fetch(`/user-management/menus/${menuId}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                document.getElementById('editMenuId').value = data.id;
+                                document.getElementById('editName').value = data.name;
+                                document.getElementById('editUrl').value = data.url;
+                                document.getElementById('editParentId').value = data.parent_id || '';
+                                document.getElementById('editUrutan').value = data.urutan || '';
+                                document.getElementById('editIcon').value = data.icon || '';
+                                document.getElementById('editStatus').value = data.status ? 1 : 0;
+                                $('#editMenuModal').modal('show');
+                            });
+                    });
+                });
+            }
+    
+            // Event listener untuk submit form edit
+            editForm.addEventListener('submit', function(event) {
+                event.preventDefault(); // Mencegah reload halaman
+    
+                const formData = new FormData(editForm);
+                const menuId = document.getElementById('editMenuId').value;
+    
+                fetch(`/user-management/menus/${menuId}`, {
+                    method: 'PUT',
+                    body: formData,
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}', // Sertakan token CSRF
+                        'Accept': 'application/json',
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => {
+                            throw new Error(JSON.stringify(err));
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Update tabel dengan data baru
+                    fetchMenuData();
+                    $('#editMenuModal').modal('hide');
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            });
+    
+            function setDeleteButtonListeners() {
+                document.querySelectorAll('.btn-link.text-danger').forEach(button => {
+                    button.addEventListener('click', function() {
+                        deleteMenuId = this.getAttribute('data-id');
+                        $('#deleteMenuModal').modal('show');
+                    });
+                });
+            }
+    
+            // Event listener untuk konfirmasi hapus
+            deleteButton.addEventListener('click', function() {
+                fetch(`/user-management/menus/${deleteMenuId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}' // Sertakan token CSRF
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Update tabel setelah penghapusan
+                    fetchMenuData();
+                    $('#deleteMenuModal').modal('hide');
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            });
+        });
+    </script>             
     <script>
         function fillEditUserModal(user) {
             document.getElementById('editUserForm').action =

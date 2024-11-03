@@ -21,6 +21,11 @@ class PageController extends Controller
         return abort(404);
     }
 
+    public function example()
+    {
+        return view("pages.example");
+    }
+
     public function vr()
     {
         return view("pages.virtual-reality");

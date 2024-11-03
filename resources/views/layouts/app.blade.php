@@ -49,6 +49,7 @@
             @include('layouts.navbars.auth.sidenav')
                 <main class="main-content border-radius-lg">
                     @yield('content')
+                    @include('layouts.footers.auth.footer')
                 </main>
             @include('components.fixed-plugin')
         @endif

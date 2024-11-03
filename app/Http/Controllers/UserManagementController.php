@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Alert;
 use App\Models\User;
 use App\Models\Role;
+use App\Models\Menu;
 use Yajra\DataTables\DataTables;
 use Illuminate\Http\Request;
 
@@ -15,7 +16,8 @@ class UserManagementController extends Controller
     {
         $users = User::with('role')->get();
         $roles = Role::all();
-        return view('pages.admin.user-management', compact('users', 'roles'));
+        $menus = Menu::all();
+        return view('pages.admin.user-management', compact('users', 'roles', 'menus'));
     }
 
     public function getDataUser()
@@ -127,5 +129,62 @@ class UserManagementController extends Controller
         $role->delete();
         Alert::success('Success', 'Role berhasil dihapus!');
         return redirect()->back();
+    }
+
+    public function getDataMenu()
+    {
+        $menus = Menu::all();
+
+        return response()->json($menus);
+    }
+
+    public function showDataMenu($id)
+    {
+        $menu = Menu::find($id);
+
+        if (!$menu) {
+            return response()->json(['message' => 'Menu not found'], 404);
+        }
+
+        return response()->json($menu);
+    }
+
+    public function storeDataMenu(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'url' => 'required|string|max:255',
+            'parent_id' => 'nullable|exists:menus,id',
+            'urutan' => 'nullable|integer',
+            'icon' => 'nullable|string|max:255',
+            'status' => 'required|boolean',
+        ]);
+
+        $menu = Menu::create($request->all());
+
+        return response()->json($menu);
+    }
+    public function updateMenu(Request $request, $id)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'url' => 'required|string|max:255',
+            'parent_id' => 'nullable|exists:menus,id',
+            'urutan' => 'nullable|integer',
+            'icon' => 'nullable|string|max:255',
+            'status' => 'required|boolean',
+        ]);
+
+        $menu = Menu::findOrFail($id); // Temukan menu berdasarkan ID
+        $menu->update($request->all()); // Perbarui data menu
+
+        return response()->json($menu);
+    }
+    public function destroyMenu($id)
+    {
+        $menu = Menu::findOrFail($id); // Temukan menu berdasarkan ID
+        $menu->delete(); // Hapus menu
+
+        return response()->json(['message' => 'Menu deleted successfully.']);
     }
 }
