@@ -746,7 +746,7 @@
     <script>
         function fillEditUserModal(user) {
             document.getElementById('editUserForm').action =
-            `/user-management/users/${user.id}`; // Ubah URL sesuai rute Anda
+                `/user-management/users/${user.id}`; // Ubah URL sesuai rute Anda
             document.getElementById('edit_username').value = user.username;
             document.getElementById('edit_firstname').value = user.firstname;
             document.getElementById('edit_lastname').value = user.lastname;

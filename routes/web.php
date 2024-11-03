@@ -28,6 +28,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;           
 use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\ParamPositionController;
+use App\Http\Controllers\PositionController;
 
 Route::get('/data', [ExampleController::class, 'getData'])->middleware('auth')->name('data.index');
 
@@ -39,6 +40,7 @@ Route::group(['prefix' => 'user-management', 'middleware' => 'auth'], function (
     Route::delete('/users/{user}', [UserManagementController::class, 'destroyUser'])->name('users.destroy');
 	Route::post('/roles', [UserManagementController::class, 'storeRole'])->name('roles.store');
 	Route::put('/roles/{role}', [UserManagementController::class, 'updateRole'])->name('roles.update');
+	Route::delete('/roles/{role}', [UserManagementController::class, 'destroyRole'])->name('roles.destroy');	
 	Route::delete('/roles/{role}', [UserManagementController::class, 'destroyRole'])->name('roles.destroy');
 	Route::get('/menus', [UserManagementController::class, 'getDataMenu'])->name('menus.data');
 	Route::post('/menus', [UserManagementController::class, 'storeDataMenu'])->name('menus.store');
@@ -46,6 +48,22 @@ Route::group(['prefix' => 'user-management', 'middleware' => 'auth'], function (
 	Route::put('/menus/{menu}', [UserManagementController::class, 'updateMenu'])->middleware('auth')->name('menus.update');
 	Route::delete('/menus/{menu}', [UserManagementController::class, 'destroyMenu'])->name('menus.destroy');
 });
+Route::group(['prefix' => 'paramposition', 'middleware' => 'auth'], function () {
+	Route::get('/', [ParamPositionController::class, 'index'])->middleware('auth')->name('paramposition.index');
+	Route::post('/store', [ParamPositionController::class, 'store'])->name('paramposition.store');
+	Route::get('/position/create', [PositionController::class, 'create'])->name('position.create');
+});
+
+Route::group(['prefix' => 'position', 'middleware' => 'auth'], function () {
+	Route::get('/', [PositionController::class, 'index'])->middleware('auth')->name('position.index');
+	Route::post('/store', [PositionController::class, 'store'])->name('position.store');
+	Route::get('/create', [PositionController::class, 'create'])->name('position.create');
+});
+
+
+
+
+
 
 Route::get('/', function () {return redirect('/dashboard');})->middleware('auth');
 	Route::get('/register', [RegisterController::class, 'create'])->middleware('guest')->name('register');
@@ -68,8 +86,5 @@ Route::group(['middleware' => 'auth'], function () {
 	Route::get('/sign-up-static', [PageController::class, 'signup'])->name('sign-up-static'); 
 	Route::get('/{page}', [PageController::class, 'index'])->name('page');
 	Route::post('logout', [LoginController::class, 'logout'])->name('logout');
-
-	Route::get('/example', [ParamPositionController::class, 'index'])->name('example');
-	Route::post('/paramposition/store', [ParamPositionController::class, 'store'])->name('paramposition.store');
 
 });
