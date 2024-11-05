@@ -29,6 +29,9 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\ParamPositionController;
 use App\Http\Controllers\PositionController;
+use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\RegencyController;
+use App\Http\Controllers\EmployeeController;
 
 Route::get('/data', [ExampleController::class, 'getData'])->middleware('auth')->name('data.index');
 
@@ -58,7 +61,24 @@ Route::group(['prefix' => 'position', 'middleware' => 'auth'], function () {
 	Route::get('/', [PositionController::class, 'index'])->middleware('auth')->name('position.index');
 	Route::post('/store', [PositionController::class, 'store'])->name('position.store');
 	Route::get('/create', [PositionController::class, 'create'])->name('position.create');
+	Route::get('/list', [PositionController::class, 'list'])->name('position.list');
 });
+
+Route::group(['prefix' => 'project', 'middleware' => 'auth'], function () {
+	Route::get('/', [ProjectController::class, 'index'])->middleware('auth')->name('project.index');
+	Route::post('/store', [ProjectController::class, 'store'])->name('project.store');
+	Route::get('/create', [ProjectController::class, 'create'])->name('project.create');
+});
+Route::group(['prefix' => 'employee', 'middleware' => 'auth'], function () {
+	Route::get('/', [EmployeeController::class, 'index'])->middleware('auth')->name('employee.index');
+	Route::post('/store', [EmployeeController::class, 'store'])->name('employee.store');
+	Route::get('/create', [EmployeeController::class, 'create'])->name('employee.create');
+});
+Route::group(['prefix' => 'regency', 'middleware' => 'auth'], function () {
+	Route::get('/', [RegencyController::class, 'regency'])->name('regency.list');
+});
+
+
 
 
 

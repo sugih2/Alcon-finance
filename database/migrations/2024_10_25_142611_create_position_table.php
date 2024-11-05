@@ -15,13 +15,18 @@ return new class extends Migration
         Schema::create('positions', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->integer('code')->unique();         
+            $table->string('code')->unique();         
 	        $table->unsignedBigInteger('fk_parposition')->nullable();
             $table->foreign('fk_parposition')
             ->references('id')
             ->on('param_positions')
             ->onUpdate('cascade')
             ->onDelete('restrict');
+            $table->unsignedBigInteger('parent_id')->nullable()->after('fk_parposition');
+            $table->foreign('parent_id')
+            ->references('id')
+            ->on('positions')
+            ->onDelete('cascade');
             $table->timestamps();
         });
       

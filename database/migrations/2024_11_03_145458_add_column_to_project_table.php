@@ -11,17 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('projects', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('code')->unique();
-            $table->unsignedBigInteger('regency_id');
-            $table->foreign('regency_id')
-              ->references('id')
-              ->on('regencies')
-              ->onUpdate('cascade')
-              ->onDelete('restrict');
-            $table->timestamps();
+        Schema::table('projects', function (Blueprint $table) {
+            $table->string('jenis')->nullable()->after('name');
+            $table->string('description')->nullable()->after('jenis');
         });
     }
 

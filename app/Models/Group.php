@@ -5,18 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Position extends Model
+class Group extends Model
 {
     use HasFactory;
     protected $fillable = [
         'name',
         'code',
-        'fk_parposition',
-        'parent_id',
+        'project_id',
+        'leader_id',
     ];
-
-    public function paramposition()
-    {
-        return $this->belongsTo(ParamPosition::class, 'fk_parposition');
-    }
 }

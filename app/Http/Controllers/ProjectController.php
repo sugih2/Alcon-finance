@@ -3,23 +3,22 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Position;
-use App\Models\ParamPosition;
+use App\Models\Project;
+use App\Models\Regency;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
-class PositionController extends Controller
+class ProjectController extends Controller
 {
     public function index()
     {
-        $positions = Position::with('paramposition')->get();
-        $paramPositions = ParamPosition::all();
-        return view('pages.position.position', compact('positions', 'paramPositions'));
+        $projects = Project::with('regency')->get();
+        return view('pages.project.project', compact('projects'));
     }
 
     public function create()
     {
-        return view('pages.position.create');
+        return view('pages.project.create');
     }
 
     public function store(Request $request)
@@ -29,9 +28,9 @@ class PositionController extends Controller
 
         // Validasi input dengan Validator
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255|unique:positions,name',
-            'code' => 'required|max:20|unique:positions,code',
-            'param_position_id' => 'required|integer'
+            'name' => 'required|string|max:255|unique:projects,name',
+            'code' => 'required|max:20|unique:projects,code',
+            'regency' => 'required|integer'
         ]);
 
         // Jika validasi gagal, kirim response error
@@ -45,20 +44,22 @@ class PositionController extends Controller
 
         try {
             // Buat dan simpan data ke model
-            $Position = Position::create([
+            $projects = Project::create([
                 'name' => $request->name,
                 'code' => $request->code,
-                'fk_parposition' => $request->param_position_id,
+                'jenis' => $request->jenis,
+                'description' => $request->description,
+                'regency_id' => $request->regency,
             ]);
 
             // Log data yang berhasil disimpan
-            Log::info("Berhasil Menyimpan: " . json_encode($Position));
+            Log::info("Berhasil Menyimpan: " . json_encode($projects));
 
             // Kirim response sukses
             return response()->json([
                 'success' => true,
                 'message' => 'Data berhasil disimpan',
-                'data'    => $Position
+                'data'    => $projects
             ], 201);
 
         } catch (\Exception $e) {
@@ -68,14 +69,8 @@ class PositionController extends Controller
             // Kirim response gagal
             return response()->json([
                 'success' => false,
-                'message' => 'Gagal menyimpan data'
+                'message' => $e->getMessage()
             ], 500);
         }
-    }
-
-    public function list()
-    {
-        $positions = Position::all();
-        return response()->json($positions);
     }
 }

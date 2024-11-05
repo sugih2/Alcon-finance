@@ -5,18 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Position extends Model
+class Employee extends Model
 {
     use HasFactory;
     protected $fillable = [
+        'nip',
         'name',
-        'code',
-        'fk_parposition',
-        'parent_id',
+        'position_id',
     ];
 
-    public function paramposition()
+    public function position()
     {
-        return $this->belongsTo(ParamPosition::class, 'fk_parposition');
+        return $this->belongsTo(Position::class);
     }
 }
