@@ -141,6 +141,8 @@
                     icon: 'success',
                     title: 'Berhasil',
                     text: 'Data berhasil disimpan'
+                }).then(() => {
+                    location.reload();
                 });
 
                 form.reset();

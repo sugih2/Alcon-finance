@@ -32,6 +32,7 @@ use App\Http\Controllers\PositionController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\RegencyController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\GroupController;
 
 Route::get('/data', [ExampleController::class, 'getData'])->middleware('auth')->name('data.index');
 
@@ -68,6 +69,11 @@ Route::group(['prefix' => 'project', 'middleware' => 'auth'], function () {
 	Route::get('/', [ProjectController::class, 'index'])->middleware('auth')->name('project.index');
 	Route::post('/store', [ProjectController::class, 'store'])->name('project.store');
 	Route::get('/create', [ProjectController::class, 'create'])->name('project.create');
+});
+Route::group(['prefix' => 'group', 'middleware' => 'auth'], function () {
+	Route::get('/', [GroupController::class, 'index'])->middleware('auth')->name('group.index');
+	Route::post('/store', [GroupController::class, 'store'])->name('group.store');
+	Route::get('/create', [GroupController::class, 'create'])->name('group.create');
 });
 Route::group(['prefix' => 'employee', 'middleware' => 'auth'], function () {
 	Route::get('/', [EmployeeController::class, 'index'])->middleware('auth')->name('employee.index');

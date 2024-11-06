@@ -14,4 +14,14 @@ class Group extends Model
         'project_id',
         'leader_id',
     ];
+
+    public function project()
+    {
+        return $this->belongsTo(Project::class);
+    }
+
+    public function leader()
+    {
+        return $this->belongsTo(Employee::class, 'leader_id');
+    }
 }

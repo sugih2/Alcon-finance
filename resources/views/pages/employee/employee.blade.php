@@ -94,7 +94,8 @@
                                 <option value="" selected>Select Position</option>
                             </select>
                         </div>
-                        <button type="button" onclick="StoreEmployee()" class="btn btn-primary">Simpan</button>
+                        <button type="button" id="btn-submit" onclick="StoreEmployee()"
+                            class="btn btn-primary">Simpan</button>
                     </form>
                 </div>
 
@@ -137,6 +138,18 @@
 
             const form = document.getElementById('FromEmployee');
             const formData = new FormData(form);
+            const submitButton = document.getElementById('btn-submit'); // Get the button element
+
+            // Disable the button to prevent double-clicks
+            submitButton.disabled = true;
+            Swal.fire({
+                title: 'Menyimpan data...',
+                html: 'Progress: <b>0%</b>',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
 
             console.log('Isi FormData:');
             for (let [key, value] of formData.entries()) {
@@ -145,6 +158,14 @@
 
             try {
                 const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                let progress = 0;
+                const progressInterval = setInterval(() => {
+                    progress += 10;
+                    Swal.update({
+                        html: `Progress: <b>${progress}%</b>`
+                    });
+                    if (progress >= 90) clearInterval(progressInterval); // Stop updating near completion
+                }, 200); // Update every 200ms
                 const response = await fetch('/employee/store', {
                     method: 'POST',
                     headers: {
@@ -152,6 +173,7 @@
                     },
                     body: formData
                 });
+                clearInterval(progressInterval);
 
                 if (!response.ok) {
                     const errorData = await response.json();
@@ -165,6 +187,8 @@
                     icon: 'success',
                     title: 'Berhasil',
                     text: 'Data berhasil disimpan'
+                }).then(() => {
+                    location.reload();
                 });
 
                 form.reset();
@@ -177,6 +201,8 @@
                     title: 'Gagal',
                     text: error.message || 'Data gagal disimpan'
                 });
+            } finally {
+                submitButton.disabled = false;
             }
         }
     </script>
