@@ -28,8 +28,9 @@ class GroupController extends Controller
         // Validasi input dengan Validator
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:25',
-            'nip' => 'required|max:10|unique:employees,nip',
-            'position' => 'required|integer'
+            'code' => 'required|max:10|unique:groups,code',
+            'project' => 'required|integer',
+            'leader' => 'required|integer'
         ]);
 
         // Jika validasi gagal, kirim response error
@@ -43,20 +44,21 @@ class GroupController extends Controller
 
         try {
             // Buat dan simpan data ke model
-            $employees = Employee::create([
+            $groups = Group::create([
                 'name' => $request->name,
-                'nip' => $request->nip,
-                'position_id' => $request->position,
+                'code' => $request->code,
+                'project_id' => $request->project,
+                'leader_id' => $request->leader,
             ]);
 
             // Log data yang berhasil disimpan
-            Log::info("Berhasil Menyimpan: " . json_encode($employees));
+            Log::info("Berhasil Menyimpan: " . json_encode($groups));
 
             // Kirim response sukses
             return response()->json([
                 'success' => true,
                 'message' => 'Data berhasil disimpan',
-                'data'    => $employees
+                'data'    => $groups
             ], 201);
 
         } catch (\Exception $e) {

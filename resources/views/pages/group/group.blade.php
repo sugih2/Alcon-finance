@@ -89,8 +89,8 @@
                                 required>
                         </div>
                         <div class="mb-3">
-                            <label for="nip" class="form-label">Code</label>
-                            <input type="text" class="form-control" id="nip" name="nip" placeholder="nip"
+                            <label for="code" class="form-label">Code</label>
+                            <input type="text" class="form-control" id="code" name="code" placeholder="code"
                                 required>
                         </div>
                         <div class="mb-3">
@@ -117,14 +117,15 @@
     <script>
         $(document).ready(function() {
             $('#project').selectize({
-                placeholder: 'Select Position',
+                placeholder: 'Select Project',
                 valueField: 'id',
                 labelField: 'name',
                 searchField: 'name',
+                preload: true,
                 load: function(query, callback) {
-                    if (!query.length) return callback();
+
                     $.ajax({
-                        url: '/position/list',
+                        url: '/project/list',
                         type: 'GET',
                         dataType: 'json',
                         data: {
@@ -142,25 +143,23 @@
                 }
             });
             $('#leader').selectize({
-                placeholder: 'Select Position',
+                placeholder: 'Select Leader',
                 valueField: 'id',
                 labelField: 'name',
                 searchField: 'name',
+                preload: true,
                 load: function(query, callback) {
-                    if (!query.length) return callback();
                     $.ajax({
-                        url: '/position/list',
+                        url: '/employee/list',
                         type: 'GET',
                         dataType: 'json',
                         data: {
                             q: query
                         },
                         success: function(data) {
-
                             callback(data);
                         },
                         error: function() {
-
                             callback();
                         }
                     });
@@ -202,7 +201,7 @@
                     });
                     if (progress >= 90) clearInterval(progressInterval); // Stop updating near completion
                 }, 200); // Update every 200ms
-                const response = await fetch('/employee/store', {
+                const response = await fetch('/group/store', {
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': csrfToken

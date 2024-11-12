@@ -73,4 +73,10 @@ class ProjectController extends Controller
             ], 500);
         }
     }
+
+    public function list()
+    {
+        $projects = Project::select('id', 'name')->get();
+        return response()->json($projects);
+    }
 }

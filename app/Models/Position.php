@@ -19,4 +19,9 @@ class Position extends Model
     {
         return $this->belongsTo(ParamPosition::class, 'fk_parposition');
     }
+
+    public function parent()
+    {
+        return $this->belongsTo(Position::class, 'parent_id');
+    }
 }

@@ -54,14 +54,19 @@ Route::group(['prefix' => 'user-management', 'middleware' => 'auth'], function (
 });
 Route::group(['prefix' => 'paramposition', 'middleware' => 'auth'], function () {
 	Route::get('/', [ParamPositionController::class, 'index'])->middleware('auth')->name('paramposition.index');
+	Route::get('/create', [ParamPositionController::class, 'create'])->name('paramposition.create');
 	Route::post('/store', [ParamPositionController::class, 'store'])->name('paramposition.store');
-	Route::get('/position/create', [PositionController::class, 'create'])->name('position.create');
+	Route::get('/edit/{id}', [ParamPositionController::class, 'edit'])->name('paramposition.edit');
+	Route::post('/storeedit/{id}', [ParamPositionController::class, 'storeEdit'])->name('paramposition.storeedit');
+	Route::get('/list', [ParamPositionController::class, 'list'])->name('paramposition.list');
 });
 
 Route::group(['prefix' => 'position', 'middleware' => 'auth'], function () {
 	Route::get('/', [PositionController::class, 'index'])->middleware('auth')->name('position.index');
 	Route::post('/store', [PositionController::class, 'store'])->name('position.store');
 	Route::get('/create', [PositionController::class, 'create'])->name('position.create');
+	Route::get('/edit/{id}', [PositionController::class, 'edit'])->name('position.edit');
+	Route::post('/storeedit/{id}', [PositionController::class, 'storeEdit'])->name('position.storeedit');
 	Route::get('/list', [PositionController::class, 'list'])->name('position.list');
 });
 
@@ -69,6 +74,7 @@ Route::group(['prefix' => 'project', 'middleware' => 'auth'], function () {
 	Route::get('/', [ProjectController::class, 'index'])->middleware('auth')->name('project.index');
 	Route::post('/store', [ProjectController::class, 'store'])->name('project.store');
 	Route::get('/create', [ProjectController::class, 'create'])->name('project.create');
+	Route::get('/list', [ProjectController::class, 'list'])->name('project.list');
 });
 Route::group(['prefix' => 'group', 'middleware' => 'auth'], function () {
 	Route::get('/', [GroupController::class, 'index'])->middleware('auth')->name('group.index');
@@ -79,6 +85,7 @@ Route::group(['prefix' => 'employee', 'middleware' => 'auth'], function () {
 	Route::get('/', [EmployeeController::class, 'index'])->middleware('auth')->name('employee.index');
 	Route::post('/store', [EmployeeController::class, 'store'])->name('employee.store');
 	Route::get('/create', [EmployeeController::class, 'create'])->name('employee.create');
+	Route::get('/list', [EmployeeController::class, 'list'])->name('employee.list');
 });
 Route::group(['prefix' => 'regency', 'middleware' => 'auth'], function () {
 	Route::get('/', [RegencyController::class, 'regency'])->name('regency.list');

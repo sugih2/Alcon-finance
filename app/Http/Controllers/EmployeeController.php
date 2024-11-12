@@ -70,4 +70,10 @@ class EmployeeController extends Controller
             ], 500);
         }
     }
+
+    public function list()
+    {
+        $employees = Employee::select('id', 'name', 'nip')->get();
+        return response()->json($employees);
+    }
 }

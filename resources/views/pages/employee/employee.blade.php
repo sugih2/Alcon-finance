@@ -1,7 +1,7 @@
 @extends('../layouts.app')
 
 @section('content')
-    @include('../layouts.navbars.auth.topnav', ['title' => 'Project'])
+    @include('../layouts.navbars.auth.topnav', ['title' => 'Employee'])
     @include('sweetalert::alert')
     <div class="row mt-4 mx-4">
         <div class="col-md-12">
@@ -47,7 +47,7 @@
                                         <td class="align-middle text-end">
                                             <div class="d-flex px-3 py-1 justify-content-center align-items-center">
                                                 <button type="button" class="btn btn-link text-primary mb-0"
-                                                    data-bs-toggle="modal" data-bs-target="#editRoleModal"
+                                                    data-bs-toggle="modal" data-bs-target="#editEmployeeModal"
                                                     data-name="{{ $e->name }}" data-id="{{ $e->id }}">
                                                     Edit
                                                 </button>
@@ -67,6 +67,45 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal Edit -->
+    <div class="modal fade" id="addEmployeeModal" tabindex="-1" aria-labelledby="addEmployeeModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addEmployeeModalLabel">Tambah Employee</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+
+                    <form id="FromEmployee">
+                        @csrf
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Name Employee</label>
+                            <input type="text" class="form-control" id="name" name="name" placeholder="name"
+                                required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="nip" class="form-label">NIP</label>
+                            <input type="text" class="form-control" id="nip" name="nip" placeholder="nip"
+                                required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="position" class="form-label">Position</label>
+                            <select name="position" id="position" required>
+                                <option value="" selected>Select Position</option>
+                            </select>
+                        </div>
+                        <button type="button" id="btn-submit" onclick="StoreEmployee()"
+                            class="btn btn-primary">Simpan</button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Create -->
     <div class="modal fade" id="addEmployeeModal" tabindex="-1" aria-labelledby="addEmployeeModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -110,8 +149,8 @@
                 valueField: 'id',
                 labelField: 'name',
                 searchField: 'name',
+                preload: true,
                 load: function(query, callback) {
-                    if (!query.length) return callback();
                     $.ajax({
                         url: '/position/list',
                         type: 'GET',
@@ -138,7 +177,7 @@
 
             const form = document.getElementById('FromEmployee');
             const formData = new FormData(form);
-            const submitButton = document.getElementById('btn-submit'); // Get the button element
+            const submitButton = document.getElementById('btn-submit');
 
             // Disable the button to prevent double-clicks
             submitButton.disabled = true;

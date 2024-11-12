@@ -8,8 +8,7 @@
             <div class="card mb-4">
                 <div class="card-header pb-0 d-flex justify-content-between align-items-center">
                     <h6></h6>
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                        data-bs-target="#addParamPositionModal">
+                    <button type="button" class="btn btn-primary" onclick="createParamPosition()">
                         Tambah Param Position
                     </button>
                 </div>
@@ -40,8 +39,7 @@
                                         <td class="align-middle text-end">
                                             <div class="d-flex px-3 py-1 justify-content-center align-items-center">
                                                 <button type="button" class="btn btn-link text-primary mb-0"
-                                                    data-bs-toggle="modal" data-bs-target="#editRoleModal"
-                                                    data-name="{{ $pp->name }}" data-id="{{ $pp->id }}">
+                                                    onclick="editParamPosition({{ $pp->id }})">
                                                     Edit
                                                 </button>
                                                 <button type="button" class="btn btn-link text-danger mb-0"
@@ -69,33 +67,76 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-
-                    <form id="FromParamPosition">
-                        @csrf
-                        <div class="mb-3">
-                            <label for="name" class="form-label">Name Parameter Position</label>
-                            <input type="text" class="form-control" id="name" name="name" placeholder="name"
-                                required>
-                        </div>
-                        <button type="button" onclick="StoreParamPosition()" class="btn btn-primary">Simpan</button>
-                    </form>
+                    <div id="createParamPosition"></div>
                 </div>
+            </div>
+        </div>
+    </div>
 
+    <div class="modal fade" id="EditParamPositionModal" tabindex="-1" aria-labelledby="addParamPositionModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addParamPositionModalLabel">Edit Param Position</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="editParamPosition"></div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
+        function editParamPosition(id) {
+            $.ajax({
+                url: "{{ url('/paramposition/edit') }}/" + id,
+                type: 'GET',
+                dataType: 'html',
+                success: function(data) {
+                    $("#editParamPosition").html(data);
+                    $('#EditParamPositionModal').modal('show');
+                },
+                error: function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to open create position form. Please try again later.',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            });
+        }
+
+        function createParamPosition() {
+            $.ajax({
+                url: "{{ url('/paramposition/create') }}",
+                type: 'GET',
+                dataType: 'html',
+                success: function(data) {
+                    $("#createParamPosition").html(data);
+                    $('#addParamPositionModal').modal('show');
+                },
+                error: function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to open create position form. Please try again later.',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            });
+        }
+
         async function StoreParamPosition() {
             event.preventDefault();
 
             const form = document.getElementById('FromParamPosition');
             const formData = new FormData(form);
+            const submitButton = document.getElementById('btn-submit');
 
-            console.log('Isi FormData:');
-            for (let [key, value] of formData.entries()) {
-                console.log(`${key}: ${value}`);
-            }
+            submitButton.disabled = true;
 
             try {
                 const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
@@ -133,6 +174,58 @@
                     title: 'Gagal',
                     text: error.message || 'Data gagal disimpan'
                 });
+            } finally {
+                submitButton.disabled = false;
+            }
+        }
+
+        async function StoreEditParamPosition(id) {
+            event.preventDefault();
+
+            const form = document.getElementById('FormEditParamPosition');
+            const formData = new FormData(form);
+            const submitButton = document.getElementById('btn-submit');
+
+            submitButton.disabled = true;
+
+            try {
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                const response = await fetch('/paramposition/storeedit/' + id, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Gagal menyimpan data.');
+                }
+
+                const data = await response.json();
+                console.log('Sukses:', data);
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil',
+                    text: 'Data berhasil disimpan'
+                }).then(() => {
+                    location.reload();
+                });
+
+                form.reset();
+
+            } catch (error) {
+                console.error('Error:', error);
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal',
+                    text: error.message || 'Data gagal disimpan'
+                });
+            } finally {
+                submitButton.disabled = false;
             }
         }
     </script>

@@ -8,7 +8,7 @@
             <div class="card mb-4">
                 <div class="card-header pb-0 d-flex justify-content-between align-items-center">
                     <h6></h6>
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPositionModal">
+                    <button type="button" class="btn btn-primary" onclick="createPosition()">
                         Tambah Position
                     </button>
                 </div>
@@ -49,8 +49,7 @@
                                         <td class="align-middle text-end">
                                             <div class="d-flex px-3 py-1 justify-content-center align-items-center">
                                                 <button type="button" class="btn btn-link text-primary mb-0"
-                                                    data-bs-toggle="modal" data-bs-target="#editRoleModal"
-                                                    data-name="{{ $p->name }}" data-id="{{ $p->id }}">
+                                                    onclick="editPosition({{ $p->id }})">
                                                     Edit
                                                 </button>
                                                 <button type="button" class="btn btn-link text-danger mb-0"
@@ -69,6 +68,24 @@
             </div>
         </div>
     </div>
+
+    <!--Modal Edit--->
+    <div class="modal fade" id="editPositionModal" tabindex="-1" aria-labelledby="editPositionModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editPositionModalLabel">Edit Position</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="editPosition"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Modal Create--->
     <div class="modal fade" id="addPositionModal" tabindex="-1" aria-labelledby="addPositionModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -77,47 +94,124 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-
-                    <form id="FromPosition">
-                        @csrf
-                        <div class="mb-3">
-                            <label for="name" class="form-label">Name Position</label>
-                            <input type="text" class="form-control" id="name" name="name" placeholder="name"
-                                required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="code" class="form-label">Code Position</label>
-                            <input type="number" class="form-control" id="code" name="code" placeholder="code"
-                                required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="param_position_id" class="form-label">Param Position</label>
-                            <select name="param_position_id" id="param_position_id" class="form-control" required>
-                                <option value="" disabled selected>Select Param Position</option>
-                                @foreach ($paramPositions as $paramPosition)
-                                    <option value="{{ $paramPosition->id }}">{{ $paramPosition->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <button type="button" onclick="StorePosition()" class="btn btn-primary">Simpan</button>
-                    </form>
+                    <div id="createPosition"></div>
                 </div>
-
             </div>
         </div>
     </div>
 
     <script>
+        function editPosition(id) {
+            $.ajax({
+                url: "{{ url('/position/edit') }}/" + id,
+                type: 'GET',
+                dataType: 'html',
+                success: function(data) {
+                    $("#editPosition").html(data);
+                    $('#editPositionModal').modal('show');
+                    $(document).ready(function() {
+                        $('#positions').selectize({
+                            placeholder: 'Select Position',
+                            valueField: 'id',
+                            labelField: 'name',
+                            searchField: 'name',
+                            preload: true,
+
+                            load: function(query, callback) {
+                                $.ajax({
+                                    url: '/position/list',
+                                    type: 'GET',
+                                    dataType: 'json',
+                                    data: {
+                                        q: query
+                                    },
+                                    success: function(data) {
+                                        callback(data);
+                                    },
+                                    error: function() {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Error',
+                                            text: 'Failed to load position data. Please try again later.',
+                                            confirmButtonText: 'OK'
+                                        });
+                                        callback();
+                                    }
+                                });
+                            }
+                        });
+                    });
+                },
+                error: function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to open create position form. Please try again later.',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            });
+        }
+
+        function createPosition() {
+            $.ajax({
+                url: "{{ url('/position/create') }}",
+                type: 'GET',
+                dataType: 'html',
+                success: function(data) {
+                    $("#createPosition").html(data);
+                    $('#addPositionModal').modal('show');
+                    $(document).ready(function() {
+                        $('#position').selectize({
+                            placeholder: 'Select Position',
+                            valueField: 'id',
+                            labelField: 'name',
+                            searchField: 'name',
+                            preload: true,
+                            load: function(query, callback) {
+                                $.ajax({
+                                    url: '/position/list',
+                                    type: 'GET',
+                                    dataType: 'json',
+                                    data: {
+                                        q: query
+                                    },
+                                    success: function(data) {
+                                        callback(data);
+                                    },
+                                    error: function() {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Error',
+                                            text: 'Failed to load position data. Please try again later.',
+                                            confirmButtonText: 'OK'
+                                        });
+                                        callback();
+                                    }
+                                });
+                            }
+                        });
+                    });
+                },
+                error: function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to open create position form. Please try again later.',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            });
+        }
+
         async function StorePosition() {
             event.preventDefault();
 
-            const form = document.getElementById('FromPosition');
+            const form = document.getElementById('FormPosition');
             const formData = new FormData(form);
+            const submitButton = document.getElementById('btn-submit');
 
-            console.log('Isi FormData:');
-            for (let [key, value] of formData.entries()) {
-                console.log(`${key}: ${value}`);
-            }
+            submitButton.disabled = true;
 
             try {
                 const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
@@ -155,6 +249,58 @@
                     title: 'Gagal',
                     text: error.message || 'Data gagal disimpan'
                 });
+            } finally {
+                submitButton.disabled = false;
+            }
+        }
+
+        async function StoreEditPosition(id) {
+            event.preventDefault();
+
+            const form = document.getElementById('FormEditPosition');
+            const formData = new FormData(form);
+            const submitButton = document.getElementById('btn-submit');
+
+            submitButton.disabled = true;
+
+            try {
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                const response = await fetch('/position/storeedit/' + id, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Gagal menyimpan data.');
+                }
+
+                const data = await response.json();
+                console.log('Sukses:', data);
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil',
+                    text: 'Data berhasil disimpan'
+                }).then(() => {
+                    location.reload();
+                });
+
+                form.reset();
+
+            } catch (error) {
+                console.error('Error:', error);
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal',
+                    text: error.message || 'Data gagal disimpan'
+                });
+            } finally {
+                submitButton.disabled = false;
             }
         }
     </script>
