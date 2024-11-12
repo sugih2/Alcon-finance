@@ -76,4 +76,10 @@ class EmployeeController extends Controller
         $employees = Employee::select('id', 'name', 'nip')->get();
         return response()->json($employees);
     }
+
+    public function getEmployeName(Request $request)
+    {
+        $employees = Employee::find($request->leader_id);
+        return response()->json(['name' => $employees->name]);
+    }
 }

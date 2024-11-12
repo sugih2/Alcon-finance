@@ -27,8 +27,18 @@ class PositionController extends Controller
     {
         $position = Position::with('paramposition')->find($id);
         $paramPositions = ParamPosition::all();
+        $html = view('pages.position.edit', compact('position', 'paramPositions'))->render();
 
-        return view('pages.position.edit', compact('position', 'paramPositions'));
+        return response()->json([
+            'html' => $html,
+            'parent_id' => $position->parent_id,
+        ]);
+    }
+
+    public function getPositionName(Request $request)
+    {
+        $position = Position::find($request->parent_id);
+        return response()->json(['name' => $position->name]);
     }
 
     public function storeEdit(Request $request, $id)
@@ -53,6 +63,7 @@ class PositionController extends Controller
             $position->update([
                 'name' => $request->name,
                 'code' => $request->code,
+                'parent_id' => $request->parent_id,
                 'fk_parposition' => $request->param_position_id,
             ]);
 

@@ -20,6 +20,18 @@ class GroupController extends Controller
         return view('pages.group.create');
     }
 
+    public function edit($id)
+    {
+        $groups = Group::find($id);
+        $html = view('pages.group.edit', compact('groups'))->render();
+
+        return response()->json([
+            'html' => $html,
+            'project_id' => $groups->project_id,
+            'leader_id' => $groups->leader_id,
+        ]);
+    }
+
     public function store(Request $request)
     {
         // Log input request

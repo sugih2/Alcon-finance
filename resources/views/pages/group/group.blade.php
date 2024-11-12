@@ -8,7 +8,7 @@
             <div class="card mb-4">
                 <div class="card-header pb-0 d-flex justify-content-between align-items-center">
                     <h6></h6>
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addGroupModal">
+                    <button type="button" class="btn btn-primary" onclick="createGroup()">
                         Tambah Group
                     </button>
                 </div>
@@ -72,6 +72,8 @@
             </div>
         </div>
     </div>
+
+    <!---Modal Create-->
     <div class="modal fade" id="addGroupModal" tabindex="-1" aria-labelledby="addGroupModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -80,92 +82,217 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-
-                    <form id="FormGroup">
-                        @csrf
-                        <div class="mb-3">
-                            <label for="name" class="form-label">Name Group</label>
-                            <input type="text" class="form-control" id="name" name="name" placeholder="name"
-                                required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="code" class="form-label">Code</label>
-                            <input type="text" class="form-control" id="code" name="code" placeholder="code"
-                                required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="project" class="form-label">Project</label>
-                            <select name="project" id="project" required>
-                                <option value="" selected>Select Project</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="leader" class="form-label">Leader</label>
-                            <select name="leader" id="leader" required>
-                                <option value="" selected>Select Leader</option>
-                            </select>
-                        </div>
-                        <button type="button" id="btn-submit" onclick="StoreGroup()"
-                            class="btn btn-primary">Simpan</button>
-                    </form>
+                    <div id="creategroup"></div>
                 </div>
+            </div>
+        </div>
+    </div>
 
+    <!---Modal Edit-->
+    <div class="modal fade" id="EditGroupModal" tabindex="-1" aria-labelledby="EditGroupModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="EditGroupModalLabel">Tambah Group</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="editgroup"></div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        $(document).ready(function() {
-            $('#project').selectize({
-                placeholder: 'Select Project',
-                valueField: 'id',
-                labelField: 'name',
-                searchField: 'name',
-                preload: true,
-                load: function(query, callback) {
+        function createGroup() {
+            $.ajax({
+                url: "{{ url('/group/create') }}",
+                type: 'GET',
+                dataType: 'html',
+                success: function(data) {
+                    $("#creategroup").html(data);
+                    $('#addGroupModal').modal('show');
+                    $(document).ready(function() {
+                        $('#project').selectize({
+                            placeholder: 'Select Project',
+                            valueField: 'id',
+                            labelField: 'name',
+                            searchField: 'name',
+                            preload: true,
+                            load: function(query, callback) {
 
-                    $.ajax({
-                        url: '/project/list',
-                        type: 'GET',
-                        dataType: 'json',
-                        data: {
-                            q: query
-                        },
-                        success: function(data) {
+                                $.ajax({
+                                    url: '/project/list',
+                                    type: 'GET',
+                                    dataType: 'json',
+                                    data: {
+                                        q: query
+                                    },
+                                    success: function(data) {
 
-                            callback(data);
-                        },
-                        error: function() {
+                                        callback(data);
+                                    },
+                                    error: function() {
 
-                            callback();
-                        }
+                                        callback();
+                                    }
+                                });
+                            }
+                        });
+                        $('#leader').selectize({
+                            placeholder: 'Select Leader',
+                            valueField: 'id',
+                            labelField: 'name',
+                            searchField: 'name',
+                            preload: true,
+                            load: function(query, callback) {
+                                $.ajax({
+                                    url: '/employee/list',
+                                    type: 'GET',
+                                    dataType: 'json',
+                                    data: {
+                                        q: query
+                                    },
+                                    success: function(data) {
+                                        callback(data);
+                                    },
+                                    error: function() {
+                                        callback();
+                                    }
+                                });
+                            }
+                        });
+                    });
+                },
+                error: function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to open create Group form. Please try again later.',
+                        confirmButtonText: 'OK'
                     });
                 }
             });
-            $('#leader').selectize({
-                placeholder: 'Select Leader',
-                valueField: 'id',
-                labelField: 'name',
-                searchField: 'name',
-                preload: true,
-                load: function(query, callback) {
-                    $.ajax({
-                        url: '/employee/list',
-                        type: 'GET',
-                        dataType: 'json',
-                        data: {
-                            q: query
+        }
+
+        function editGroup(id) {
+            $.ajax({
+                url: "{{ url('/group/edit') }}/" + id,
+                type: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    $("#editgroup").html(response.html);
+                    $('#EditGroupModal').modal('show');
+                    const existingProjectId = response.project_id
+                    const existingLeaderId = response.leader_id
+
+                    $('#projectedit').selectize({
+                        placeholder: 'Select Project',
+                        valueField: 'id',
+                        labelField: 'name',
+                        searchField: 'name',
+                        preload: true,
+                        load: function(query, callback) {
+
+                            $.ajax({
+                                url: '/project/list',
+                                type: 'GET',
+                                dataType: 'json',
+                                data: {
+                                    q: query
+                                },
+                                success: function(data) {
+
+                                    callback(data);
+                                },
+                                error: function() {
+
+                                    callback();
+                                }
+                            });
                         },
-                        success: function(data) {
-                            callback(data);
-                        },
-                        error: function() {
-                            callback();
+                        onInitialize: function() {
+                            const selectize = this;
+
+                            if (existingProjectId) {
+                                $.ajax({
+                                    url: '/project/get-project-name',
+                                    type: 'GET',
+                                    dataType: 'json',
+                                    data: {
+                                        project_id: existingProjectId
+                                    },
+                                    success: function(data) {
+                                        selectize.addOption({
+                                            id: existingProjectId,
+                                            name: data.name
+                                        });
+                                        selectize.setValue(
+                                            existingProjectId);
+                                    }
+                                });
+                            }
                         }
+                    });
+                    $('#leaderedit').selectize({
+                        placeholder: 'Select Leader',
+                        valueField: 'id',
+                        labelField: 'name',
+                        searchField: 'name',
+                        preload: true,
+                        load: function(query, callback) {
+                            $.ajax({
+                                url: '/employee/list',
+                                type: 'GET',
+                                dataType: 'json',
+                                data: {
+                                    q: query
+                                },
+                                success: function(data) {
+                                    callback(data);
+                                },
+                                error: function() {
+                                    callback();
+                                }
+                            });
+                        },
+                        onInitialize: function() {
+                            const selectize = this;
+
+                            if (existingLeaderId) {
+                                $.ajax({
+                                    url: '/employe/get-employe-name',
+                                    type: 'GET',
+                                    dataType: 'json',
+                                    data: {
+                                        leader_id: existingLeaderId
+                                    },
+                                    success: function(data) {
+                                        selectize.addOption({
+                                            id: existingLeaderId,
+                                            name: data.name
+                                        });
+                                        selectize.setValue(
+                                            existingLeaderId);
+                                    }
+                                });
+                            }
+                        }
+                    });
+
+                },
+                error: function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to open Edit Group form. Please try again later.',
+                        confirmButtonText: 'OK'
                     });
                 }
             });
-        });
+        }
+
+
 
 
         async function StoreGroup() {

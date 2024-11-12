@@ -12,4 +12,10 @@ class RegencyController extends Controller
         $regencies = Regency::all();
         return response()->json($regencies);
     }
+    
+    public function getRegencyName(Request $request)
+    {
+        $regency = Regency::find($request->regency_id);
+        return response()->json(['name' => $regency->name]);
+    }
 }

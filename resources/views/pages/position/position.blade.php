@@ -105,42 +105,65 @@
             $.ajax({
                 url: "{{ url('/position/edit') }}/" + id,
                 type: 'GET',
-                dataType: 'html',
-                success: function(data) {
-                    $("#editPosition").html(data);
+                dataType: 'json',
+                success: function(response) {
+                    $("#editPosition").html(response.html);
                     $('#editPositionModal').modal('show');
-                    $(document).ready(function() {
-                        $('#positions').selectize({
-                            placeholder: 'Select Position',
-                            valueField: 'id',
-                            labelField: 'name',
-                            searchField: 'name',
-                            preload: true,
+                    const existingPositionId = response.parent_id
 
-                            load: function(query, callback) {
+                    $('#positionsedit').selectize({
+                        placeholder: 'Select Position',
+                        valueField: 'id',
+                        labelField: 'name',
+                        searchField: 'name',
+                        preload: true,
+
+                        load: function(query, callback) {
+                            $.ajax({
+                                url: '/position/list',
+                                type: 'GET',
+                                dataType: 'json',
+                                data: {
+                                    q: query
+                                },
+                                success: function(data) {
+                                    callback(data);
+                                },
+                                error: function() {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error',
+                                        text: 'Failed to load position data. Please try again later.',
+                                        confirmButtonText: 'OK'
+                                    });
+                                    callback();
+                                }
+                            });
+                        },
+                        onInitialize: function() {
+                            const selectize = this;
+
+                            if (existingPositionId) {
                                 $.ajax({
-                                    url: '/position/list',
+                                    url: '/position/get-position-name',
                                     type: 'GET',
                                     dataType: 'json',
                                     data: {
-                                        q: query
+                                        parent_id: existingPositionId
                                     },
                                     success: function(data) {
-                                        callback(data);
-                                    },
-                                    error: function() {
-                                        Swal.fire({
-                                            icon: 'error',
-                                            title: 'Error',
-                                            text: 'Failed to load position data. Please try again later.',
-                                            confirmButtonText: 'OK'
+                                        selectize.addOption({
+                                            id: existingPositionId,
+                                            name: data.name
                                         });
-                                        callback();
+                                        selectize.setValue(
+                                            existingPositionId);
                                     }
                                 });
                             }
-                        });
+                        }
                     });
+
                 },
                 error: function() {
                     Swal.fire({

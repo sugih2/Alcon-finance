@@ -12,8 +12,8 @@
     </div>
     <div class="mb-3">
         <label for="position" class="form-label">Bawahan</label>
-        <select name="position" id="positions" required>
-            <option value="{{ $position->parent_id }}" disabled selected>Select Bawahan</option>
+        <select name="position" id="positionsedit" required>
+            <option value="" disabled selected>Select Bawahan</option>
         </select>
     </div>
     <div class="mb-3">

@@ -21,6 +21,17 @@ class ProjectController extends Controller
         return view('pages.project.create');
     }
 
+    public function edit($id)
+    {
+        $projects = Project::find($id);
+        $html = view('pages.project.edit', compact('projects'))->render();
+    
+        return response()->json([
+            'html' => $html,
+            'regency_id' => $projects->regency_id,
+        ]);
+    }
+
     public function store(Request $request)
     {
         // Log input request
@@ -70,6 +81,48 @@ class ProjectController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function storeEdit(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255|unique:projects,name,' . $id,
+            'code' => 'required|max:20|unique:projects,code,' . $id,
+            'regency' => 'required|integer'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal',
+                'errors'  => $validator->errors()
+            ], 422);
+        }
+
+        try {
+            $project = Project::findOrFail($id);
+
+            $project->update([
+                'name' => $request->name,
+                'code' => $request->code,
+                'jenis' => $request->jenis,
+                'description' => $request->description,
+                'regency_id' => $request->regency,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Data berhasil diupdate',
+                'data'    => $project
+            ], 200);
+
+        } catch (\Exception $e) {
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mengupdate data'
             ], 500);
         }
     }
