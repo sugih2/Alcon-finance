@@ -14,54 +14,32 @@
                 </div>
                 <div class="card-body px-0 pt-0 pb-2">
                     <div class="table-responsive p-0">
-                        <table class="table align-items-center mb-0">
+                        <table class="table align-items-center mb-0" id="employeeTable">
                             <thead>
                                 <tr>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">No
-                                    </th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                        Name</th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                        NIP</th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                        Position</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">No</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Name</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">NIP</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Position</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @php $index = 1; @endphp
                                 @foreach ($employees as $e)
                                     <tr>
-                                        <td>
-                                            <p class="text-sm font-weight-bold mb-0">{{ $index++ }}</p>
-                                        </td>
-                                        <td>
-                                            <p class="text-sm font-weight-bold mb-0">{{ $e->name }}</p>
-                                        </td>
-                                        <td>
-                                            <p class="text-sm font-weight-bold mb-0">{{ $e->nip }}</p>
-                                        </td>
-                                        <td>
-                                            <p class="text-sm font-weight-bold mb-0">{{ $e->position->name }}</p>
-                                        </td>
-
+                                        <td>{{ $index++ }}</td>
+                                        <td>{{ $e->name }}</td>
+                                        <td>{{ $e->nip }}</td>
+                                        <td>{{ $e->position->name }}</td>
                                         <td class="align-middle text-end">
-                                            <div class="d-flex px-3 py-1 justify-content-center align-items-center">
-                                                <button type="button" class="btn btn-link text-primary mb-0"
-                                                    data-bs-toggle="modal" data-bs-target="#editEmployeeModal"
-                                                    data-name="{{ $e->name }}" data-id="{{ $e->id }}">
-                                                    Edit
-                                                </button>
-                                                <button type="button" class="btn btn-link text-danger mb-0"
-                                                    data-bs-toggle="modal" data-bs-target="#deleteRoleModal"
-                                                    data-id="{{ $e->id }}">
-                                                    Delete
-                                                </button>
-                                            </div>
+                                            <button type="button" class="btn btn-link text-primary mb-0" data-bs-toggle="modal" data-bs-target="#editEmployeeModal" data-name="{{ $e->name }}" data-id="{{ $e->id }}">Edit</button>
+                                            <button type="button" class="btn btn-link text-danger mb-0" data-bs-toggle="modal" data-bs-target="#deleteRoleModal" data-id="{{ $e->id }}">Delete</button>
                                         </td>
                                     </tr>
                                 @endforeach
                             </tbody>
-                        </table>
+                        </table>                       
                     </div>
                 </div>
             </div>
@@ -142,8 +120,24 @@
         </div>
     </div>
 
-    <script>
+    <script>           
         $(document).ready(function() {
+            $('#employeeTable').DataTable({
+                responsive: true,
+                language: {
+                    search: "Cari:",
+                    lengthMenu: "Tampilkan _MENU_ entri",
+                    info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+                    infoEmpty: "Tidak ada entri",
+                    zeroRecords: "Tidak ada entri yang cocok",
+                    paginate: {
+                        first: "Pertama",
+                        last: "Terakhir",
+                        next: "Berikutnya",
+                        previous: "Sebelumnya"
+                    }
+                }
+            });
             $('#position').selectize({
                 placeholder: 'Select Position',
                 valueField: 'id',
