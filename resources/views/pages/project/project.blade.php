@@ -8,7 +8,7 @@
             <div class="card mb-4">
                 <div class="card-header pb-0 d-flex justify-content-between align-items-center">
                     <h6></h6>
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addProjectModal">
+                    <button type="button" class="btn btn-primary" onclick="createProject()">
                         Tambah Project
                     </button>
                 </div>
@@ -58,8 +58,7 @@
                                         <td class="align-middle text-end">
                                             <div class="d-flex px-3 py-1 justify-content-center align-items-center">
                                                 <button type="button" class="btn btn-link text-primary mb-0"
-                                                    data-bs-toggle="modal" data-bs-target="#editRoleModal"
-                                                    data-name="{{ $p->name }}" data-id="{{ $p->id }}">
+                                                    onclick="editProject({{ $p->id }})">
                                                     Edit
                                                 </button>
                                                 <button type="button" class="btn btn-link text-danger mb-0"
@@ -86,84 +85,153 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-
-                    <form id="FromProject">
-                        @csrf
-                        <div class="mb-3">
-                            <label for="name" class="form-label">Name Project</label>
-                            <input type="text" class="form-control" id="name" name="name" placeholder="name"
-                                required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="code" class="form-label">Code Project</label>
-                            <input type="text" class="form-control" id="code" name="code" placeholder="code"
-                                required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="jenis" class="form-label">Jenis</label>
-                            <input type="text" class="form-control" id="jenis" name="jenis" placeholder="jenis"
-                                required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="regency" class="form-label">Daerah/Kota</label>
-                            <select name="regency" id="regency" required>
-                                <option value="" selected>Select Daerah/Kota</option>
-                            </select>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="description" class="form-label">Description</label>
-                            <textarea type="text" class="form-control" id="description" name="description" placeholder="description"></textarea>
-                        </div>
-                        <button type="button" onclick="StoreProject()" class="btn btn-primary">Simpan</button>
-                    </form>
+                    <div id="createProject"></div>
                 </div>
+            </div>
+        </div>
+    </div>
 
+    <div class="modal fade" id="EditProjectModal" tabindex="-1" aria-labelledby="EditProjectModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="EditProjectModalLabel">Tambah Project</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="editProject"></div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        $(document).ready(function() {
-            $('#regency').selectize({
-                placeholder: 'Select Daerah/Kota',
-                valueField: 'id',
-                labelField: 'name',
-                searchField: 'name',
-                load: function(query, callback) {
-                    if (!query.length) return callback();
-                    $.ajax({
-                        url: '/regency',
-                        type: 'GET',
-                        dataType: 'json',
-                        data: {
-                            q: query
-                        },
-                        success: function(data) {
+        function createProject() {
+            $.ajax({
+                url: "{{ url('/project/create') }}",
+                type: 'GET',
+                dataType: 'html',
+                success: function(data) {
+                    $("#createProject").html(data);
+                    $('#addProjectModal').modal('show');
+                    $(document).ready(function() {
+                        $('#regency').selectize({
+                            placeholder: 'Select Daerah/Kota',
+                            valueField: 'id',
+                            labelField: 'name',
+                            searchField: 'name',
+                            load: function(query, callback) {
+                                if (!query.length) return callback();
+                                $.ajax({
+                                    url: '/regency',
+                                    type: 'GET',
+                                    dataType: 'json',
+                                    data: {
+                                        q: query
+                                    },
+                                    success: function(data) {
 
-                            callback(data);
-                        },
-                        error: function() {
+                                        callback(data);
+                                    },
+                                    error: function() {
 
-                            callback();
-                        }
+                                        callback();
+                                    }
+                                });
+                            }
+                        });
+                    });
+                },
+                error: function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to open create project form. Please try again later.',
+                        confirmButtonText: 'OK'
                     });
                 }
             });
-        });
+        }
 
+        function editProject(id) {
+            $.ajax({
+                url: "{{ url('/project/edit') }}/" + id,
+                type: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    $("#editProject").html(response.html);
+                    $('#EditProjectModal').modal('show');
+
+                    const existingRegencyId = response.regency_id;
+
+                    $('#regencyedit').selectize({
+                        placeholder: 'Select Daerah/Kota',
+                        valueField: 'id',
+                        labelField: 'name',
+                        searchField: 'name',
+                        preload: true,
+
+                        load: function(query, callback) {
+                            $.ajax({
+                                url: '/regency',
+                                type: 'GET',
+                                dataType: 'json',
+                                data: {
+                                    q: query
+                                },
+                                success: function(data) {
+                                    callback(data);
+                                },
+                                error: function() {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error',
+                                        text: 'Failed to load Regency data. Please try again later.',
+                                        confirmButtonText: 'OK'
+                                    });
+                                    callback();
+                                }
+                            });
+                        },
+                        onInitialize: function() {
+                            const selectize = this;
+
+                            if (existingRegencyId) {
+                                $.ajax({
+                                    url: '/regency/get-regency-name',
+                                    type: 'GET',
+                                    dataType: 'json',
+                                    data: {
+                                        regency_id: existingRegencyId
+                                    },
+                                    success: function(data) {
+                                        selectize.addOption({
+                                            id: existingRegencyId,
+                                            name: data.name
+                                        });
+                                        selectize.setValue(existingRegencyId);
+                                    }
+                                });
+                            }
+                        }
+                    });
+                },
+                error: function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to open create position form. Please try again later.',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            });
+        }
 
         async function StoreProject() {
             event.preventDefault();
 
             const form = document.getElementById('FromProject');
             const formData = new FormData(form);
-
-            console.log('Isi FormData:');
-            for (let [key, value] of formData.entries()) {
-                console.log(`${key}: ${value}`);
-            }
-
             try {
                 const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
                 const response = await fetch('/project/store', {
@@ -200,6 +268,56 @@
                     title: 'Gagal',
                     text: error.message || 'Data gagal disimpan'
                 });
+            }
+        }
+
+        async function StoreEditProjects(id) {
+            event.preventDefault();
+
+            const form = document.getElementById('FromEditprojects');
+            const formData = new FormData(form);
+            const submitButton = document.getElementById('btn-submit');
+
+            submitButton.disabled = true;
+
+            try {
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                const response = await fetch('/project/storeedit/' + id, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Gagal menyimpan data.');
+                }
+
+                const data = await response.json();
+                console.log('Sukses:', data);
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil',
+                    text: 'Data berhasil disimpan'
+                }).then(() => {
+                    location.reload();
+                });
+
+                form.reset();
+
+            } catch (error) {
+                console.error('Error:', error);
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal',
+                    text: error.message || 'Data gagal disimpan'
+                });
+            } finally {
+                submitButton.disabled = false;
             }
         }
     </script>

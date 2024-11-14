@@ -68,27 +68,34 @@ Route::group(['prefix' => 'position', 'middleware' => 'auth'], function () {
 	Route::get('/edit/{id}', [PositionController::class, 'edit'])->name('position.edit');
 	Route::post('/storeedit/{id}', [PositionController::class, 'storeEdit'])->name('position.storeedit');
 	Route::get('/list', [PositionController::class, 'list'])->name('position.list');
+	Route::get('/get-position-name', [PositionController::class, 'getPositionName'])->name('position.name');
 });
 
 Route::group(['prefix' => 'project', 'middleware' => 'auth'], function () {
 	Route::get('/', [ProjectController::class, 'index'])->middleware('auth')->name('project.index');
 	Route::post('/store', [ProjectController::class, 'store'])->name('project.store');
 	Route::get('/create', [ProjectController::class, 'create'])->name('project.create');
+	Route::get('/edit/{id}', [ProjectController::class, 'edit'])->name('project.edit');
+	Route::post('/storeedit/{id}', [ProjectController::class, 'storeEdit'])->name('project.storeedit');
 	Route::get('/list', [ProjectController::class, 'list'])->name('project.list');
+	Route::get('/get-project-name', [ProjectController::class, 'getProjectName'])->name('project.name');
 });
 Route::group(['prefix' => 'group', 'middleware' => 'auth'], function () {
 	Route::get('/', [GroupController::class, 'index'])->middleware('auth')->name('group.index');
 	Route::post('/store', [GroupController::class, 'store'])->name('group.store');
 	Route::get('/create', [GroupController::class, 'create'])->name('group.create');
+	Route::get('/edit/{id}', [GroupController::class, 'edit'])->name('group.edit');
 });
 Route::group(['prefix' => 'employee', 'middleware' => 'auth'], function () {
 	Route::get('/', [EmployeeController::class, 'index'])->middleware('auth')->name('employee.index');
 	Route::post('/store', [EmployeeController::class, 'store'])->name('employee.store');
 	Route::get('/create', [EmployeeController::class, 'create'])->name('employee.create');
 	Route::get('/list', [EmployeeController::class, 'list'])->name('employee.list');
+	Route::get('/get-employee-name', [EmployeeController::class, 'getEmployeeName'])->name('employee.name');
 });
 Route::group(['prefix' => 'regency', 'middleware' => 'auth'], function () {
 	Route::get('/', [RegencyController::class, 'regency'])->name('regency.list');
+	Route::get('/get-regency-name', [RegencyController::class, 'getRegencyName'])->name('regency.name');
 });
 
 
