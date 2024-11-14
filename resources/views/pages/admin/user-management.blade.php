@@ -14,46 +14,41 @@
                 </div>
                 <div class="card-body px-0 pt-0 pb-2">
                     <div class="table-responsive p-0">
-                        <table class="table align-items-center mb-0">
+                        <table id="rolesTable" class="table align-items-center mb-0">
                             <thead>
                                 <tr>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">No
-                                    </th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                        Role Name</th>
-                                    <th
-                                        class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                        Action</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">No</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Role Name</th>
+                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @php $index = 1; @endphp
                                 @foreach ($roles as $role)
                                     <tr>
-                                        <td>
-                                            <p class="text-sm font-weight-bold mb-0">{{ $index++ }}</p>
-                                        </td>
-                                        <td>
-                                            <p class="text-sm font-weight-bold mb-0">{{ $role->name }}</p>
-                                        </td>
-                                        <td class="align-middle text-end">
-                                            <div class="d-flex px-3 py-1 justify-content-center align-items-center">
-                                                <button type="button" class="btn btn-link text-primary mb-0"
-                                                    data-bs-toggle="modal" data-bs-target="#editRoleModal"
-                                                    data-name="{{ $role->name }}" data-id="{{ $role->id }}">
-                                                    Edit
-                                                </button>
-                                                <button type="button" class="btn btn-link text-danger mb-0"
-                                                    data-bs-toggle="modal" data-bs-target="#deleteRoleModal"
-                                                    data-id="{{ $role->id }}">
-                                                    Delete
-                                                </button>
-                                            </div>
+                                        <td>{{ $index++ }}</td>
+                                        <td>{{ $role->name }}</td>
+                                        <td class="text-center">
+                                            <button type="button" class="btn btn-link text-primary" data-bs-toggle="modal" data-bs-target="#editRoleModal"
+                                                data-name="{{ $role->name }}" data-id="{{ $role->id }}">Edit</button>
+                                            <button type="button" class="btn btn-link text-danger" data-bs-toggle="modal" data-bs-target="#deleteRoleModal"
+                                                data-id="{{ $role->id }}">Delete</button>
                                         </td>
                                     </tr>
                                 @endforeach
                             </tbody>
                         </table>
+                        <script>
+                            $(document).ready(function() {
+                                $('#rolesTable').DataTable({
+                                    // Sesuaikan dengan opsi DataTables yang diinginkan
+                                    responsive: true,
+                                    paginate: false,
+                                    searching: false,
+                                    info: false
+                                });
+                            });
+                        </script>                        
                     </div>
                 </div>
             </div>
@@ -69,121 +64,43 @@
                         <table class="table align-items-center mb-0" id="menuTable">
                             <thead>
                                 <tr>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">No
-                                    </th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                        Nama Menu</th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                        Url</th>
-                                    <th
-                                        class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                        Action</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">No</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Nama Menu</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Url</th>
+                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @php $index = 1; @endphp
                                 @foreach ($menus as $menu)
                                     <tr>
-                                        <td class="align-middle text-center">
-                                            <p class="text-sm font-weight-bold mb-0">{{ $index++ }}</p>
-                                        </td>
-                                        <td>
-                                            <p class="text-sm font-weight-bold mb-0">{{ $menu->name }}</p>
-                                        </td>
-                                        <td>
-                                            <p class="text-sm font-weight-bold mb-0">{{ $menu->url }}</p>
-                                        </td>
+                                        <td class="align-middle text-center">{{ $index++ }}</td>
+                                        <td>{{ $menu->name }}</td>
+                                        <td>{{ $menu->url }}</td>
                                         <td class="align-middle text-end">
-                                            <div class="d-flex px-3 py-1 justify-content-center align-items-center">
-                                                <button type="button" class="btn btn-link text-primary mb-0"
-                                                    data-bs-toggle="modal" data-bs-target="#editMenuModal"
-                                                    data-name="{{ $menu->name }}" data-id="{{ $menu->id }}">
-                                                    Edit
-                                                </button>
-                                                <button type="button" class="btn btn-link text-danger mb-0"
-                                                    data-bs-toggle="modal" data-bs-target="#deleteMenuModal"
-                                                    data-id="{{ $menu->id }}">
-                                                    Delete
-                                                </button>
-                                            </div>
+                                            <button type="button" class="btn btn-link text-primary mb-0" data-bs-toggle="modal" data-bs-target="#editMenuModal" data-name="{{ $menu->name }}" data-id="{{ $menu->id }}">Edit</button>
+                                            <button type="button" class="btn btn-link text-danger mb-0" data-bs-toggle="modal" data-bs-target="#deleteMenuModal" data-id="{{ $menu->id }}">Delete</button>
                                         </td>
                                     </tr>
                                 @endforeach
                             </tbody>
                         </table>
+                        <script>
+                            $(document).ready(function() {
+                                $('#menuTable').DataTable({
+                                    responsive: true,
+                                    paginate: false,
+                                    searching: false,
+                                    info: false
+                                });
+                            });
+                        </script>                        
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="col-md-8">
-            <div class="card mb-4">
-                <div class="card-header pb-0 d-flex justify-content-between align-items-center">
-                    <h6>Users</h6>
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
-                        Tambah
-                    </button>
-                </div>
-                <div class="card-body px-0 pt-0 pb-2">
-                    <div class="table-responsive p-0">
-                        <table class="table align-items-center mb-0">
-                            <thead>
-                                <tr>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Name
-                                    </th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                        Role</th>
-                                    <th
-                                        class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                        Create Date</th>
-                                    <th
-                                        class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                        Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($users as $user)
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex px-3 py-1">
-                                                <div>
-                                                    <img src="./img/team-{{ $user->id }}.jpg" class="avatar me-3"
-                                                        alt="image">
-                                                </div>
-                                                <div class="d-flex flex-column justify-content-center">
-                                                    <h6 class="mb-0 text-sm">{{ $user->firstname }} {{ $user->lastname }}
-                                                    </h6>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <p class="text-sm font-weight-bold mb-0">{{ $user->role->name }}</p>
-                                        </td>
-                                        <td class="align-middle text-center text-sm">
-                                            <p class="text-sm font-weight-bold mb-0">
-                                                {{ $user->created_at->format('d/m/Y') }}</p>
-                                        </td>
-                                        <td class="align-middle text-end">
-                                            <div class="d-flex px-3 py-1 justify-content-center align-items-center">
-                                                <button class="btn btn-link text-primary mb-0" data-bs-toggle="modal"
-                                                    data-bs-target="#editUserModal"
-                                                    onclick="fillEditUserModal({{ $user }})">Edit</button>
-                                                <button class="btn btn-link text-danger mb-0" data-bs-toggle="modal"
-                                                    data-bs-target="#deleteUserModal"
-                                                    onclick="setDeleteFormAction('{{ route('users.destroy', $user) }}')">
-                                                    Delete
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {{-- <div class="col-md-8">
             <div class="card mb-4">
                 <div class="card-header pb-0 d-flex justify-content-between align-items-center">
                     <h6>Users</h6>
@@ -213,7 +130,8 @@
             $('#usersTable').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: '{{ route('users.data') }}', // Pastikan ini benar
+                searching: false,
+                ajax: '{{ route('users.data') }}',
                 columns: [
                     {
                         data: 'name',
@@ -261,7 +179,7 @@
                 }
             });
         });
-        </script> --}}
+        </script>
     </div>
     
     <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
@@ -546,7 +464,7 @@
             </div>
         </div>
     </div>        
-    <script>
+    {{-- <script>
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('menuForm');
             const editForm = document.getElementById('editMenuForm');
@@ -742,9 +660,10 @@
                 });
             });
         });
-    </script>             
+    </script>              --}}
     <script>
         function fillEditUserModal(user) {
+            console.modal('user = ', user)
             document.getElementById('editUserForm').action =
                 `/user-management/users/${user.id}`; // Ubah URL sesuai rute Anda
             document.getElementById('edit_username').value = user.username;
@@ -757,9 +676,10 @@
         function setDeleteFormAction(action) {
             document.getElementById('delete-form').action = action;
         }
+        // Modal Edit
         var editRoleModal = document.getElementById('editRoleModal');
         editRoleModal.addEventListener('show.bs.modal', function(event) {
-            var button = event.relatedTarget; // Tombol yang mengaktifkan modal
+            var button = event.relatedTarget;
             var roleName = button.getAttribute('data-name');
             var roleId = button.getAttribute('data-id');
 
@@ -769,15 +689,43 @@
 
             modalTitle.textContent = 'Edit Role';
             roleInput.value = roleName;
-            form.action = '{{ url('user-management/roles') }}' + '/' + roleId; // Ganti action form
+            form.action = '{{ url('user-management/roles') }}/' + roleId;
         });
+
+        // Modal Delete
         var deleteRoleModal = document.getElementById('deleteRoleModal');
         deleteRoleModal.addEventListener('show.bs.modal', function(event) {
-            var button = event.relatedTarget; // Tombol yang mengaktifkan modal
+            var button = event.relatedTarget;
             var roleId = button.getAttribute('data-id');
 
             var form = deleteRoleModal.querySelector('#deleteRoleForm');
-            form.action = '{{ url('user-management/roles') }}/' + roleId; // Ganti action form
+            form.action = '{{ url('user-management/roles') }}/' + roleId;
+        });
+
+        // Modal Edit Menu
+        var editMenuModal = document.getElementById('editMenuModal');
+        editMenuModal.addEventListener('show.bs.modal', function(event) {
+            var button = event.relatedTarget;
+            var menuName = button.getAttribute('data-name');
+            var menuId = button.getAttribute('data-id');
+
+            var modalTitle = editMenuModal.querySelector('.modal-title');
+            var nameInput = editMenuModal.querySelector('#menu-name'); // Pastikan id sesuai di form modal edit
+            var form = editMenuModal.querySelector('form');
+
+            modalTitle.textContent = 'Edit Menu';
+            nameInput.value = menuName;
+            form.action = '{{ url('menu-management/menus') }}/' + menuId; // Ganti action form
+        });
+
+        // Modal Delete Menu
+        var deleteMenuModal = document.getElementById('deleteMenuModal');
+        deleteMenuModal.addEventListener('show.bs.modal', function(event) {
+            var button = event.relatedTarget;
+            var menuId = button.getAttribute('data-id');
+
+            var form = deleteMenuModal.querySelector('#deleteMenuForm'); // Pastikan id form benar
+            form.action = '{{ url('menu-management/menus') }}/' + menuId;
         });
     </script>
 @endsection
