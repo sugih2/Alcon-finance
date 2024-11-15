@@ -33,6 +33,7 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\RegencyController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\GroupController;
+use App\Http\Controllers\PresenceController;
 
 Route::get('/data', [ExampleController::class, 'getData'])->middleware('auth')->name('data.index');
 
@@ -96,6 +97,15 @@ Route::group(['prefix' => 'employee', 'middleware' => 'auth'], function () {
 Route::group(['prefix' => 'regency', 'middleware' => 'auth'], function () {
 	Route::get('/', [RegencyController::class, 'regency'])->name('regency.list');
 	Route::get('/get-regency-name', [RegencyController::class, 'getRegencyName'])->name('regency.name');
+});
+Route::group(['prefix' => 'presence', 'middleware' => 'auth'], function () {
+    Route::get('/', [PresenceController::class, 'index'])->middleware('auth')->name('presence.index');
+    Route::post('/store', [PresenceController::class, 'store'])->name('presence.store');
+    Route::get('/create', [PresenceController::class, 'create'])->name('presence.create');
+    Route::get('/list', [PresenceController::class, 'list'])->name('presence.list');
+    Route::get('/edit/{id}', [PresenceController::class, 'edit'])->name('presence.edit');
+    Route::post('/update/{id}', [PresenceController::class, 'update'])->name('presence.update');
+    Route::delete('/delete/{id}', [PresenceController::class, 'destroy'])->name('presence.delete');
 });
 
 
