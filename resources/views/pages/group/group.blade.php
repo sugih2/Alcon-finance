@@ -52,8 +52,7 @@
                                         <td class="align-middle text-end">
                                             <div class="d-flex px-3 py-1 justify-content-center align-items-center">
                                                 <button type="button" class="btn btn-link text-primary mb-0"
-                                                    data-bs-toggle="modal" data-bs-target="#editRoleModal"
-                                                    data-name="{{ $g->name }}" data-id="{{ $g->id }}">
+                                                    onclick="editGroup({{ $g->id }})">
                                                     Edit
                                                 </button>
                                                 <button type="button" class="btn btn-link text-danger mb-0"
@@ -162,6 +161,32 @@
                                 });
                             }
                         });
+                        $('#members').selectize({
+                            placeholder: 'Pilih Tukang',
+                            valueField: 'id',
+                            labelField: 'name',
+                            searchField: 'name',
+                            preload: true,
+                            plugins: [
+                                'remove_button'
+                            ], // Allows items to be removed
+                            load: function(query, callback) {
+                                $.ajax({
+                                    url: '/employee/list/pekerja', // Adjust URL if necessary
+                                    type: 'GET',
+                                    dataType: 'json',
+                                    data: {
+                                        q: query
+                                    },
+                                    success: function(data) {
+                                        callback(data);
+                                    },
+                                    error: function() {
+                                        callback();
+                                    }
+                                });
+                            },
+                        });
                     });
                 },
                 error: function() {
@@ -261,7 +286,7 @@
 
                             if (existingLeaderId) {
                                 $.ajax({
-                                    url: '/employe/get-employe-name',
+                                    url: '/employee/get-employee-name',
                                     type: 'GET',
                                     dataType: 'json',
                                     data: {
@@ -279,6 +304,54 @@
                             }
                         }
                     });
+                    $(document).ready(function() {
+                        $('#members').selectize({
+                            placeholder: 'Pilih Tukang',
+                            valueField: 'id',
+                            labelField: 'name',
+                            searchField: 'name',
+                            preload: true,
+                            plugins: ['remove_button'], // Allows items to be removed
+                            load: function(query, callback) {
+                                $.ajax({
+                                    url: '/employee/list/pekerja', // Adjust URL if necessary
+                                    type: 'GET',
+                                    dataType: 'json',
+                                    data: {
+                                        q: query
+                                    },
+                                    success: function(data) {
+                                        callback(data);
+                                    },
+                                    error: function() {
+                                        callback();
+                                    }
+                                });
+                            },
+                            onInitialize: function() {
+                                const selectize = this;
+
+                                if (existingLeaderId) {
+                                    $.ajax({
+                                        url: '/employee/get-employee-name',
+                                        type: 'GET',
+                                        dataType: 'json',
+                                        data: {
+                                            leader_id: existingLeaderId
+                                        },
+                                        success: function(data) {
+                                            selectize.addOption({
+                                                id: existingLeaderId,
+                                                name: data.name
+                                            });
+                                            selectize.setValue(
+                                                existingLeaderId);
+                                        }
+                                    });
+                                }
+                            }
+                        });
+                    });
 
                 },
                 error: function() {
@@ -292,18 +365,29 @@
             });
         }
 
-
-
-
         async function StoreGroup() {
             event.preventDefault();
 
-            const form = document.getElementById('FormGroup');
-            const formData = new FormData(form);
-            const submitButton = document.getElementById('btn-submit'); // Get the button element
-
-            // Disable the button to prevent double-clicks
+            const submitButton = document.getElementById('btn-submit');
             submitButton.disabled = true;
+
+            // Ambil nilai manual dari elemen form
+            const name = document.getElementById('name').value;
+            const code = document.getElementById('code').value;
+            const project = document.getElementById('project').value;
+            const leader = document.getElementById('leader').value;
+
+            // Ambil nilai dari Selectize
+            const membersSelect = $('#members')[0].selectize;
+            const members = membersSelect.getValue(); // Array dari anggota yang dipilih
+
+            // Validasi jika tidak ada anggota yang dipilih
+            if (members.length === 0) {
+                Swal.fire('Error', 'Harap pilih minimal satu anggota.', 'error');
+                submitButton.disabled = false;
+                return;
+            }
+
             Swal.fire({
                 title: 'Menyimpan data...',
                 html: 'Progress: <b>0%</b>',
@@ -313,10 +397,16 @@
                 }
             });
 
-            console.log('Isi FormData:');
-            for (let [key, value] of formData.entries()) {
-                console.log(`${key}: ${value}`);
-            }
+            // Susun data secara manual
+            const formData = {
+                name: name,
+                code: code,
+                project: project,
+                leader: leader,
+                members: members, // Array anggota
+            };
+
+            console.log('Data yang dikirim:', formData);
 
             try {
                 const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
@@ -331,29 +421,29 @@
                 const response = await fetch('/group/store', {
                     method: 'POST',
                     headers: {
-                        'X-CSRF-TOKEN': csrfToken
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Content-Type': 'application/json',
                     },
-                    body: formData
+                    body: JSON.stringify(formData),
                 });
                 clearInterval(progressInterval);
 
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || 'Gagal menyimpan data.');
+                const responseData = await response.json();
+                console.log('Response Data:', responseData);
+
+                if (!response.ok || !responseData.success) {
+                    throw new Error(responseData.message || 'Gagal menyimpan data.');
                 }
 
-                const data = await response.json();
-                console.log('Sukses:', data);
+                console.log('Sukses:', responseData);
 
                 Swal.fire({
                     icon: 'success',
                     title: 'Berhasil',
-                    text: 'Data berhasil disimpan'
+                    text: responseData.message || 'Data berhasil disimpan'
                 }).then(() => {
                     location.reload();
                 });
-
-                form.reset();
 
             } catch (error) {
                 console.error('Error:', error);

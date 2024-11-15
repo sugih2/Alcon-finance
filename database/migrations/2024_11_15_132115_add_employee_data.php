@@ -11,22 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('employees', function (Blueprint $table) {
-            $table->id();
-            $table->string('nip')->unique();
+        Schema::table('employees', function (Blueprint $table) {
             $table->string('nik', 16)->unique();
-            $table->string('name');
             $table->string('phone', 15);
             $table->string('address', 255);
             $table->string('email', 50);
             $table->date('birth_date');
-            $table->unsignedBigInteger('position_id');
-            $table->foreign('position_id')
-              ->references('id')
-              ->on('positions')
-              ->onUpdate('cascade')
-              ->onDelete('restrict');
-            $table->timestamps();
         });
     }
 
@@ -35,7 +25,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('employees', function (Blueprint $table) {
+        Schema::table('employess', function (Blueprint $table) {
             //
         });
     }

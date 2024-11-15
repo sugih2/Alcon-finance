@@ -2,11 +2,13 @@
     @csrf
     <div class="mb-3">
         <label for="name" class="form-label">Name Group</label>
-        <input type="text" class="form-control" id="name" name="name" placeholder="name" required>
+        <input type="text" class="form-control" value="{{ $groups->name }}" id="name" name="name"
+            placeholder="name" required>
     </div>
     <div class="mb-3">
         <label for="code" class="form-label">Code</label>
-        <input type="text" class="form-control" id="code" name="code" placeholder="code" required>
+        <input type="text" class="form-control" value="{{ $groups->code }}" id="code" name="code"
+            placeholder="code" required>
     </div>
     <div class="mb-3">
         <label for="project" class="form-label">Project</label>
@@ -20,5 +22,6 @@
             <option value="" selected>Select Leader</option>
         </select>
     </div>
-    <button type="button" id="btn-submit" onclick="StoreGroup()" class="btn btn-primary">Simpan</button>
+    <button type="button" id="btn-submit" onclick="StoreEditGroup({{ $groups->id }})"
+        class="btn btn-primary">Update</button>
 </form>

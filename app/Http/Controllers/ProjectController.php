@@ -132,4 +132,10 @@ class ProjectController extends Controller
         $projects = Project::select('id', 'name')->get();
         return response()->json($projects);
     }
+
+    public function getProjectName(Request $request)
+    {
+        $projects = Project::find($request->project_id);
+        return response()->json(['name' => $projects->name]);
+    }
 }

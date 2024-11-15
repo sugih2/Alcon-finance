@@ -91,7 +91,10 @@ Route::group(['prefix' => 'employee', 'middleware' => 'auth'], function () {
 	Route::get('/', [EmployeeController::class, 'index'])->middleware('auth')->name('employee.index');
 	Route::post('/store', [EmployeeController::class, 'store'])->name('employee.store');
 	Route::get('/create', [EmployeeController::class, 'create'])->name('employee.create');
+	Route::get('/edit/{id}', [EmployeeController::class, 'edit'])->name('employee.edit');
+	Route::post('/storeedit/{id}', [EmployeeController::class, 'edit'])->name('employee.storeedit');
 	Route::get('/list', [EmployeeController::class, 'list'])->name('employee.list');
+	Route::get('/list/pekerja', [EmployeeController::class, 'list_pekerja'])->name('employee.list-member');
 	Route::get('/get-employee-name', [EmployeeController::class, 'getEmployeeName'])->name('employee.name');
 });
 Route::group(['prefix' => 'regency', 'middleware' => 'auth'], function () {

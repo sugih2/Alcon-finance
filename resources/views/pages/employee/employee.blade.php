@@ -8,7 +8,7 @@
             <div class="card mb-4">
                 <div class="card-header pb-0 d-flex justify-content-between align-items-center">
                     <h6></h6>
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addEmployeeModal">
+                    <button type="button" class="btn btn-primary" onclick="createEmployee()">
                         Tambah Employee
                     </button>
                 </div>
@@ -17,11 +17,28 @@
                         <table class="table align-items-center mb-0" id="employeeTable">
                             <thead>
                                 <tr>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">No</th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Name</th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">NIP</th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Position</th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Action</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">No
+                                    </th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">NIP
+                                    </th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">NIK
+                                    </th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                        Name</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                        Brith Date</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                        Addres</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                        Email</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                        Phone</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                        Position</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                        Group</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                        Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -29,59 +46,33 @@
                                 @foreach ($employees as $e)
                                     <tr>
                                         <td>{{ $index++ }}</td>
-                                        <td>{{ $e->name }}</td>
                                         <td>{{ $e->nip }}</td>
+                                        <td>{{ $e->nik }}</td>
+                                        <td>{{ $e->name }}</td>
+                                        <td>{{ $e->birth_date }}</td>
+                                        <td>{{ $e->address }}</td>
+                                        <td>{{ $e->email }}</td>
+                                        <td>{{ $e->phone }}</td>
                                         <td>{{ $e->position->name }}</td>
+                                        <td>Ujang</td>
                                         <td class="align-middle text-end">
-                                            <button type="button" class="btn btn-link text-primary mb-0" data-bs-toggle="modal" data-bs-target="#editEmployeeModal" data-name="{{ $e->name }}" data-id="{{ $e->id }}">Edit</button>
-                                            <button type="button" class="btn btn-link text-danger mb-0" data-bs-toggle="modal" data-bs-target="#deleteRoleModal" data-id="{{ $e->id }}">Delete</button>
+                                            <button type="button" class="btn btn-link text-primary mb-0"
+                                                onclick="editEmployee({{ $e->id }})">Edit</button>
+                                            <button type="button" class="btn btn-link text-danger mb-0"
+                                                data-bs-toggle="modal" data-bs-target="#deleteRoleModal"
+                                                data-id="{{ $e->id }}">Delete</button>
                                         </td>
                                     </tr>
                                 @endforeach
                             </tbody>
-                        </table>                       
+                        </table>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal Edit -->
-    <div class="modal fade" id="addEmployeeModal" tabindex="-1" aria-labelledby="addEmployeeModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addEmployeeModalLabel">Tambah Employee</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
 
-                    <form id="FromEmployee">
-                        @csrf
-                        <div class="mb-3">
-                            <label for="name" class="form-label">Name Employee</label>
-                            <input type="text" class="form-control" id="name" name="name" placeholder="name"
-                                required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="nip" class="form-label">NIP</label>
-                            <input type="text" class="form-control" id="nip" name="nip" placeholder="nip"
-                                required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="position" class="form-label">Position</label>
-                            <select name="position" id="position" required>
-                                <option value="" selected>Select Position</option>
-                            </select>
-                        </div>
-                        <button type="button" id="btn-submit" onclick="StoreEmployee()"
-                            class="btn btn-primary">Simpan</button>
-                    </form>
-                </div>
-
-            </div>
-        </div>
-    </div>
 
     <!-- Modal Create -->
     <div class="modal fade" id="addEmployeeModal" tabindex="-1" aria-labelledby="addEmployeeModalLabel" aria-hidden="true">
@@ -92,79 +83,169 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-
-                    <form id="FromEmployee">
-                        @csrf
-                        <div class="mb-3">
-                            <label for="name" class="form-label">Name Employee</label>
-                            <input type="text" class="form-control" id="name" name="name" placeholder="name"
-                                required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="nip" class="form-label">NIP</label>
-                            <input type="text" class="form-control" id="nip" name="nip" placeholder="nip"
-                                required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="position" class="form-label">Position</label>
-                            <select name="position" id="position" required>
-                                <option value="" selected>Select Position</option>
-                            </select>
-                        </div>
-                        <button type="button" id="btn-submit" onclick="StoreEmployee()"
-                            class="btn btn-primary">Simpan</button>
-                    </form>
+                    <div id="createEmployee"></div>
                 </div>
-
             </div>
         </div>
     </div>
 
-    <script>           
+    <!-- Modal Edit -->
+    <div class="modal fade" id="EditEmployeeModal" tabindex="-1" aria-labelledby="EditEmployeeModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="EditEmployeeModalLabel">Edit Employee</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="editEmployee"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
         $(document).ready(function() {
             $('#employeeTable').DataTable({
                 responsive: true,
-                language: {
-                    search: "Cari:",
-                    lengthMenu: "Tampilkan _MENU_ entri",
-                    info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
-                    infoEmpty: "Tidak ada entri",
-                    zeroRecords: "Tidak ada entri yang cocok",
-                    paginate: {
-                        first: "Pertama",
-                        last: "Terakhir",
-                        next: "Berikutnya",
-                        previous: "Sebelumnya"
-                    }
-                }
-            });
-            $('#position').selectize({
-                placeholder: 'Select Position',
-                valueField: 'id',
-                labelField: 'name',
-                searchField: 'name',
-                preload: true,
-                load: function(query, callback) {
-                    $.ajax({
-                        url: '/position/list',
-                        type: 'GET',
-                        dataType: 'json',
-                        data: {
-                            q: query
-                        },
-                        success: function(data) {
-
-                            callback(data);
-                        },
-                        error: function() {
-
-                            callback();
-                        }
-                    });
-                }
+                // language: {
+                //     search: "Cari:",
+                //     lengthMenu: "Tampilkan _MENU_ entri",
+                //     info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+                //     infoEmpty: "Tidak ada entri",
+                //     zeroRecords: "Tidak ada entri yang cocok",
+                //     paginate: {
+                //         first: "Pertama",
+                //         last: "Terakhir",
+                //         next: "Berikutnya",
+                //         previous: "Sebelumnya"
+                //     }
+                // }
             });
         });
 
+        function createEmployee() {
+            $.ajax({
+                url: "{{ url('/employee/create') }}",
+                type: 'GET',
+                dataType: 'html',
+                success: function(data) {
+                    $("#createEmployee").html(data);
+                    $('#addEmployeeModal').modal('show');
+                    $(document).ready(function() {
+                        $('#position').selectize({
+                            placeholder: 'Select Position',
+                            valueField: 'id',
+                            labelField: 'name',
+                            searchField: 'name',
+                            preload: true,
+                            load: function(query, callback) {
+                                $.ajax({
+                                    url: '/position/list',
+                                    type: 'GET',
+                                    dataType: 'json',
+                                    data: {
+                                        q: query
+                                    },
+                                    success: function(data) {
+
+                                        callback(data);
+                                    },
+                                    error: function() {
+
+                                        callback();
+                                    }
+                                });
+                            }
+                        });
+                    });
+                },
+                error: function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to open create Group form. Please try again later.',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            });
+        }
+
+        function editEmployee(id) {
+            $.ajax({
+                url: "{{ url('/employee/edit') }}/" + id,
+                type: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    $("#editEmployee").html(response.html);
+                    $('#EditEmployeeModal').modal('show');
+                    const existingPositionId = response.position_id;
+                    $(document).ready(function() {
+                        $('#position').selectize({
+                            placeholder: 'Select Position',
+                            valueField: 'id',
+                            labelField: 'name',
+                            searchField: 'name',
+                            preload: true,
+                            load: function(query, callback) {
+                                $.ajax({
+                                    url: '/position/list',
+                                    type: 'GET',
+                                    dataType: 'json',
+                                    data: {
+                                        q: query
+                                    },
+                                    success: function(data) {
+
+                                        callback(data);
+                                    },
+                                    error: function() {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Error',
+                                            text: 'Failed to load Position data. Please try again later.',
+                                            confirmButtonText: 'OK'
+                                        });
+                                        callback();
+                                    }
+                                });
+                            },
+                            onInitialize: function() {
+                                const selectize = this;
+
+                                if (existingPositionId) {
+                                    $.ajax({
+                                        url: '/position/get-position-name',
+                                        type: 'GET',
+                                        dataType: 'json',
+                                        data: {
+                                            parent_id: existingPositionId
+                                        },
+                                        success: function(data) {
+                                            selectize.addOption({
+                                                id: existingPositionId,
+                                                name: data.name
+                                            });
+                                            selectize.setValue(
+                                                existingPositionId);
+                                        }
+                                    });
+                                }
+                            }
+                        });
+                    });
+                },
+                error: function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to open Edit Employee form. Please try again later.',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            });
+        }
 
         async function StoreEmployee() {
             event.preventDefault();

@@ -20,5 +20,11 @@
             <option value="" selected>Select Leader</option>
         </select>
     </div>
+    <div class="mb-3">
+        <label for="members" class="form-label">Group Members</label>
+        <select name="members[]" id="members" multiple required>
+            <option value="" selected hidden>Select Members</option>
+        </select>
+    </div>
     <button type="button" id="btn-submit" onclick="StoreGroup()" class="btn btn-primary">Simpan</button>
 </form>

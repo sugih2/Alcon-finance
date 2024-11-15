@@ -19,6 +19,17 @@ class EmployeeController extends Controller
     {
         return view('pages.employee.create');
     }
+
+    public function edit($id)
+    {
+        $employee = Employee::with('position')->find($id);
+        $html = view('pages.employee.edit', compact('employee'))->render();
+
+        return response()->json([
+            'html' => $html,
+            'position_id' => $employee->position_id,
+        ]);
+    }
     
     public function store(Request $request)
     {
@@ -27,8 +38,13 @@ class EmployeeController extends Controller
 
         // Validasi input dengan Validator
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:25',
             'nip' => 'required|max:10|unique:employees,nip',
+            'nik' => 'required|max:16|unique:employees,nik',
+            'name' => 'required|string|max:25',
+            'birth_date' => 'required|date',
+            'address' => 'required|string',
+            'email' => 'required|email|unique:employees,email',
+            'phone' => 'required|max:13',
             'position' => 'required|integer'
         ]);
 
@@ -36,7 +52,7 @@ class EmployeeController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validasi gagal',
+                'message' => $validator->errors()->first(),
                 'errors'  => $validator->errors()
             ], 422);
         }
@@ -44,8 +60,13 @@ class EmployeeController extends Controller
         try {
             // Buat dan simpan data ke model
             $employees = Employee::create([
-                'name' => $request->name,
                 'nip' => $request->nip,
+                'nik' => $request->nik,
+                'name' => $request->name,
+                'birth_date' => $request->birth_date,
+                'address' => $request->address,
+                'email' => $request->email,
+                'phone' => $request->phone,
                 'position_id' => $request->position,
             ]);
 
@@ -77,9 +98,20 @@ class EmployeeController extends Controller
         return response()->json($employees);
     }
 
-    public function getEmployeName(Request $request)
+    public function list_pekerja()
+    {
+        $employees = Employee::whereHas('position.paramPosition', function ($query) {
+            $query->where('name', 'PEKERJA');
+        })->get();
+
+        return response()->json($employees);
+    }
+
+    public function getEmployeeName(Request $request)
     {
         $employees = Employee::find($request->leader_id);
         return response()->json(['name' => $employees->name]);
     }
+
+
 }
