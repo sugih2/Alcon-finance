@@ -13,59 +13,68 @@
                     </button>
                 </div>
                 <div class="card-body px-0 pt-0 pb-2">
-                    <div class="table-responsive p-0">
-                        <table class="table align-items-center mb-0">
-                            <thead>
-                                <tr>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">No
-                                    </th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                        Name</th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                        Code</th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                        Project</th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                        Kepala Group</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @php $index = 1; @endphp
-                                @foreach ($groups as $g)
+                    <div class="container">
+                        <div class="table-responsive p-0">
+                            <table class="table align-items-center mb-0">
+                                <thead>
                                     <tr>
-                                        <td>
-                                            <p class="text-sm font-weight-bold mb-0">{{ $index++ }}</p>
-                                        </td>
-                                        <td>
-                                            <p class="text-sm font-weight-bold mb-0">{{ $g->name }}</p>
-                                        </td>
-                                        <td>
-                                            <p class="text-sm font-weight-bold mb-0">{{ $g->code }}</p>
-                                        </td>
-                                        <td>
-                                            <p class="text-sm font-weight-bold mb-0">{{ $g->project->name }}</p>
-                                        </td>
-                                        <td>
-                                            <p class="text-sm font-weight-bold mb-0">{{ $g->leader->name }}</p>
-                                        </td>
-
-                                        <td class="align-middle text-end">
-                                            <div class="d-flex px-3 py-1 justify-content-center align-items-center">
-                                                <button type="button" class="btn btn-link text-primary mb-0"
-                                                    onclick="editGroup({{ $g->id }})">
-                                                    Edit
-                                                </button>
-                                                <button type="button" class="btn btn-link text-danger mb-0"
-                                                    data-bs-toggle="modal" data-bs-target="#deleteRoleModal"
-                                                    data-id="{{ $g->id }}">
-                                                    Delete
-                                                </button>
-                                            </div>
-                                        </td>
+                                        <th
+                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                            No
+                                        </th>
+                                        <th
+                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                            Name</th>
+                                        <th
+                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                            Code</th>
+                                        <th
+                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                            Project</th>
+                                        <th
+                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                            Kepala Group</th>
                                     </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    @php $index = 1; @endphp
+                                    @foreach ($groups as $g)
+                                        <tr>
+                                            <td class="align-middle text-center">
+                                                <p class="text-sm font-weight-bold mb-0">
+                                                    {{ $index++ }}</p>
+                                            </td>
+                                            <td>
+                                                <p class="text-sm font-weight-bold mb-0">{{ $g->name }}</p>
+                                            </td>
+                                            <td>
+                                                <p class="text-sm font-weight-bold mb-0">{{ $g->code }}</p>
+                                            </td>
+                                            <td>
+                                                <p class="text-sm font-weight-bold mb-0">{{ $g->project->name }}</p>
+                                            </td>
+                                            <td>
+                                                <p class="text-sm font-weight-bold mb-0">{{ $g->leader->name }}</p>
+                                            </td>
+
+                                            <td class="align-middle text-end">
+                                                <div class="d-flex px-3 py-1 justify-content-center align-items-center">
+                                                    <button type="button" class="btn btn-link text-primary mb-0"
+                                                        onclick="editGroup({{ $g->id }})">
+                                                        Edit
+                                                    </button>
+                                                    <button type="button" class="btn btn-link text-danger mb-0"
+                                                        data-bs-toggle="modal" data-bs-target="#deleteRoleModal"
+                                                        data-id="{{ $g->id }}">
+                                                        Delete
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -146,7 +155,7 @@
                             preload: true,
                             load: function(query, callback) {
                                 $.ajax({
-                                    url: '/employee/list',
+                                    url: '/employee/list/kepala-pekerja',
                                     type: 'GET',
                                     dataType: 'json',
                                     data: {

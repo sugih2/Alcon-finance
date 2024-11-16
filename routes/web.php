@@ -95,6 +95,7 @@ Route::group(['prefix' => 'employee', 'middleware' => 'auth'], function () {
 	Route::post('/storeedit/{id}', [EmployeeController::class, 'edit'])->name('employee.storeedit');
 	Route::get('/list', [EmployeeController::class, 'list'])->name('employee.list');
 	Route::get('/list/pekerja', [EmployeeController::class, 'list_pekerja'])->name('employee.list-member');
+	Route::get('/list/kepala-pekerja', [EmployeeController::class, 'list_kepala_pekerja'])->name('employee.list-kepala-pekerja');
 	Route::get('/get-employee-name', [EmployeeController::class, 'getEmployeeName'])->name('employee.name');
 });
 Route::group(['prefix' => 'regency', 'middleware' => 'auth'], function () {

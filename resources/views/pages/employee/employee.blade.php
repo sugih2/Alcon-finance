@@ -13,59 +13,75 @@
                     </button>
                 </div>
                 <div class="card-body px-0 pt-0 pb-2">
-                    <div class="table-responsive p-0">
-                        <table class="table align-items-center mb-0" id="employeeTable">
-                            <thead>
-                                <tr>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">No
-                                    </th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">NIP
-                                    </th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">NIK
-                                    </th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                        Name</th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                        Brith Date</th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                        Addres</th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                        Email</th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                        Phone</th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                        Position</th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                        Group</th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                        Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @php $index = 1; @endphp
-                                @foreach ($employees as $e)
+                    <div class="container">
+                        <div class="table-responsive p-0">
+                            <table class="table align-items-center mb-0" id="employeeTable">
+                                <thead>
                                     <tr>
-                                        <td>{{ $index++ }}</td>
-                                        <td>{{ $e->nip }}</td>
-                                        <td>{{ $e->nik }}</td>
-                                        <td>{{ $e->name }}</td>
-                                        <td>{{ $e->birth_date }}</td>
-                                        <td>{{ $e->address }}</td>
-                                        <td>{{ $e->email }}</td>
-                                        <td>{{ $e->phone }}</td>
-                                        <td>{{ $e->position->name }}</td>
-                                        <td>Ujang</td>
-                                        <td class="align-middle text-end">
-                                            <button type="button" class="btn btn-link text-primary mb-0"
-                                                onclick="editEmployee({{ $e->id }})">Edit</button>
-                                            <button type="button" class="btn btn-link text-danger mb-0"
-                                                data-bs-toggle="modal" data-bs-target="#deleteRoleModal"
-                                                data-id="{{ $e->id }}">Delete</button>
-                                        </td>
+                                        <th
+                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                            No
+                                        </th>
+                                        <th
+                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                            NIP
+                                        </th>
+                                        <th
+                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                            NIK
+                                        </th>
+                                        <th
+                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                            Name</th>
+                                        <th
+                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                            Brith Date</th>
+                                        <th
+                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                            Addres</th>
+                                        <th
+                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                            Email</th>
+                                        <th
+                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                            Phone</th>
+                                        <th
+                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                            Position</th>
+                                        <th
+                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                            Group</th>
+                                        <th
+                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                            Action</th>
                                     </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    @php $index = 1; @endphp
+                                    @foreach ($employees as $e)
+                                        <tr>
+                                            <td class="align-middle text-center">{{ $index++ }}</td>
+                                            <td>{{ $e->nip }}</td>
+                                            <td>{{ $e->nik }}</td>
+                                            <td>{{ $e->name }}</td>
+                                            <td>{{ $e->birth_date }}</td>
+                                            <td>{{ $e->address }}</td>
+                                            <td>{{ $e->email }}</td>
+                                            <td>{{ $e->phone }}</td>
+                                            <td>{{ $e->position->name }}</td>
+                                            <td>Ujang</td>
+                                            <td class="align-middle text-end">
+                                                <button type="button" class="btn btn-link text-primary mb-0"
+                                                    onclick="editEmployee({{ $e->id }})">Edit</button>
+                                                <button type="button" class="btn btn-link text-danger mb-0"
+                                                    data-bs-toggle="modal" data-bs-target="#deleteRoleModal"
+                                                    data-id="{{ $e->id }}">Delete</button>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>

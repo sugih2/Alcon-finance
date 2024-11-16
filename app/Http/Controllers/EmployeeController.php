@@ -107,6 +107,15 @@ class EmployeeController extends Controller
         return response()->json($employees);
     }
 
+    public function list_kepala_pekerja()
+    {
+        $employees = Employee::whereHas('position.paramPosition', function ($query) {
+            $query->where('name', 'KEPALA PEKERJA');
+        })->get();
+
+        return response()->json($employees);
+    }
+
     public function getEmployeeName(Request $request)
     {
         $employees = Employee::find($request->leader_id);
