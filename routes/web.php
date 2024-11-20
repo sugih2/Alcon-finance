@@ -45,13 +45,15 @@ Route::group(['prefix' => 'user-management', 'middleware' => 'auth'], function (
     Route::delete('/users/{user}', [UserManagementController::class, 'destroyUser'])->name('users.destroy');
 	Route::post('/roles', [UserManagementController::class, 'storeRole'])->name('roles.store');
 	Route::put('/roles/{role}', [UserManagementController::class, 'updateRole'])->name('roles.update');
-	Route::delete('/roles/{role}', [UserManagementController::class, 'destroyRole'])->name('roles.destroy');	
 	Route::delete('/roles/{role}', [UserManagementController::class, 'destroyRole'])->name('roles.destroy');
+	Route::get('/roles/{role}/permissions', [UserManagementController::class, 'getPermissions'])->name('roles.permissions');	
+	Route::post('/roles/{role}/permissions/save', [UserManagementController::class, 'savePermissions'])->name('roles.permissions.save');
 	Route::get('/menus', [UserManagementController::class, 'getDataMenu'])->name('menus.data');
 	Route::post('/menus', [UserManagementController::class, 'storeDataMenu'])->name('menus.store');
 	Route::get('/menus/{menu}', [UserManagementController::class, 'showDataMenu'])->name('menus.show');
 	Route::put('/menus/{menu}', [UserManagementController::class, 'updateMenu'])->middleware('auth')->name('menus.update');
 	Route::delete('/menus/{menu}', [UserManagementController::class, 'destroyMenu'])->name('menus.destroy');
+	
 });
 Route::group(['prefix' => 'paramposition', 'middleware' => 'auth'], function () {
 	Route::get('/', [ParamPositionController::class, 'index'])->middleware('auth')->name('paramposition.index');
@@ -110,6 +112,8 @@ Route::group(['prefix' => 'presence', 'middleware' => 'auth'], function () {
     Route::get('/edit/{id}', [PresenceController::class, 'edit'])->name('presence.edit');
     Route::post('/update/{id}', [PresenceController::class, 'update'])->name('presence.update');
     Route::delete('/delete/{id}', [PresenceController::class, 'destroy'])->name('presence.delete');
+	Route::post('/process-import', [PresenceController::class, 'processImport'])->name('presence.processImport');
+    Route::post('/store-import', [PresenceController::class, 'storeImport'])->name('presence.storeImport');
 });
 
 

@@ -16,4 +16,20 @@ class Menu extends Model
         'icon',
         'status'
     ];
+    public function children()
+    {
+        return $this->hasMany(Menu::class, 'parent_id');
+    }
+
+    // Relasi ke menu parent
+    public function parent()
+    {
+        return $this->belongsTo(Menu::class, 'parent_id');
+    }
+
+    // Relasi ke MenuPermission
+    public function menuPermissions()
+    {
+        return $this->hasMany(MenuPermission::class);
+    }
 }

@@ -6,8 +6,11 @@ use Alert;
 use App\Models\User;
 use App\Models\Role;
 use App\Models\Menu;
+use App\Models\RolePermission;
+use App\Models\MenuPermission;
 use Yajra\DataTables\DataTables;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 
 class UserManagementController extends Controller
@@ -186,5 +189,64 @@ class UserManagementController extends Controller
         $menu->delete(); // Hapus menu
 
         return response()->json(['message' => 'Menu deleted successfully.']);
+    }
+    public function getPermissions(Role $role)
+    {
+        $menus = Menu::with(['menuPermissions.rolePermissions' => function ($query) use ($role) {
+            $query->where('role_id', $role->id);
+        }])->get();
+
+        return view('pages.admin.permissions-partial', compact('menus', 'role'))->render();
+    }
+    public function savePermissions(Request $request, $roleId)
+    {
+        $menus = Menu::all();
+    
+        $menuPermissionsData = [];
+        $rolePermissionsData = [];
+    
+        foreach ($menus as $menu) {
+            $menuPermissionsData[] = [
+                'menu_id' => $menu->id,
+                'c' => false,
+                'r' => false,
+                'u' => false,
+                'd' => false,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+    
+            // Cek apakah menu_permission sudah ada
+            $menuPermission = MenuPermission::where('menu_id', $menu->id)->first();
+    
+            if ($menuPermission) {
+                $rolePermissionsData[] = [
+                    'menu_permission_id' => $menuPermission->id,
+                    'role_id' => $roleId,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+            }
+        }
+    
+        // Buat atau perbarui menu_permissions
+        MenuPermission::upsert($menuPermissionsData, ['menu_id'], ['updated_at']);
+    
+        // Ambil semua menu_permissions terbaru
+        $menuPermissions = MenuPermission::whereIn('menu_id', $menus->pluck('id'))->get();
+    
+        foreach ($menuPermissions as $menuPermission) {
+            $rolePermissionsData[] = [
+                'menu_permission_id' => $menuPermission->id,
+                'role_id' => $roleId,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+    
+        // Simpan role_permissions
+        RolePermission::upsert($rolePermissionsData, ['menu_permission_id', 'role_id'], ['updated_at']);
+    
+        return response()->json(['message' => 'Permissions saved successfully']);
     }
 }

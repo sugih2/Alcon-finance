@@ -29,10 +29,15 @@
                                         <td>{{ $index++ }}</td>
                                         <td>{{ $role->name }}</td>
                                         <td class="text-center">
-                                            <button type="button" class="btn btn-link text-primary" data-bs-toggle="modal" data-bs-target="#editRoleModal"
-                                                data-name="{{ $role->name }}" data-id="{{ $role->id }}">Edit</button>
-                                            <button type="button" class="btn btn-link text-danger" data-bs-toggle="modal" data-bs-target="#deleteRoleModal"
-                                                data-id="{{ $role->id }}">Delete</button>
+                                            <div class="d-flex flex-column flex-md-row gap-1 justify-content-center">
+                                                {{-- <button type="button" class="btn btn-link text-info" data-bs-toggle="modal" data-bs-target="#editRolePermission"
+                                                    data-name="{{ $role->name }}" data-id="{{ $role->id }}">Permission</button> --}}
+                                                <button type="button" class="btn btn-link text-info" onclick="showPermissions({{ $role->id }})">Permissions</button>
+                                                <button type="button" class="btn btn-link text-primary" data-bs-toggle="modal" data-bs-target="#editRoleModal"
+                                                    data-name="{{ $role->name }}" data-id="{{ $role->id }}">Edit</button>
+                                                <button type="button" class="btn btn-link text-danger" data-bs-toggle="modal" data-bs-target="#deleteRoleModal"
+                                                    data-id="{{ $role->id }}">Delete</button>
+                                            </div>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -463,7 +468,24 @@
                 </div>
             </div>
         </div>
-    </div>        
+    </div>
+    <div class="modal fade" id="permissionsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Manage Permissions</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>              
     {{-- <script>
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('menuForm');
@@ -727,5 +749,43 @@
             var form = deleteMenuModal.querySelector('#deleteMenuForm'); // Pastikan id form benar
             form.action = '{{ url('menu-management/menus') }}/' + menuId;
         });
+        function showPermissions(roleId) {
+            // Panggil AJAX untuk mengambil data permissions
+            $.ajax({
+                url: `/user-management/roles/${roleId}/permissions`, // Route untuk fetch data
+                type: 'GET',
+                success: function (response) {
+                    // Ganti isi modal dengan data yang diterima
+                    $('#permissionsModal .modal-body').html(response);
+                    $('#permissionsModal').modal('show');
+                },
+                error: function (xhr) {
+                    alert('Failed to load permissions.');
+                }
+            });
+        };
+        document.getElementById('savePermissions').addEventListener('click', function () {
+            const roleId = document.getElementById('permissionsModal').getAttribute('data-role-id'); // Ambil roleId dari atribut modal
+            savePermissions(roleId);
+        });
+        function savePermissions(roleId) {
+            // Ambil data checkbox dari form
+            const formData = $('#permissionsForm').serialize();
+
+            $.ajax({
+                url: `/user-management/roles/${roleId}/permissions`,
+                type: 'POST',
+                data: formData,
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // CSRF Token
+                },
+                success: function (response) {
+                    alert(response.message);
+                },
+                error: function (xhr) {
+                    alert('Failed to save permissions.');
+                }
+            });
+        }
     </script>
 @endsection
