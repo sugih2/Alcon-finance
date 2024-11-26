@@ -23,9 +23,12 @@ class Presence extends Model
      */
     protected $fillable = [
         'employed_id',
+        'code_upload',
         'tanggal_scan',
         'tanggal',
-        'jam',
+        'jam_masuk',
+        'jam_pulang',
+        'presensi_status',
         'sn',
     ];
 
@@ -35,9 +38,9 @@ class Presence extends Model
      * @var array
      */
     protected $casts = [
-        'tanggal_scan' => 'date',
+        'tanggal_scan' => 'datetime:Y-m-d H:i:s',
         'tanggal' => 'date',
-        'jam' => 'datetime:H:i:s',
+        'jam' => 'H:i:s',
     ];
 
     /**
@@ -47,6 +50,6 @@ class Presence extends Model
      */
     public function employee()
     {
-        return $this->belongsTo(Employee::class, 'employed_id', 'nip');
+        return $this->belongsTo(Employee::class, 'employed_id', 'id');
     }
 }

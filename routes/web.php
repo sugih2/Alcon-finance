@@ -34,6 +34,8 @@ use App\Http\Controllers\RegencyController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\PresenceController;
+use App\Http\Controllers\ParamComponenController;
+use App\Http\Controllers\PraPayrollController;
 
 Route::get('/data', [ExampleController::class, 'getData'])->middleware('auth')->name('data.index');
 
@@ -99,6 +101,7 @@ Route::group(['prefix' => 'employee', 'middleware' => 'auth'], function () {
 	Route::get('/list/pekerja', [EmployeeController::class, 'list_pekerja'])->name('employee.list-member');
 	Route::get('/list/kepala-pekerja', [EmployeeController::class, 'list_kepala_pekerja'])->name('employee.list-kepala-pekerja');
 	Route::get('/get-employee-name', [EmployeeController::class, 'getEmployeeName'])->name('employee.name');
+	Route::get('/employee-list', [EmployeeController::class, 'getEmployeeList'])->name('employee.getlist');
 });
 Route::group(['prefix' => 'regency', 'middleware' => 'auth'], function () {
 	Route::get('/', [RegencyController::class, 'regency'])->name('regency.list');
@@ -115,6 +118,44 @@ Route::group(['prefix' => 'presence', 'middleware' => 'auth'], function () {
 	Route::post('/process-import', [PresenceController::class, 'processImport'])->name('presence.processImport');
     Route::post('/store-import', [PresenceController::class, 'storeImport'])->name('presence.storeImport');
 });
+Route::group(['prefix' => 'componen', 'middleware' => 'auth'], function () {
+	Route::get('/', [ParamComponenController::class, 'index'])->middleware('auth')->name('componen.index');
+	Route::post('/store', [ParamComponenController::class, 'store'])->name('componen.store');
+	Route::get('/create', [ParamComponenController::class, 'create'])->name('componen.create');
+	Route::get('/edit/{id}', [ParamComponenController::class, 'edit'])->name('componen.edit');
+	Route::post('/storeedit/{id}', [ParamComponenController::class, 'edit'])->name('componen.storeedit');
+	Route::get('/list', [ParamComponenController::class, 'list'])->name('componen.list');
+	Route::get('/get-componen-name', [ParamComponenController::class, 'getComponenName'])->name('componen.name');
+	Route::get('/componen-list', [ParamComponenController::class, 'getComponentList'])->name('componen.getlist');
+});
+Route::group(['prefix' => 'pra-payroll', 'middleware' => 'auth'], function () {
+	Route::get('/', [PraPayrollController::class, 'index'])->middleware('auth')->name('prapayroll.index');
+	Route::post('/store', [PraPayrollController::class, 'store'])->name('prapayroll.store');
+	Route::get('/create', [PraPayrollController::class, 'create'])->name('prapayroll.create');
+	Route::get('/edit/{id}', [PraPayrollController::class, 'edit'])->name('prapayroll.edit');
+	Route::post('/storeedit/{id}', [PraPayrollController::class, 'edit'])->name('prapayroll.storeedit');
+	Route::get('/list', [PraPayrollController::class, 'list'])->name('prapayroll.list');
+	Route::get('/get-componen-name', [PraPayrollController::class, 'getComponenName'])->name('prapayroll.name');
+});
+Route::group(['prefix' => 'adjusment', 'middleware' => 'auth'], function () {
+	Route::get('/', [PraPayrollController::class, 'adjusment'])->middleware('auth')->name('adjusment.index');
+	Route::post('/store', [PraPayrollController::class, 'store'])->name('adjusment.store');
+	Route::get('/create', [PraPayrollController::class, 'create'])->name('adjusment.create');
+	Route::get('/edit/{id}', [PraPayrollController::class, 'edit'])->name('adjusment.edit');
+	Route::post('/storeedit/{id}', [PraPayrollController::class, 'edit'])->name('adjusment.storeedit');
+	Route::get('/list', [PraPayrollController::class, 'list'])->name('adjusment.list');
+	Route::get('/get-componen-name', [PraPayrollController::class, 'list-name'])->name('adjusment.name');
+	Route::get('/employee', [PraPayrollController::class, 'employee'])->name('adjusment.employee');
+	Route::get('/component', [PraPayrollController::class, 'component'])->name('adjusment.component');
+	Route::post('/store-employee', [PraPayrollController::class, 'storeselectkar'])->name('adjusment.storeselectkar');
+	Route::post('/store-component', [PraPayrollController::class, 'storeselectcom'])->name('adjusment.storeselectcom');
+	Route::post('/store-adjusment', [PraPayrollController::class, 'storeadjusment'])->name('adjusment.storeadjusment');
+	
+
+
+});
+
+
 
 
 

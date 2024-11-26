@@ -3,7 +3,22 @@
 @section('content')
     @include('../layouts.navbars.auth.topnav', ['title' => 'Presence'])
     @include('sweetalert::alert')
-    
+
+    <div class="row mt-4 mx-4">
+        <div class="col-md-12">
+            <div class="card mb-4">
+                <div class="card-header pb-0 d-flex justify-content-between align-items-center">
+                    <h6>Preview</h6>
+                    <button id="saveButton" class="btn btn-success btn-sm" style="display:none;">Save</button>
+                </div>
+                <div class="card-body px-0 pt-0 pb-2">
+                    <div class="table-responsive p-0" id="table-preview">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="row mt-4 mx-4">
         <div class="col-md-12">
             <div class="card mb-4">
@@ -12,7 +27,8 @@
                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#importModal">
                         Import Presence
                     </button>
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPresenceModal">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                        data-bs-target="#addPresenceModal">
                         Tambah Presence
                     </button>
                 </div>
@@ -41,18 +57,24 @@
                                         <td>{{ $presence->jam }}</td>
                                         <td>{{ $presence->sn }}</td>
                                         <td class="align-middle text-end">
-                                            <button type="button" class="btn btn-link text-primary mb-0" data-bs-toggle="modal" data-bs-target="#editPresenceModal" data-id="{{ $presence->id }}">Edit</button>
-                                            <button type="button" class="btn btn-link text-danger mb-0" data-bs-toggle="modal" data-bs-target="#deletePresenceModal" data-id="{{ $presence->id }}">Delete</button>
+                                            <button type="button" class="btn btn-link text-primary mb-0"
+                                                data-bs-toggle="modal" data-bs-target="#editPresenceModal"
+                                                data-id="{{ $presence->id }}">Edit</button>
+                                            <button type="button" class="btn btn-link text-danger mb-0"
+                                                data-bs-toggle="modal" data-bs-target="#deletePresenceModal"
+                                                data-id="{{ $presence->id }}">Delete</button>
                                         </td>
                                     </tr>
                                 @endforeach
                             </tbody>
-                        </table>                       
+                        </table>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+
 
     <!-- Modal Import -->
     <div class="modal fade" id="importModal" tabindex="-1" role="dialog">
@@ -67,7 +89,8 @@
                     <div class="modal-body">
                         <div class="form-group">
                             <label for="file">Pilih File (XML/XLS)</label>
-                            <input type="file" class="form-control" name="file" id="file" accept=".xml, .xls, .xlsx" required>
+                            <input type="file" class="form-control" name="file" id="file"
+                                accept=".xml, .xls, .xlsx" required>
                         </div>
                         <div class="form-group">
                             <label for="start_date">Tanggal Mulai</label>
@@ -86,143 +109,155 @@
             </div>
         </div>
     </div>
-    
-    <!-- Modal Proses Data -->
-    <div class="modal fade" id="processDataModal" tabindex="-1" role="dialog" aria-labelledby="processDataModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="processDataModalLabel">Proses Data</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <p>Proses data sedang berlangsung...</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Preview Data -->
-    <div class="modal fade" id="previewDataModal" tabindex="-1" role="dialog" aria-labelledby="previewDataModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="previewDataModalLabel">Preview Data</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <h3>Preview Data</h3>
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Tanggal</th>
-                                <th>Jam Masuk</th>
-                                <th>Jam Keluar</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="previewTable"></tbody>
-                    </table>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" id="saveData" class="btn btn-success">Simpan Data</button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
-                </div>
-            </div>
-        </div>
-    </div>   
 
     <script>
         function submitImportForm() {
             $('#importForm').submit();
         }
 
-        // Handle form submission using AJAX
-        $('#importForm').on('submit', function (e) {
+        $('#importForm').on('submit', function(e) {
             e.preventDefault();
             let formData = new FormData(this);
 
             $.ajax({
-                url: "{{ route('presence.processImport') }}",  // Endpoint untuk memproses import
+                url: "{{ route('presence.processImport') }}",
                 method: "POST",
                 data: formData,
                 processData: false,
                 contentType: false,
-                success: function (response) {
+                success: function(response) {
                     // Debug log untuk memeriksa data yang diterima
                     console.log(response);
-                    
+
                     if (response.data && response.data.length > 0) {
-                        // Menampilkan modal preview
-                        $('#previewDataModal').modal('show');
-                        
-                        let tableContent = '';
-                        response.data.forEach((row, index) => {
-                            tableContent += `<tr>
-                                <td>${index + 1}</td>
-                                <td>${row.tanggal}</td>
-                                <td>${row.jam_masuk}</td>
-                                <td>${row.jam_keluar}</td>
-                                <td>Valid</td>
-                            </tr>`;
-                        });
-                        
-                        response.invalidData.forEach((row, index) => {
-                            tableContent += `<tr class="text-danger">
-                                <td>${index + 1}</td>
-                                <td>${row.tanggal}</td>
-                                <td>${row.jam}</td>
-                                <td>-</td>
-                                <td>Invalid</td>
-                            </tr>`;
-                        });
-                        
-                        $('#previewTable').html(tableContent);  // Menampilkan data ke tabel preview
+                        generateTable(response.data);
+                        $("#importModal").modal("hide");
                     } else {
-                        alert('Tidak ada data untuk dipreview');
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal',
+                            text: 'Data tidak ditemukan'
+                        });
                     }
                 },
-                error: function (xhr, status, error) {
+                error: function(xhr, status, error) {
                     alert('Terjadi kesalahan saat memproses data');
                 }
             });
         });
 
-        // Fungsi untuk menyimpan data setelah preview
-        $('#saveData').on('click', function () {
-            const validatedData = [];  // Ambil data valid yang telah divalidasi
+        function generateTable(data) {
+            let tableHtml = `
+            <table class="table align-items-center mb-0">
+                <thead>
+                    <tr>
+                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">NIP</th>
+                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nama</th>
+                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Tanggal</th>
+                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Jam Masuk</th>
+                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Jam Pulang</th>
+                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Presensi Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
 
-            // Submit data menggunakan AJAX
-            $.ajax({
-                url: "{{ route('presence.storeImport') }}",  // Endpoint untuk menyimpan data
-                method: "POST",
-                data: { data: validatedData },
-                success: function (response) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Berhasil',
-                        text: response.message || 'Data berhasil disimpan'
-                    }).then(() => {
-                        location.reload();
-                    });
-                },
-                error: function (xhr, status, error) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Gagal',
-                        text: 'Data gagal disimpan'
-                    });
+            data.forEach(item => {
+                tableHtml += `
+                <tr>
+                    <td>${item.nip || '-'}</td>
+                    <td>${item.nama || '-'}</td>
+                    <td>${item.tanggal || '-'}</td>
+                    <td>${item.jam_masuk || '-'}</td>
+                    <td>${item.jam_pulang || '-'}</td>
+                    <td>${item.presensi_status || '-'}</td>
+                </tr>
+            `;
+            });
+
+            tableHtml += `
+                </tbody>
+            </table>
+        `;
+
+            // Tambahkan ke div tabel di dalam preview
+            $('#table-preview').html(tableHtml);
+
+            if (data.length > 0) {
+                $('#saveButton').show().data('data', data); // Simpan data di tombol Save
+            } else {
+                $('#saveButton').hide();
+            }
+        }
+
+        // Fungsi untuk menyimpan data setelah preview
+        $('#saveButton').on('click', function() {
+            let dataToSave = $(this).data('data'); // Ambil data yang telah disimpan di tombol
+            const submitButton = this;
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+            // Nonaktifkan tombol untuk mencegah klik ganda
+            submitButton.disabled = true;
+
+            Swal.fire({
+                title: 'Menyimpan data...',
+                html: 'Progress: <b>0%</b>',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
                 }
             });
+
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress += 10;
+                Swal.update({
+                    html: `Progress: <b>${progress}%</b>`
+                });
+                if (progress >= 90) clearInterval(progressInterval); // Stop updating near completion
+            }, 200);
+
+            console.log('cekkkkkk:'.dataToSave);
+
+            // Atur header CSRF
+            // $.ajaxSetup({
+            //     headers: {
+            //         'X-CSRF-TOKEN': csrfToken
+            //     }
+            // });
+
+            // // Kirim data ke server menggunakan AJAX
+            // $.ajax({
+            //     url: "{{ route('presence.storeImport') }}",
+            //     method: "POST",
+            //     data: {
+            //         data: dataToSave
+            //     },
+            //     success: function(response) {
+            //         clearInterval(progressInterval); // Hentikan progres
+            //         Swal.fire({
+            //             icon: 'success',
+            //             title: 'Berhasil',
+            //             text: 'Data berhasil disimpan'
+            //         }).then(() => {
+            //             location.reload(); // Refresh halaman setelah berhasil
+            //         });
+            //         $('#saveButton').hide();
+            //         submitButton.disabled = false; // Sembunyikan tombol setelah berhasil disimpan
+            //     },
+            //     error: function(xhr, status, error) {
+            //         clearInterval(progressInterval); // Hentikan progres
+            //         Swal.fire({
+            //             icon: 'error',
+            //             title: 'Gagal',
+            //             text: 'Terjadi kesalahan saat menyimpan data.'
+            //         });
+            //         console.error(xhr.responseText); // Log detail error
+            //         submitButton.disabled = false; // Aktifkan kembali tombol untuk mencoba lagi
+            //     }
+            // });
         });
+
 
         // Initialize DataTable
         $(document).ready(function() {

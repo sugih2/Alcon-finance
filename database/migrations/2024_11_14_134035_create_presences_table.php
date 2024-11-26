@@ -13,15 +13,18 @@ return new class extends Migration
     {
         Schema::create('presences', function (Blueprint $table) {
             $table->id();
-            $table->string('employed_id');
-            $table->date('tanggal_scan');
+            $table->unsignedBigInteger('employed_id');
+            $table->string('code_upload');
+            $table->datetime('tanggal_scan');
             $table->date('tanggal');
-            $table->time('jam');
+            $table->time('jam_masuk');
+            $table->time('jam_pulang');
+            $table->string('presensi_status');
             $table->string('sn');
             $table->timestamps();
 
             $table->foreign('employed_id')
-                ->references('nip')
+                ->references('id')
                 ->on('employees')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');

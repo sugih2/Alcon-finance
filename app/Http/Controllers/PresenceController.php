@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Presence;
 use App\Models\Employee;
+use App\Models\SettingShift;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
@@ -182,78 +183,146 @@ class PresenceController extends Controller
     //     ]);
     // }
 
+    
     public function processImport(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'file' => 'required|mimes:xls,xlsx,xml',
             'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
+            'end_date' => 'required|date|after_or_equal:start_date'
         ]);
 
-        Log::info('Request All: ', $request->all());
-        $file = $request->file('file');
-        $data = [];
+        if ($validator->fails()) {
+            $errors = $validator->errors()->toArray();
+            $errorMessages = [];
 
-        if ($file->getClientOriginalExtension() === 'xml') {
-            $fileContent = file_get_contents($file);
-            $fileContent = preg_replace('/<\?xml:stylesheet(.*?)\?>/', '<?xml-stylesheet\1?>', $fileContent);
-            $xml = simplexml_load_string($fileContent);
-
-            if ($xml === false) {
-                Log::error('Error parsing XML: ' . implode(", ", libxml_get_errors()));
-                return response()->json(['error' => 'Failed to parse XML'], 400);
+            foreach ($errors as $field => $errorMessagesForField) {
+                $errorMessages[$field] = $errorMessagesForField[0];
             }
 
-
-            if (isset($xml->ROWS->ROW)) {
-                foreach ($xml->ROWS->ROW as $row) {
-                    $data[] = [
-                        'tanggal_scan' => (string) $row['dbg_scanlogscan_date'] ?? null,
-                        'tanggal' => (string) $row['dbg_scanlogtgl'] ?? null,
-                        'jam' => (string) $row['dbg_scanlogjam'] ?? null,
-                        'nip' => (string) $row['dbg_scanlogpegawai_nip'] ?? null,
-                        'nama' => (string) $row['dbg_scanlogpegawai_nama'] ?? null,
-                        'sn' => (string) $row['dbg_scanlogsn'] ?? null,
-                    ];
-                }
-                Log::info('Data Presensi:' . json_encode($data));
-            } else {
-                Log::warning('Invalid XML structure');
-            }
-        } else {
-            $data = Excel::toArray([], $file)[0];
+            return response()->json(['error' => $errorMessages], 400);
         }
 
-        $filteredData = array_filter($data, function ($row) use ($request) {
-            $date = $row['tanggal'] ?? $row['tanggal_scan'] ?? null;
+        try 
+        {
+            Log::info('Request All: ', $request->all());
+            $file = $request->file('file');
+            $data = [];
 
-            if (!$date) {
-                Log::warning('Invalid date in row: ' . json_encode($row));
-                return false;
+            if ($file->getClientOriginalExtension() === 'xml') {
+                $fileContent = file_get_contents($file);
+                $fileContent = preg_replace('/<\?xml:stylesheet(.*?)\?>/', '<?xml-stylesheet\1?>', $fileContent);
+                $xml = simplexml_load_string($fileContent);
+
+                if ($xml === false) {
+                    Log::error('Error parsing XML: ' . implode(", ", libxml_get_errors()));
+                    return response()->json(['error' => 'Failed to parse XML'], 400);
+                }
+
+                if (isset($xml->ROWS->ROW)) {
+                    foreach ($xml->ROWS->ROW as $row) {
+                        $data[] = [
+                            'tanggal_scan' => (string) $row['dbg_scanlogscan_date'] ?? null,
+                            'tanggal' => (string) $row['dbg_scanlogtgl'] ?? null,
+                            'jam' => (string) $row['dbg_scanlogjam'] ?? null,
+                            'nip' => (string) $row['dbg_scanlogpegawai_nip'] ?? null,
+                            'nama' => (string) $row['dbg_scanlogpegawai_nama'] ?? null,
+                            'sn' => (string) $row['dbg_scanlogsn'] ?? null,
+                        ];
+                    }
+                    Log::info('Data Presensi:' . json_encode($data));
+                } else {
+                    Log::warning('Invalid XML structure');
+                    return response()->json(['error' => 'Invalid XML structure'], 400);
+                }
+            } else {
+                $data = Excel::toArray([], $file)[0];
             }
 
-            try {
-                $date = Carbon::parse($date);
-            } catch (\Exception $e) {
-                Log::error('Invalid date format: ' . $date);
-                return false;
+            $filteredData = array_filter($data, function ($item) use ($request) {
+                return $item['tanggal'] >= $request->start_date && $item['tanggal'] <= $request->end_date;
+            });
+
+            Log::info('Filtered Data: ' . json_encode($filteredData));
+
+            // Grupkan Data Berdasarkan NIP dan Tanggal
+            $groupedData = [];
+            foreach ($filteredData as $item) {
+                $key = $item['nip'] . '|' . $item['tanggal'];
+                if (!isset($groupedData[$key])) {
+                    $groupedData[$key] = [];
+                }
+                $groupedData[$key][] = $item;
             }
 
-            $startDate = Carbon::parse($request->start_date);
-            $endDate = Carbon::parse($request->end_date);
+            $finalData = [];
+            foreach ($groupedData as $key => $items) {
+                [$nip, $tanggal] = explode('|', $key);
+                $shift = SettingShift::where('kode', 'S001')->first(); // Contoh shift, sesuaikan kode shift
 
-            return $date->between($startDate, $endDate);
-        });
+                if (!$shift) {
+                    Log::warning("No shift found for NIP: $nip on $tanggal");
+                    continue;
+                }
 
-        Log::info('Filtered Data: ' . json_encode($filteredData));
+                // Filter jam masuk
+                $jamMasukData = array_filter($items, function ($item) use ($shift) {
+                    return $item['jam'] >= $shift->awal_masuk && $item['jam'] <= $shift->maks_late;
+                });
 
-        $validatedData = $this->validatePresenceData($filteredData);
+                $jamMasuk = null;
+                $presensiStatus = null;
 
-        return response()->json([
-            'data' => $validatedData['data'],
-            'invalidData' => $validatedData['invalid'],
-        ]);
+                
+
+
+                // Filter jam pulang
+                $jamPulangData = array_filter($items, function ($item) use ($shift) {
+                    return $item['jam'] > $shift->jam_pulang && $item['jam'] <= '23:59:59';
+                });
+
+                $jamPulang = null;
+                if (!empty($jamPulangData)) {
+                    $jamPulang = max(array_column($jamPulangData, 'jam'));
+                }
+
+                if (!empty($jamMasukData)) {
+                    $jamMasuk = min(array_column($jamMasukData, 'jam'));
+
+                    if ($jamMasuk < $shift->jam_masuk) {
+                        $presensiStatus = 'EarlyIn';
+                    } elseif ($jamMasuk >= $shift->jam_masuk && $jamMasuk <= date('H:i:s', strtotime($shift->jam_masuk) + 59)) {
+                        $presensiStatus = 'OnTime';
+                    } else {
+                        $presensiStatus = 'Late';
+                    }
+                } elseif ($jamPulang) {
+                    $presensiStatus = 'MissingIn';
+                }
+
+                // Tambahkan ke final
+                if ($jamMasuk || $jamPulang) {
+                    $finalData[] = [
+                        'nip' => $nip,
+                        'nama' => $items[0]['nama'],
+                        'tanggal' => $tanggal,
+                        'jam_masuk' => $jamMasuk,
+                        'jam_pulang' => $jamPulang,
+                        'presensi_status' => $presensiStatus,
+                        'sn' => $items[0]['sn'],
+                    ];
+                }
+            }
+
+            Log::info('Final Data: ' . json_encode($finalData, JSON_PRETTY_PRINT));
+
+            return response()->json(['data' => $finalData]);
+        } catch (\Exception $e) {
+            Log::error('Error: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to process import'], 500);
+        }
     }
+
 
     private function validatePresenceData(array $filteredData)
     {

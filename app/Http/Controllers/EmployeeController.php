@@ -122,5 +122,27 @@ class EmployeeController extends Controller
         return response()->json(['name' => $employees->name]);
     }
 
+    public function getEmployeeList(Request $request)
+    {
+        Log::info("Request: " . json_encode($request->all()));
+
+        $employees = Employee::with(['position:id,name'])
+        ->select('id', 'name', 'nip', 'position_id')
+        ->orderBy('name', 'asc')
+        ->distinct()
+        ->get();
+
+        $employees = $employees->map(function($employee) {
+            return [
+                'id' => $employee->id,
+                'nama_lengkap' => $employee->name,
+                'nomor_induk_karyawan' => $employee->nip,
+                'jabatan_nama' => $employee->position->name
+            ];
+        });
+        
+        return response()->json($employees);
+    }
+
 
 }
