@@ -239,6 +239,10 @@ class PresenceController extends Controller
                 $data = Excel::toArray([], $file)[0];
             }
 
+
+
+
+
             $filteredData = array_filter($data, function ($item) use ($request) {
                 return $item['tanggal'] >= $request->start_date && $item['tanggal'] <= $request->end_date;
             });
@@ -299,7 +303,12 @@ class PresenceController extends Controller
                 } elseif ($jamPulang) {
                     $presensiStatus = 'MissingIn';
                 }
-
+                // Tambahkan status karyawan
+                foreach ($data as &$rows) {
+                    $employee = Employee::where('nip', $row['nip'])->first();
+                    $row['status_karyawan'] = $employee ? 'karyawan' : 'bukan karyawan';
+                }
+                Log::info('Data Presensi:' . json_encode($row));
                 // Tambahkan ke final
                 if ($jamMasuk || $jamPulang) {
                     $finalData[] = [
@@ -310,6 +319,7 @@ class PresenceController extends Controller
                         'jam_pulang' => $jamPulang,
                         'presensi_status' => $presensiStatus,
                         'sn' => $items[0]['sn'],
+                        'status_karyawan' => $row[0]['status_karyawan'],
                     ];
                 }
             }
@@ -446,6 +456,7 @@ class PresenceController extends Controller
                     Log::warning("Employee dengan NIP {$row['nip']} tidak ditemukan.");
                     return response()->json(['error' => "Employee dengan NIP {$row['nip']} tidak ditemukan."], 404);
                 }
+
 
                 // Simpan data presensi
                 $presemsi = Presence::create([
