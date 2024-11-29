@@ -175,12 +175,8 @@
                 </a>
             </li>
             <li class="nav-item">
-<<<<<<< HEAD
-                <a class="nav-link " href="">
-=======
                 <a class="nav-link {{ Route::currentRouteName() == 'runpayroll.index' ? 'active' : '' }}"
                     href="{{ route('runpayroll.index') }}">
->>>>>>> 25ef1f9e4637d64b00bb7130d1b4b67d1fb32a74
                     <div
                         class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
                         <i class="ni ni-single-02 text-dark text-sm opacity-10"></i>

@@ -8,10 +8,7 @@ use App\Models\Employee;
 use App\Models\SettingShift;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Log;
-<<<<<<< HEAD
-=======
 use Illuminate\Support\Facades\DB;
->>>>>>> 25ef1f9e4637d64b00bb7130d1b4b67d1fb32a74
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
 
@@ -187,7 +184,7 @@ class PresenceController extends Controller
     //     ]);
     // }
 
-    
+
     public function processImport(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -207,8 +204,7 @@ class PresenceController extends Controller
             return response()->json(['error' => $errorMessages], 400);
         }
 
-        try 
-        {
+        try {
             Log::info('Request All: ', $request->all());
             $file = $request->file('file');
             $data = [];
@@ -277,7 +273,7 @@ class PresenceController extends Controller
                 $jamMasuk = null;
                 $presensiStatus = null;
 
-                
+
 
 
                 // Filter jam pulang
@@ -417,20 +413,6 @@ class PresenceController extends Controller
 
     public function storeImport(Request $request)
     {
-<<<<<<< HEAD
-        $request->validate(['data' => 'required|array']);
-
-        foreach ($request->data as $row) {
-            Presence::create([
-                'tanggal' => $row['tanggal'],
-                'jam_masuk' => $row['jam_masuk'],
-                'jam_keluar' => $row['jam_keluar'],
-                'nip' => $row['nip'],
-            ]);
-        }
-
-        return response()->json(['message' => 'Data berhasil disimpan!']);
-=======
         Log::info('Request Data: ' . json_encode($request->all(), JSON_PRETTY_PRINT));
         // $request->validate(['data' => 'required|array']);
 
@@ -458,13 +440,13 @@ class PresenceController extends Controller
             foreach ($request->data as $row) {
                 // Cari id karyawan berdasarkan nip
                 $employee = Employee::where('nip', $row['nip'])->first();
-        
+
                 if (!$employee) {
                     // Skip jika employee tidak ditemukan
                     Log::warning("Employee dengan NIP {$row['nip']} tidak ditemukan.");
                     return response()->json(['error' => "Employee dengan NIP {$row['nip']} tidak ditemukan."], 404);
                 }
-        
+
                 // Simpan data presensi
                 $presemsi = Presence::create([
                     'employed_id' => $employee->id, // ID karyawan
@@ -486,8 +468,5 @@ class PresenceController extends Controller
             Log::error('Error: ' . $e->getMessage());
             return response()->json(['error' => 'Gagal menyimpan data presensi'], 500);
         }
-
-       
->>>>>>> 25ef1f9e4637d64b00bb7130d1b4b67d1fb32a74
     }
 }
