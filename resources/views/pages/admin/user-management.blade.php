@@ -53,7 +53,7 @@
                                     info: false
                                 });
                             });
-                        </script>                        
+                        </script>
                     </div>
                 </div>
             </div>
@@ -99,7 +99,7 @@
                                     info: false
                                 });
                             });
-                        </script>                        
+                        </script>
                     </div>
                 </div>
             </div>
@@ -129,7 +129,7 @@
                 </div>
             </div>
         </div>
-        
+
         <script>
             $(document).ready(function() {
             $('#usersTable').DataTable({
@@ -154,8 +154,8 @@
                         }
                     },
                     { data: 'role.name', name: 'role.name' },
-                    { 
-                        data: 'created_at', 
+                    {
+                        data: 'created_at',
                         name: 'created_at',
                         render: function(data) {
                             return moment(data).format('DD/MM/YYYY'); // Pastikan moment.js sudah diimpor
@@ -186,7 +186,7 @@
         });
         </script>
     </div>
-    
+
     <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -485,7 +485,7 @@
                 </div>
             </div>
         </div>
-    </div>              
+    </div>
     {{-- <script>
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('menuForm');
@@ -493,13 +493,13 @@
             const tableBody = document.querySelector('#menuTable tbody');
             const deleteButton = document.getElementById('confirmDeleteButton');
             let deleteMenuId;
-    
+
             // Event listener untuk submit form menambah menu
             form.addEventListener('submit', function(event) {
                 event.preventDefault(); // Mencegah reload halaman
-    
+
                 const formData = new FormData(form); // Mengambil data dari formulir
-    
+
                 fetch('/user-management/menus', {
                     method: 'POST',
                     body: formData,
@@ -546,10 +546,10 @@
                     console.error('Error:', error);
                 });
             });
-    
+
             // Fetch dan render data menu
             fetchMenuData();
-    
+
             function fetchMenuData() {
                 fetch('/user-management/menus')
                     .then(response => response.json())
@@ -561,10 +561,10 @@
                         console.error('Error fetching menu data:', error);
                     });
             }
-    
+
             function renderMenuTable() {
                 tableBody.innerHTML = ''; // Clear the table body
-    
+
                 window.menuData.forEach((menu, index) => {
                     const row = `
                         <tr>
@@ -595,12 +595,12 @@
                     `;
                     tableBody.insertAdjacentHTML('beforeend', row);
                 });
-    
+
                 // Set event listeners untuk tombol edit dan delete setelah tabel dirender
                 setEditButtonListeners();
                 setDeleteButtonListeners();
             }
-    
+
             function setEditButtonListeners() {
                 document.querySelectorAll('.btn-link.text-primary').forEach(button => {
                     button.addEventListener('click', function() {
@@ -620,14 +620,14 @@
                     });
                 });
             }
-    
+
             // Event listener untuk submit form edit
             editForm.addEventListener('submit', function(event) {
                 event.preventDefault(); // Mencegah reload halaman
-    
+
                 const formData = new FormData(editForm);
                 const menuId = document.getElementById('editMenuId').value;
-    
+
                 fetch(`/user-management/menus/${menuId}`, {
                     method: 'PUT',
                     body: formData,
@@ -653,7 +653,7 @@
                     console.error('Error:', error);
                 });
             });
-    
+
             function setDeleteButtonListeners() {
                 document.querySelectorAll('.btn-link.text-danger').forEach(button => {
                     button.addEventListener('click', function() {
@@ -662,7 +662,7 @@
                     });
                 });
             }
-    
+
             // Event listener untuk konfirmasi hapus
             deleteButton.addEventListener('click', function() {
                 fetch(`/user-management/menus/${deleteMenuId}`, {
