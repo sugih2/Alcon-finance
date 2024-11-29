@@ -18,7 +18,7 @@
                                 <div class="form-group">
                                     <label for="periode" class="col-form-label">Periode Start</label>
                                     <input type="date" class="col-sm-2 form-control" id="periode" placeholder="Periode"
-                                        name="efektif_date">
+                                        name="start_date">
                                 </div>
 
                                 <div class="form-group">
@@ -135,7 +135,6 @@
 
             console.log(payload);
 
-            Kirim payload ke backend
             fetch('/run-payroll/store', {
                     method: 'POST',
                     headers: {
