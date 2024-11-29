@@ -38,7 +38,7 @@
                             <thead>
                                 <tr>
                                     <th>No</th>
-                                    <th>Employee ID</th>
+                                    <th>Employee Name</th>
                                     <th>Tanggal Scan</th>
                                     <th>Tanggal</th>
                                     <th>Jam Masuk</th>
@@ -52,7 +52,7 @@
                                 @foreach ($presences as $presence)
                                     <tr>
                                         <td>{{ $index++ }}</td>
-                                        <td>{{ $presence->employed_id }}</td>
+                                        <td>{{ $presence->employee->name }}</td>
                                         <td>{{ $presence->tanggal_scan }}</td>
                                         <td>{{ $presence->tanggal }}</td>
                                         <td>{{ $presence->jam_masuk }}</td>

@@ -36,6 +36,7 @@ use App\Http\Controllers\GroupController;
 use App\Http\Controllers\PresenceController;
 use App\Http\Controllers\ParamComponenController;
 use App\Http\Controllers\PraPayrollController;
+use App\Http\Controllers\RunPayrollController;
 
 Route::get('/data', [ExampleController::class, 'getData'])->middleware('auth')->name('data.index');
 
@@ -150,9 +151,13 @@ Route::group(['prefix' => 'adjusment', 'middleware' => 'auth'], function () {
 	Route::post('/store-employee', [PraPayrollController::class, 'storeselectkar'])->name('adjusment.storeselectkar');
 	Route::post('/store-component', [PraPayrollController::class, 'storeselectcom'])->name('adjusment.storeselectcom');
 	Route::post('/store-adjusment', [PraPayrollController::class, 'storeadjusment'])->name('adjusment.storeadjusment');
-	
-
-
+});
+Route::group(['prefix' => 'run-payroll', 'middleware' => 'auth'], function () {
+	Route::get('/', [RunPayrollController::class, 'index'])->middleware('auth')->name('runpayroll.index');
+	Route::post('/store', [RunPayrollController::class, 'store'])->name('runpayroll.store');
+	Route::get('/employee', [RunPayrollController::class, 'employee'])->name('runpayroll.employee');
+	Route::get('/get-selected-employees', [RunPayrollController::class, 'getSelectedEmployees'])->name('runpayroll.employee');
+	Route::post('/store-employee', [RunPayrollController::class, 'storeselectkar'])->name('runpayroll.storeselectkar');
 });
 
 
