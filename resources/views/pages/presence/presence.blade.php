@@ -44,6 +44,7 @@
                                     <th>Jam Masuk</th>
                                     <th>Jam Pulang</th>
                                     <th>SN</th>
+                                    <th>Status</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -57,6 +58,7 @@
                                         <td>{{ $presence->tanggal }}</td>
                                         <td>{{ $presence->jam_masuk }}</td>
                                         <td>{{ $presence->jam_pulang }}</td>
+                                        <td>{{ $presence->status_karyawan}}</td>
                                         <td>{{ $presence->sn }}</td>
                                         <td class="align-middle text-end">
                                             <button type="button" class="btn btn-link text-primary mb-0"
@@ -76,8 +78,29 @@
         </div>
     </div>
 
-
-
+{{-- <!-- Modal untuk menampilkan data lengkap -->
+ <div id="detailModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <p id="modal-content"></p>
+    </div>
+</div>  --}}
+<div id="detailModal" class="modal" >
+        <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Select Component</h5>
+                    <button type="button" class="close"  onclick="closeModal()" id="close-button" data-dismiss="modal"
+                        aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="content-absen" class="p-2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- Modal Import -->
     <div class="modal fade" id="importModal" tabindex="-1" role="dialog">
         <div class="modal-dialog modal-lg" role="document">
@@ -149,30 +172,36 @@
         });
 
         function generateTable(data) {
+            // Membuat objek untuk menyimpan hanya satu entri per NIP
+    const uniqueData = {};
+
+// Memasukkan data ke dalam objek berdasarkan NIP
+data.forEach(item => {
+    if (!uniqueData[item.nip]) {
+        uniqueData[item.nip] = item; // Simpan entri pertama untuk setiap NIP
+    }
+});
+
+// Ambil nilai objek uniqueData dan ubah menjadi array untuk pemrosesan lebih lanjut
+const filteredData = Object.values(uniqueData);
             let tableHtml = `
             <table class="table align-items-center mb-0">
                 <thead>
                     <tr>
                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">NIP</th>
                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nama</th>
-                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Tanggal</th>
-                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Jam Masuk</th>
-                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Jam Pulang</th>
-                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Presensi Status</th>
+                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Status Karyawan</th>
                     </tr>
                 </thead>
                 <tbody>
         `;
 
-            data.forEach(item => {
+        filteredData .forEach(item => {
                 tableHtml += `
-                <tr>
+                 <tr class="clickable-row" data-nip="${item.nip}">
                     <td>${item.nip || '-'}</td>
                     <td>${item.nama || '-'}</td>
-                    <td>${item.tanggal || '-'}</td>
-                    <td>${item.jam_masuk || '-'}</td>
-                    <td>${item.jam_pulang || '-'}</td>
-                    <td>${item.presensi_status || '-'}</td>
+                    <td>${item.status_karyawan[0] || '-'}</td>
                 </tr>
             `;
             });
@@ -184,6 +213,56 @@
 
             // Tambahkan ke div tabel di dalam preview
             $('#table-preview').html(tableHtml);
+
+            // Menambahkan event listener untuk baris yang dapat diklik
+document.querySelectorAll('.clickable-row').forEach(row => {
+    row.addEventListener('click', function() {
+        const nip = this.getAttribute('data-nip');
+        showFullDetails(nip); // Menampilkan data lengkap berdasarkan NIP
+    });
+});
+
+// Fungsi untuk menampilkan detail data berdasarkan NIP
+function showFullDetails(nip) {
+    const selectedItems = data.filter(item => item.nip === nip);
+    if (selectedItems.length > 0) {
+        // Membuat konten modal dengan mengelompokkan data berdasarkan NIP
+        let modalContent = `<h4>Data untuk NIP: ${nip}</h4>`;
+        
+        
+            modalContent += `
+            <table class="table align-items-center mb-0">
+                <thead>
+                    <tr>
+                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Tanggal</th>
+                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Jam Masuk</th>
+                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Jam Pulang</th>
+                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                
+            `;
+            selectedItems.forEach(item => {
+                modalContent += `
+                 <tr class="clickable-row" data-nip="${item.nip}">
+                    <td>${item.tanggal || '-'}</td>
+                    <td>${item.jam_masuk || '-'}</td>
+                    <td>${item.jam_pulang || '-'}</td>
+                    <td>${item.presensi_status || '-'}</td>
+                </tr>
+            `;
+            });
+
+            modalContent += `
+                </tbody>
+            </table>
+        `;
+        document.getElementById('content-absen').innerHTML = modalContent;
+        document.getElementById('detailModal').style.display = 'block';
+    }
+}
+
 
             if (data.length > 0) {
                 $('#saveButton').show().data('data', data); // Simpan data di tombol Save
@@ -290,5 +369,8 @@
                 }
             });
         });
+        function closeModal() {
+    document.getElementById('detailModal').style.display = 'none';
+}
     </script>
 @endsection

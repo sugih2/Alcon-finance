@@ -24866,3 +24866,9 @@ pre[class*=language-] {
     overflow: auto !important;
   }
 }
+
+div.dt-container div.dt-layout-table > div{
+  display: block !important;
+    overflow: auto !important;
+    max-height: 400px !important;
+}

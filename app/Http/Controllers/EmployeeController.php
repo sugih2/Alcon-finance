@@ -30,7 +30,7 @@ class EmployeeController extends Controller
             'position_id' => $employee->position_id,
         ]);
     }
-    
+
     public function store(Request $request)
     {
         // Log input request
@@ -79,7 +79,6 @@ class EmployeeController extends Controller
                 'message' => 'Data berhasil disimpan',
                 'data'    => $employees
             ], 201);
-
         } catch (\Exception $e) {
             // Log error jika terjadi masalah
             Log::error("Error: " . $e->getMessage());
@@ -127,12 +126,12 @@ class EmployeeController extends Controller
         //Log::info("Request: " . json_encode($request->all()));
 
         $employees = Employee::with(['position:id,name'])
-        ->select('id', 'name', 'nip', 'position_id')
-        ->orderBy('name', 'asc')
-        ->distinct()
-        ->get();
+            ->select('id', 'name', 'nip', 'position_id')
+            ->orderBy('name', 'asc')
+            ->distinct()
+            ->get();
 
-        $employees = $employees->map(function($employee) {
+        $employees = $employees->map(function ($employee) {
             return [
                 'id' => $employee->id,
                 'nama_lengkap' => $employee->name,
@@ -140,9 +139,7 @@ class EmployeeController extends Controller
                 'jabatan_nama' => $employee->position->name
             ];
         });
-        
+
         return response()->json($employees);
     }
-
-
 }
