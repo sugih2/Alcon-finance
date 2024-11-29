@@ -124,7 +124,11 @@ class EmployeeController extends Controller
 
     public function getEmployeeList(Request $request)
     {
+<<<<<<< HEAD
         Log::info("Request: " . json_encode($request->all()));
+=======
+        //Log::info("Request: " . json_encode($request->all()));
+>>>>>>> 25ef1f9e4637d64b00bb7130d1b4b67d1fb32a74
 
         $employees = Employee::with(['position:id,name'])
         ->select('id', 'name', 'nip', 'position_id')

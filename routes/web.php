@@ -25,7 +25,11 @@ use App\Http\Controllers\UserProfileController;
 use App\Http\Controllers\ResetPassword;
 use App\Http\Controllers\ChangePassword;
 use App\Http\Controllers\RoleController;
+<<<<<<< HEAD
 use App\Http\Controllers\UserController;
+=======
+use App\Http\Controllers\UserController;           
+>>>>>>> 25ef1f9e4637d64b00bb7130d1b4b67d1fb32a74
 use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\ParamPositionController;
 use App\Http\Controllers\PositionController;
@@ -36,10 +40,15 @@ use App\Http\Controllers\GroupController;
 use App\Http\Controllers\PresenceController;
 use App\Http\Controllers\ParamComponenController;
 use App\Http\Controllers\PraPayrollController;
+<<<<<<< HEAD
+=======
+use App\Http\Controllers\RunPayrollController;
+>>>>>>> 25ef1f9e4637d64b00bb7130d1b4b67d1fb32a74
 
 Route::get('/data', [ExampleController::class, 'getData'])->middleware('auth')->name('data.index');
 
 Route::group(['prefix' => 'user-management', 'middleware' => 'auth'], function () {
+<<<<<<< HEAD
 	Route::get('/', [UserManagementController::class, 'index'])->middleware('auth')->name('user-management.index');
 	Route::get('/users', [UserManagementController::class, 'getDataUser'])->name('users.data');
 	Route::post('/users', [UserManagementController::class, 'storeUser'])->name('users.store');
@@ -49,12 +58,27 @@ Route::group(['prefix' => 'user-management', 'middleware' => 'auth'], function (
 	Route::put('/roles/{role}', [UserManagementController::class, 'updateRole'])->name('roles.update');
 	Route::delete('/roles/{role}', [UserManagementController::class, 'destroyRole'])->name('roles.destroy');
 	Route::get('/roles/{role}/permissions', [UserManagementController::class, 'getPermissions'])->name('roles.permissions');
+=======
+    Route::get('/', [UserManagementController::class, 'index'])->middleware('auth')->name('user-management.index');
+    Route::get('/users', [UserManagementController::class, 'getDataUser'])->name('users.data');
+    Route::post('/users', [UserManagementController::class, 'storeUser'])->name('users.store');
+    Route::put('/users/{user}', [UserManagementController::class, 'updateUser'])->name('users.update');
+    Route::delete('/users/{user}', [UserManagementController::class, 'destroyUser'])->name('users.destroy');
+	Route::post('/roles', [UserManagementController::class, 'storeRole'])->name('roles.store');
+	Route::put('/roles/{role}', [UserManagementController::class, 'updateRole'])->name('roles.update');
+	Route::delete('/roles/{role}', [UserManagementController::class, 'destroyRole'])->name('roles.destroy');
+	Route::get('/roles/{role}/permissions', [UserManagementController::class, 'getPermissions'])->name('roles.permissions');	
+>>>>>>> 25ef1f9e4637d64b00bb7130d1b4b67d1fb32a74
 	Route::post('/roles/{role}/permissions/save', [UserManagementController::class, 'savePermissions'])->name('roles.permissions.save');
 	Route::get('/menus', [UserManagementController::class, 'getDataMenu'])->name('menus.data');
 	Route::post('/menus', [UserManagementController::class, 'storeDataMenu'])->name('menus.store');
 	Route::get('/menus/{menu}', [UserManagementController::class, 'showDataMenu'])->name('menus.show');
 	Route::put('/menus/{menu}', [UserManagementController::class, 'updateMenu'])->middleware('auth')->name('menus.update');
 	Route::delete('/menus/{menu}', [UserManagementController::class, 'destroyMenu'])->name('menus.destroy');
+<<<<<<< HEAD
+=======
+	
+>>>>>>> 25ef1f9e4637d64b00bb7130d1b4b67d1fb32a74
 });
 Route::group(['prefix' => 'paramposition', 'middleware' => 'auth'], function () {
 	Route::get('/', [ParamPositionController::class, 'index'])->middleware('auth')->name('paramposition.index');
@@ -107,6 +131,7 @@ Route::group(['prefix' => 'regency', 'middleware' => 'auth'], function () {
 	Route::get('/get-regency-name', [RegencyController::class, 'getRegencyName'])->name('regency.name');
 });
 Route::group(['prefix' => 'presence', 'middleware' => 'auth'], function () {
+<<<<<<< HEAD
 	Route::get('/', [PresenceController::class, 'index'])->middleware('auth')->name('presence.index');
 	Route::post('/store', [PresenceController::class, 'store'])->name('presence.store');
 	Route::get('/create', [PresenceController::class, 'create'])->name('presence.create');
@@ -116,6 +141,17 @@ Route::group(['prefix' => 'presence', 'middleware' => 'auth'], function () {
 	Route::delete('/delete/{id}', [PresenceController::class, 'destroy'])->name('presence.delete');
 	Route::post('/process-import', [PresenceController::class, 'processImport'])->name('presence.processImport');
 	Route::post('/store-import', [PresenceController::class, 'storeImport'])->name('presence.storeImport');
+=======
+    Route::get('/', [PresenceController::class, 'index'])->middleware('auth')->name('presence.index');
+    Route::post('/store', [PresenceController::class, 'store'])->name('presence.store');
+    Route::get('/create', [PresenceController::class, 'create'])->name('presence.create');
+    Route::get('/list', [PresenceController::class, 'list'])->name('presence.list');
+    Route::get('/edit/{id}', [PresenceController::class, 'edit'])->name('presence.edit');
+    Route::post('/update/{id}', [PresenceController::class, 'update'])->name('presence.update');
+    Route::delete('/delete/{id}', [PresenceController::class, 'destroy'])->name('presence.delete');
+	Route::post('/process-import', [PresenceController::class, 'processImport'])->name('presence.processImport');
+    Route::post('/store-import', [PresenceController::class, 'storeImport'])->name('presence.storeImport');
+>>>>>>> 25ef1f9e4637d64b00bb7130d1b4b67d1fb32a74
 });
 Route::group(['prefix' => 'componen', 'middleware' => 'auth'], function () {
 	Route::get('/', [ParamComponenController::class, 'index'])->middleware('auth')->name('componen.index');
@@ -150,6 +186,16 @@ Route::group(['prefix' => 'adjusment', 'middleware' => 'auth'], function () {
 	Route::post('/store-component', [PraPayrollController::class, 'storeselectcom'])->name('adjusment.storeselectcom');
 	Route::post('/store-adjusment', [PraPayrollController::class, 'storeadjusment'])->name('adjusment.storeadjusment');
 });
+<<<<<<< HEAD
+=======
+Route::group(['prefix' => 'run-payroll', 'middleware' => 'auth'], function () {
+	Route::get('/', [RunPayrollController::class, 'index'])->middleware('auth')->name('runpayroll.index');
+	Route::post('/store', [RunPayrollController::class, 'store'])->name('runpayroll.store');
+	Route::get('/employee', [RunPayrollController::class, 'employee'])->name('runpayroll.employee');
+	Route::get('/get-selected-employees', [RunPayrollController::class, 'getSelectedEmployees'])->name('runpayroll.employee');
+	Route::post('/store-employee', [RunPayrollController::class, 'storeselectkar'])->name('runpayroll.storeselectkar');
+});
+>>>>>>> 25ef1f9e4637d64b00bb7130d1b4b67d1fb32a74
 
 
 
@@ -160,6 +206,7 @@ Route::group(['prefix' => 'adjusment', 'middleware' => 'auth'], function () {
 
 
 
+<<<<<<< HEAD
 Route::get('/', function () {
 	return redirect('/dashboard');
 })->middleware('auth');
@@ -172,15 +219,37 @@ Route::post('/reset-password', [ResetPassword::class, 'send'])->middleware('gues
 Route::get('/change-password', [ChangePassword::class, 'show'])->middleware('guest')->name('change-password');
 Route::post('/change-password', [ChangePassword::class, 'update'])->middleware('guest')->name('change.perform');
 Route::get('/dashboard', [HomeController::class, 'index'])->name('home')->middleware('auth');
+=======
+Route::get('/', function () {return redirect('/dashboard');})->middleware('auth');
+	Route::get('/register', [RegisterController::class, 'create'])->middleware('guest')->name('register');
+	Route::post('/register', [RegisterController::class, 'store'])->middleware('guest')->name('register.perform');
+	Route::get('/login', [LoginController::class, 'show'])->middleware('guest')->name('login');
+	Route::post('/login', [LoginController::class, 'login'])->middleware('guest')->name('login.perform');
+	Route::get('/reset-password', [ResetPassword::class, 'show'])->middleware('guest')->name('reset-password');
+	Route::post('/reset-password', [ResetPassword::class, 'send'])->middleware('guest')->name('reset.perform');
+	Route::get('/change-password', [ChangePassword::class, 'show'])->middleware('guest')->name('change-password');
+	Route::post('/change-password', [ChangePassword::class, 'update'])->middleware('guest')->name('change.perform');
+	Route::get('/dashboard', [HomeController::class, 'index'])->name('home')->middleware('auth');
+>>>>>>> 25ef1f9e4637d64b00bb7130d1b4b67d1fb32a74
 Route::group(['middleware' => 'auth'], function () {
 	Route::get('/example', [PageController::class, 'example'])->name('example');
 	Route::get('/virtual-reality', [PageController::class, 'vr'])->name('virtual-reality');
 	Route::get('/rtl', [PageController::class, 'rtl'])->name('rtl');
 	Route::get('/profile', [UserProfileController::class, 'show'])->name('profile');
 	Route::post('/profile', [UserProfileController::class, 'update'])->name('profile.update');
+<<<<<<< HEAD
 	Route::get('/profile-static', [PageController::class, 'profile'])->name('profile-static');
 	Route::get('/sign-in-static', [PageController::class, 'signin'])->name('sign-in-static');
 	Route::get('/sign-up-static', [PageController::class, 'signup'])->name('sign-up-static');
 	Route::get('/{page}', [PageController::class, 'index'])->name('page');
 	Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 });
+=======
+	Route::get('/profile-static', [PageController::class, 'profile'])->name('profile-static'); 
+	Route::get('/sign-in-static', [PageController::class, 'signin'])->name('sign-in-static');
+	Route::get('/sign-up-static', [PageController::class, 'signup'])->name('sign-up-static'); 
+	Route::get('/{page}', [PageController::class, 'index'])->name('page');
+	Route::post('logout', [LoginController::class, 'logout'])->name('logout');
+
+});
+>>>>>>> 25ef1f9e4637d64b00bb7130d1b4b67d1fb32a74

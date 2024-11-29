@@ -8,16 +8,28 @@
             <div class="card mb-4">
                 <div class="card-header pb-0 d-flex justify-content-between align-items-center">
                     <h6></h6>
+<<<<<<< HEAD
                     <button type="button" class="btn btn-primary" onclick="createPosition()" style="">
+=======
+                    <button type="button" class="btn btn-primary" onclick="createPosition()">
+>>>>>>> 25ef1f9e4637d64b00bb7130d1b4b67d1fb32a74
                         Tambah Position
                     </button>
                 </div>
                 <div class="card-body px-0 pt-0 pb-2">
+<<<<<<< HEAD
                     <div class="container" >
                         <div class="table-responsive p-0" style="overflow : auto ; max-height:500px;">
                             <table class="table align-items-center mb-0" id="positionTable">
                                 <thead style="position: fixed; bottom: 65%; ">
                                     <tr style="top: 100%">
+=======
+                    <div class="container">
+                        <div class="table-responsive p-0">
+                            <table class="table align-items-center mb-0" id="positionTable">
+                                <thead>
+                                    <tr>
+>>>>>>> 25ef1f9e4637d64b00bb7130d1b4b67d1fb32a74
                                         <th
                                             class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                             No

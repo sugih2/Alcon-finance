@@ -8,6 +8,10 @@ use App\Models\Employee;
 use App\Models\SettingShift;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Log;
+<<<<<<< HEAD
+=======
+use Illuminate\Support\Facades\DB;
+>>>>>>> 25ef1f9e4637d64b00bb7130d1b4b67d1fb32a74
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
 
@@ -413,6 +417,7 @@ class PresenceController extends Controller
 
     public function storeImport(Request $request)
     {
+<<<<<<< HEAD
         $request->validate(['data' => 'required|array']);
 
         foreach ($request->data as $row) {
@@ -425,5 +430,64 @@ class PresenceController extends Controller
         }
 
         return response()->json(['message' => 'Data berhasil disimpan!']);
+=======
+        Log::info('Request Data: ' . json_encode($request->all(), JSON_PRETTY_PRINT));
+        // $request->validate(['data' => 'required|array']);
+
+        $validator = Validator::make($request->all(), [
+            'data' => 'required|array',
+            'data.*.nip' => 'required|string',
+            'data.*.tanggal' => 'required|date',
+            'data.*.presensi_status' => 'required|string|in:EarlyIn,Late,OnTime,MissingIn',
+            'data.*.sn' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            $errors = $validator->errors()->toArray();
+            $errorMessages = [];
+
+            foreach ($errors as $field => $errorMessagesForField) {
+                $errorMessages[$field] = $errorMessagesForField[0];
+            }
+
+            return response()->json(['error' => $errorMessages], 400);
+        }
+        try {
+            DB::beginTransaction();
+
+            foreach ($request->data as $row) {
+                // Cari id karyawan berdasarkan nip
+                $employee = Employee::where('nip', $row['nip'])->first();
+        
+                if (!$employee) {
+                    // Skip jika employee tidak ditemukan
+                    Log::warning("Employee dengan NIP {$row['nip']} tidak ditemukan.");
+                    return response()->json(['error' => "Employee dengan NIP {$row['nip']} tidak ditemukan."], 404);
+                }
+        
+                // Simpan data presensi
+                $presemsi = Presence::create([
+                    'employed_id' => $employee->id, // ID karyawan
+                    'code_upload' => 'UP001',    // Contoh, sesuaikan jika ada kode khusus
+                    'tanggal_scan' => now(),        // Anda dapat menyesuaikan sumber tanggal scan
+                    'tanggal' => $row['tanggal'],
+                    'jam_masuk' => $row['jam_masuk'],
+                    'jam_pulang' => $row['jam_pulang'],
+                    'presensi_status' => $row['presensi_status'],
+                    'sn' => $row['sn'], // Serial number
+                ]);
+                Log::info("Data presensi untuk NIP {$row['nip']} pada tanggal {$row['tanggal']} berhasil disimpan.");
+            }
+
+            DB::commit();
+            return response()->json(['message' => 'Data berhasil disimpan!']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error: ' . $e->getMessage());
+            return response()->json(['error' => 'Gagal menyimpan data presensi'], 500);
+        }
+
+       
+>>>>>>> 25ef1f9e4637d64b00bb7130d1b4b67d1fb32a74
     }
 }

@@ -38,10 +38,18 @@
                             <thead>
                                 <tr>
                                     <th>No</th>
+<<<<<<< HEAD
                                     <th>Employee ID</th>
                                     <th>Tanggal Scan</th>
                                     <th>Tanggal</th>
                                     <th>Jam</th>
+=======
+                                    <th>Employee Name</th>
+                                    <th>Tanggal Scan</th>
+                                    <th>Tanggal</th>
+                                    <th>Jam Masuk</th>
+                                    <th>Jam Pulang</th>
+>>>>>>> 25ef1f9e4637d64b00bb7130d1b4b67d1fb32a74
                                     <th>SN</th>
                                     <th>Action</th>
                                 </tr>
@@ -51,10 +59,18 @@
                                 @foreach ($presences as $presence)
                                     <tr>
                                         <td>{{ $index++ }}</td>
+<<<<<<< HEAD
                                         <td>{{ $presence->employed_id }}</td>
                                         <td>{{ $presence->tanggal_scan }}</td>
                                         <td>{{ $presence->tanggal }}</td>
                                         <td>{{ $presence->jam }}</td>
+=======
+                                        <td>{{ $presence->employee->name }}</td>
+                                        <td>{{ $presence->tanggal_scan }}</td>
+                                        <td>{{ $presence->tanggal }}</td>
+                                        <td>{{ $presence->jam_masuk }}</td>
+                                        <td>{{ $presence->jam_pulang }}</td>
+>>>>>>> 25ef1f9e4637d64b00bb7130d1b4b67d1fb32a74
                                         <td>{{ $presence->sn }}</td>
                                         <td class="align-middle text-end">
                                             <button type="button" class="btn btn-link text-primary mb-0"
@@ -217,6 +233,7 @@
                 if (progress >= 90) clearInterval(progressInterval); // Stop updating near completion
             }, 200);
 
+<<<<<<< HEAD
             console.log('cekkkkkk:'.dataToSave);
 
             // Atur header CSRF
@@ -256,6 +273,57 @@
             //         submitButton.disabled = false; // Aktifkan kembali tombol untuk mencoba lagi
             //     }
             // });
+=======
+            console.log('cekkkkkk:', dataToSave);
+
+            // Atur header CSRF
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken
+                }
+            });
+
+            // Kirim data ke server menggunakan AJAX
+            $.ajax({
+                url: "{{ route('presence.storeImport') }}",
+                method: "POST",
+                data: {
+                    data: dataToSave
+                },
+                success: function(response) {
+                    console.log(response);
+                    clearInterval(progressInterval); // Hentikan progres
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil',
+                        text: 'Data berhasil disimpan'
+                    }).then(() => {
+                        location.reload(); // Refresh halaman setelah berhasil
+                    });
+                    $('#saveButton').hide();
+                    submitButton.disabled = false; // Sembunyikan tombol setelah berhasil disimpan
+                },
+                error: function(xhr, status, error) {
+                    clearInterval(progressInterval);
+
+                    let errorMessage = 'Terjadi kesalahan saat menyimpan data';
+                    if (xhr.status === 422) {
+                        const errors = xhr.responseJSON.errors;
+                        errorMessage = Object.values(errors).flat().join(', ');
+                    } else if (xhr.responseJSON && xhr.responseJSON.error) {
+                        errorMessage = xhr.responseJSON.error;
+                    }
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal',
+                        text: errorMessage
+                    });
+
+                    console.error(xhr.responseText); // Log detail error di konsol
+                    submitButton.disabled = false; // Aktifkan kembali tombol untuk mencoba lagi
+                },
+            });
+>>>>>>> 25ef1f9e4637d64b00bb7130d1b4b67d1fb32a74
         });
 
 
