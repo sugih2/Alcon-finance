@@ -221,6 +221,14 @@ class PresenceController extends Controller
 
                 if (isset($xml->ROWS->ROW)) {
                     foreach ($xml->ROWS->ROW as $row) {
+                        $nip = (string) $row['dbg_scanlogpegawai_nip'] ?? null;
+
+                        // Mengecek apakah nip ada di database
+                        $exists = Employee::where('nip', $nip)->exists();
+
+                        // Menentukan status karyawan
+                        $status_karyawan = $exists ? 'Karyawan' : 'Bukan Karyawan';
+
                         $data[] = [
                             'tanggal_scan' => (string) $row['dbg_scanlogscan_date'] ?? null,
                             'tanggal' => (string) $row['dbg_scanlogtgl'] ?? null,
@@ -229,8 +237,11 @@ class PresenceController extends Controller
                             'nama' => (string) $row['dbg_scanlogpegawai_nama'] ?? null,
                             'sn' => (string) $row['dbg_scanlogsn'] ?? null,
                         ];
+                        $row['status_karyawan'] = $status_karyawan;
+                        Log::info('Data yang diproses:', [
+                            $row['status_karyawan'] = $status_karyawan,
+                        ]);
                     }
-                    Log::info('Data Presensi:' . json_encode($data));
                 } else {
                     Log::warning('Invalid XML structure');
                     return response()->json(['error' => 'Invalid XML structure'], 400);
@@ -238,6 +249,7 @@ class PresenceController extends Controller
             } else {
                 $data = Excel::toArray([], $file)[0];
             }
+            Log::info('Data Presensi:' . json_encode($data));
 
 
 
@@ -304,11 +316,32 @@ class PresenceController extends Controller
                     $presensiStatus = 'MissingIn';
                 }
                 // Tambahkan status karyawan
-                foreach ($data as &$rows) {
-                    $employee = Employee::where('nip', $row['nip'])->first();
-                    $row['status_karyawan'] = $employee ? 'karyawan' : 'bukan karyawan';
-                }
-                Log::info('Data Presensi:' . json_encode($row));
+                // foreach ($filteredData as $key => $rows) {
+                //     $cekDataEmployee = $rows['nip'];
+
+                //     // Mengecek apakah nip ada di database
+                //     $exists = Employee::where('nip', $cekDataEmployee)->exists();
+
+                //     // Set status karyawan berdasarkan apakah nip ditemukan
+                //     // Set status karyawan berdasarkan apakah nip ditemukan
+                //     if ($exists) {
+                //         // Pastikan array sudah ada dan terinisialisasi
+                //         if (!isset($row[$key])) {
+                //             $row[$key] = [];
+                //         }
+
+                //         $row[$key]['status_karyawan'] = 'Karyawan';  // Memperbarui status pada filteredData
+                //     } else {
+                //         // Pastikan array sudah ada dan terinisialisasi
+                //         if (!isset($row[$key])) {
+                //             $row[$key] = [];
+                //         }
+
+                //         $row[$key]['status_karyawan'] = 'Bukan Karyawan';  // Memperbarui status pada filteredData
+                //     }
+                //     Log::info('Checked status for nip:', ['nip' => $cekDataEmployee,  $row['status_karyawan']]);
+                // }
+
                 // Tambahkan ke final
                 if ($jamMasuk || $jamPulang) {
                     $finalData[] = [
