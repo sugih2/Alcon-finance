@@ -208,6 +208,7 @@ class PresenceController extends Controller
             Log::info('Request All: ', $request->all());
             $file = $request->file('file');
             $data = [];
+            $getStatus = [];
 
             if ($file->getClientOriginalExtension() === 'xml') {
                 $fileContent = file_get_contents($file);
@@ -220,15 +221,12 @@ class PresenceController extends Controller
                 }
 
                 if (isset($xml->ROWS->ROW)) {
+
+                    // Mengecek apakah NIP ada di database Employee
+
                     foreach ($xml->ROWS->ROW as $row) {
-                        $nip = (string) $row['dbg_scanlogpegawai_nip'] ?? null;
-
-                        // Mengecek apakah nip ada di database
-                        $exists = Employee::where('nip', $nip)->exists();
-
-                        // Menentukan status karyawan
-                        $status_karyawan = $exists ? 'Karyawan' : 'Bukan Karyawan';
-
+                        $nip = (string) $row['dbg_scanlogpegawai_nip'];
+                        $isEmployee = Employee::where('nip', $nip)->exists();
                         $data[] = [
                             'tanggal_scan' => (string) $row['dbg_scanlogscan_date'] ?? null,
                             'tanggal' => (string) $row['dbg_scanlogtgl'] ?? null,
@@ -236,11 +234,13 @@ class PresenceController extends Controller
                             'nip' => (string) $row['dbg_scanlogpegawai_nip'] ?? null,
                             'nama' => (string) $row['dbg_scanlogpegawai_nama'] ?? null,
                             'sn' => (string) $row['dbg_scanlogsn'] ?? null,
+                            'status_karyawan' => $isEmployee ? 'Karyawan' : 'Bukan Karyawan',
                         ];
-                        $row['status_karyawan'] = $status_karyawan;
-                        Log::info('Data yang diproses:', [
-                            $row['status_karyawan'] = $status_karyawan,
-                        ]);
+
+                        $getStatus[] = [
+                            'status_karyawan' => $isEmployee ? 'Karyawan' : 'Bukan Karyawan'
+                        ];
+                        Log::info('Data Presensi:' . json_encode($nip, $isEmployee));
                     }
                 } else {
                     Log::warning('Invalid XML structure');
@@ -249,7 +249,6 @@ class PresenceController extends Controller
             } else {
                 $data = Excel::toArray([], $file)[0];
             }
-            Log::info('Data Presensi:' . json_encode($data));
 
 
 
@@ -260,6 +259,24 @@ class PresenceController extends Controller
             });
 
             Log::info('Filtered Data: ' . json_encode($filteredData));
+            $uniqueData = [];
+
+            foreach ($filteredData as $itemssss) {
+                $key = $itemssss['nip']; // Gunakan NIP sebagai kunci unik
+
+                // Jika kombinasi nip belum ada di hasil, tambahkan
+                if (!isset($uniqueData[$key])) {
+                    $uniqueData[$key] = $itemssss;
+                }
+            }
+
+            $uniqueData = array_values($uniqueData);
+            $statuses = array_map(function ($item) {
+                return $item['status_karyawan'];
+            }, $uniqueData);
+
+            // Output data unik
+            log::info("CEKKKK SOUND : " . json_encode($statuses, JSON_PRETTY_PRINT));
 
             // Grupkan Data Berdasarkan NIP dan Tanggal
             $groupedData = [];
@@ -315,31 +332,10 @@ class PresenceController extends Controller
                 } elseif ($jamPulang) {
                     $presensiStatus = 'MissingIn';
                 }
-                // Tambahkan status karyawan
-                // foreach ($filteredData as $key => $rows) {
-                //     $cekDataEmployee = $rows['nip'];
-
-                //     // Mengecek apakah nip ada di database
-                //     $exists = Employee::where('nip', $cekDataEmployee)->exists();
-
-                //     // Set status karyawan berdasarkan apakah nip ditemukan
-                //     // Set status karyawan berdasarkan apakah nip ditemukan
-                //     if ($exists) {
-                //         // Pastikan array sudah ada dan terinisialisasi
-                //         if (!isset($row[$key])) {
-                //             $row[$key] = [];
-                //         }
-
-                //         $row[$key]['status_karyawan'] = 'Karyawan';  // Memperbarui status pada filteredData
-                //     } else {
-                //         // Pastikan array sudah ada dan terinisialisasi
-                //         if (!isset($row[$key])) {
-                //             $row[$key] = [];
-                //         }
-
-                //         $row[$key]['status_karyawan'] = 'Bukan Karyawan';  // Memperbarui status pada filteredData
-                //     }
-                //     Log::info('Checked status for nip:', ['nip' => $cekDataEmployee,  $row['status_karyawan']]);
+                // foreach ($data as &$rows) {
+                //     $employee = Employee::where('nip', $rows['nip'])->first();
+                //     $row['status_karyawan'] = $employee ? 'karyawan' : 'bukan karyawan';
+                //     Log::info('Data Presensi:', ['nip' => $rows['nip']]);
                 // }
 
                 // Tambahkan ke final
@@ -352,7 +348,12 @@ class PresenceController extends Controller
                         'jam_pulang' => $jamPulang,
                         'presensi_status' => $presensiStatus,
                         'sn' => $items[0]['sn'],
-                        'status_karyawan' => $row[0]['status_karyawan'],
+                        'status_karyawan' => array_values(array_column(
+                            array_filter($uniqueData, function ($item) use ($nip) {
+                                return $item['nip'] === $nip; // Filter berdasarkan NIP
+                            }),
+                            'status_karyawan' // Ambil kolom `status_karyawan`
+                        )) ?? null // Ambil elemen pertama, jika ada
                     ];
                 }
             }
