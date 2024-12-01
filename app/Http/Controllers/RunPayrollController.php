@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Models\Employee;
+use App\Models\MasterPayroll;
+use App\Models\Presence;
+use Illuminate\Support\Facades\Validator;
 
 class RunPayrollController extends Controller
 {
@@ -50,91 +53,114 @@ class RunPayrollController extends Controller
     }
 
 ##RUN PAYROLL PROCESS##
-    public function RunPayrollNew(Request $request)
+    public function store(Request $request)
     {
+        Log::info("Request: " . json_encode($request->all()));
+
+        $validator = Validator::make($request->all(), [
+            'description' => 'required|string',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after:start_date',
+            'employee_ids' => 'required|array|min:1',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first(),
+                'errors'  => $validator->errors()
+            ], 422);
+        }
+
         $description = $request->input('description');
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
+        $employeeIds = $request->input('employee_ids');
 
         //Log::info("Start Date: $startDate, End Date: $endDate");
-        $activeTransactions = SettingTunjangan::where('efektif_date', '<=', $endDate)
+        $activeTransactions = MasterPayroll::where('efektif_date', '<=', $endDate)
         ->where(function ($query) use ($startDate, $endDate) {
             $query->whereNull('end_date')
                 ->orWhereBetween('end_date', [$startDate, $endDate])
                 ->orWhere('end_date', '>', $startDate);
         })
-        ->with(['tunjanganKaryawans.getEmploy', 'tunjanganKaryawans.parcom'])
+        ->whereHas('detailPayroll.employee', function ($query) use ($employeeIds) {
+            $query->whereIn('id', $employeeIds);
+        })
+        ->with(['detailPayroll.employee', 'detailPayroll.component'])
         ->get();
-        //Log::info("Active Transactions: " . json_encode($activeTransactions, JSON_PRETTY_PRINT));
+
+        Log::info("Active Transactions: " . json_encode($activeTransactions, JSON_PRETTY_PRINT));
 
         $combinedData = collect([]);
 
         foreach ($activeTransactions as $settingTunjangan) {
             $groupedData = [
                 'transaksi' => $settingTunjangan,
-                'karyawan' => $settingTunjangan->tunjanganKaryawans->map(function ($tunjanganKaryawan) {
+                'karyawan' => $settingTunjangan->detailPayroll->map(function ($tunjanganKaryawan) {
                     return [
-                        'karyawan' => $tunjanganKaryawan->getEmploy,
-                        'param_componen' => $tunjanganKaryawan->parcom,
-                        'nilai' => $tunjanganKaryawan->nilai,
+                        'karyawan' => $tunjanganKaryawan->employee,
+                        'param_componen' => $tunjanganKaryawan->component,
+                        'nilai' => $tunjanganKaryawan->amount,
                     ];
                 }),
             ];
+            //Log::info("Grouped Data: " . json_encode($groupedData, JSON_PRETTY_PRINT));
 
             $groupedData = collect([$groupedData]);
             $groupedData = $this->calculatePresensiAndSalaries($groupedData, $startDate, $endDate);
 
-            foreach ($groupedData->first()['karyawan'] as $employeeData) {
-                $employeeId = $employeeData['karyawan']->id;
+            // foreach ($groupedData->first()['karyawan'] as $employeeData) {
+            //     $employeeId = $employeeData['karyawan']->id;
 
-                if (!$combinedData->has($employeeId)) {
-                    $combinedData->put($employeeId, [
-                        'karyawan' => $employeeData['karyawan'],
-                        'components' => [
-                            'salary' => 0,
-                            'allowance' => [],
-                            'benefit' => [],
-                            'deduction' => [],
-                        ],
-                        'total_pendapatan' => 0,
-                        'total_potongan' => 0,
-                        'gaji_bruto' => 0,
-                        'gaji_bersih' => 0,
-                    ]);
-                }
+            //     if (!$combinedData->has($employeeId)) {
+            //         $combinedData->put($employeeId, [
+            //             'karyawan' => $employeeData['karyawan'],
+            //             'components' => [
+            //                 'salary' => 0,
+            //                 'allowance' => [],
+            //                 'benefit' => [],
+            //                 'deduction' => [],
+            //             ],
+            //             'total_pendapatan' => 0,
+            //             'total_potongan' => 0,
+            //             'gaji_bruto' => 0,
+            //             'gaji_bersih' => 0,
+            //         ]);
+            //     }
 
-                $existingData = $combinedData->get($employeeId);
+            //     $existingData = $combinedData->get($employeeId);
 
-                $existingData['components']['salary'] += $employeeData['components']['salary'];
+            //     $existingData['components']['salary'] += $employeeData['components']['salary'];
                 
-                foreach ($employeeData['components']['allowance'] as $key => $value) {
-                    if (!isset($existingData['components']['allowance'][$key])) {
-                        $existingData['components']['allowance'][$key] = 0;
-                    }
-                    $existingData['components']['allowance'][$key] += $value;
-                }
-                foreach ($employeeData['components']['benefit'] as $key => $value) {
-                    if (!isset($existingData['components']['benefit'][$key])) {
-                        $existingData['components']['benefit'][$key] = 0;
-                    }
-                    $existingData['components']['benefit'][$key] += $value;
-                }
-                foreach ($employeeData['components']['deduction'] as $key => $value) {
-                    if (!isset($existingData['components']['deduction'][$key])) {
-                        $existingData['components']['deduction'][$key] = 0;
-                    }
-                    $existingData['components']['deduction'][$key] += $value;
-                }
+            //     foreach ($employeeData['components']['allowance'] as $key => $value) {
+            //         if (!isset($existingData['components']['allowance'][$key])) {
+            //             $existingData['components']['allowance'][$key] = 0;
+            //         }
+            //         $existingData['components']['allowance'][$key] += $value;
+            //     }
+            //     foreach ($employeeData['components']['benefit'] as $key => $value) {
+            //         if (!isset($existingData['components']['benefit'][$key])) {
+            //             $existingData['components']['benefit'][$key] = 0;
+            //         }
+            //         $existingData['components']['benefit'][$key] += $value;
+            //     }
+            //     foreach ($employeeData['components']['deduction'] as $key => $value) {
+            //         if (!isset($existingData['components']['deduction'][$key])) {
+            //             $existingData['components']['deduction'][$key] = 0;
+            //         }
+            //         $existingData['components']['deduction'][$key] += $value;
+            //     }
 
-                $existingData['total_pendapatan'] += $employeeData['total_pendapatan'] ?? 0;
-                $existingData['total_potongan'] += $employeeData['total_potongan'] ?? 0;
-                $existingData['gaji_bruto'] += $employeeData['gaji_bruto'] ?? 0;
-                $existingData['gaji_bersih'] += $employeeData['gaji_bersih'] ?? 0;
-                $combinedData->put($employeeId, $existingData);
-            }
+            //     $existingData['total_pendapatan'] += $employeeData['total_pendapatan'] ?? 0;
+            //     $existingData['total_potongan'] += $employeeData['total_potongan'] ?? 0;
+            //     $existingData['gaji_bruto'] += $employeeData['gaji_bruto'] ?? 0;
+            //     $existingData['gaji_bersih'] += $employeeData['gaji_bersih'] ?? 0;
+            //     $combinedData->put($employeeId, $existingData);
+            // }
         }
 
-        $this->insertCombinedPayrollData($combinedData, $startDate, $endDate , $description);
+        // $this->insertCombinedPayrollData($combinedData, $startDate, $endDate , $description);
 
         // Log the combined data
         //Log::info('Combined Data: ' . json_encode($combinedData, JSON_PRETTY_PRINT));
@@ -144,46 +170,29 @@ class RunPayrollController extends Controller
 
     private function calculatePresensiAndSalaries($groupedData, $startDate, $endDate)
     {
-        // $endDate = '2024-07-20';
-        // $startDate = '2024-06-21';
-
-        // $paramPeriode = ParamPeriode::where('status', '=', 'Aktif')->first();
-        // $formattedStartDate = intval($paramPeriode->startdate);
-        // $formattedEndDate = intval($paramPeriode->enddate);
-
-        // $endDate = Carbon::now()->format('Y-m') . '-' . $formattedEndDate;
-        // $startDate = Carbon::parse($endDate)->subMonth()->format('Y-m') . '-' . $formattedStartDate;
-
         return $groupedData->map(function ($item) use ($startDate, $endDate) {
             $employeeData = $item['karyawan']->map(function ($tunjanganKaryawan) use ($startDate, $endDate) {
                 $employee = $tunjanganKaryawan['karyawan'];
                 $employeeId = $tunjanganKaryawan['karyawan']->id;
 
-                $rekapPresensi = RekapAbsensi::where('id_karyawan', $employeeId)
-                    ->where('mulai_periode', '=', $startDate)
-                    ->where('akhir_periode', '=', $endDate)
-                    ->first();
-                //Log::info("Rekap Presensisssssssss: " . json_encode($rekapPresensi, JSON_PRETTY_PRINT));
-                if (!$rekapPresensi) {
+                $jumlahHariKerja = Presence::getTotalHadir($employeeId, $startDate, $endDate);
+                Log::info("Masuk Kerja: " . json_encode($jumlahHariKerja, JSON_PRETTY_PRINT));
+                if (!$jumlahHariKerja) {
                     Log::warning("No presensi data found for employee ID: $employeeId in period: $startDate to $endDate");
-                    return [
-                        'karyawan' => $tunjanganKaryawan['karyawan'],
-                        'param_componen' => $tunjanganKaryawan['param_componen'],
-                        'nilai' => $tunjanganKaryawan['nilai'],
-                        'presensi' => null,
-                        'salary' => 0,
-                        'components' => [
-                            'salary' => 0,
-                            'allowance' => [],
-                            'benefit' => [],
-                            'deduction' => [],
-                        ]
-                    ];
+                    // return [
+                    //     'karyawan' => $tunjanganKaryawan['karyawan'],
+                    //     'param_componen' => $tunjanganKaryawan['param_componen'],
+                    //     'nilai' => $tunjanganKaryawan['nilai'],
+                    //     'presensi' => null,
+                    //     'salary' => 0,
+                    //     'components' => [
+                    //         'salary' => 0,
+                    //         'allowance' => [],
+                    //         'benefit' => [],
+                    //         'deduction' => [],
+                    //     ]
+                    // ];
                 }
-
-                $prorate = $employee->getprorate($employeeId);
-                $workingDays = $rekapPresensi->jumlah_hari_kerja;
-                $prorateDays = $rekapPresensi->jumlah_hari_prorate;
                 // Logging values for presensi and prorate calculations
                 //Log::info("Employee ID: $employeeId - Prorate: $prorate, Working Days: $workingDays, Prorate Days: $prorateDays");
 
@@ -269,15 +278,6 @@ class RunPayrollController extends Controller
 
     private function insertCombinedPayrollData($combinedData, $startDate, $endDate, $description)
     {
-        //$startDate = '2024-06-21';
-        //$endDate = '2024-07-20';
-
-        // $paramPeriode = ParamPeriode::where('status', '=', 'Aktif')->first();
-        // $formattedStartDate = intval($paramPeriode->startdate);
-        // $formattedEndDate = intval($paramPeriode->enddate);
-
-        // $endDate = Carbon::now()->format('Y-m') . '-' . $formattedEndDate;
-        // $startDate = Carbon::parse($endDate)->subMonth()->format('Y-m') . '-' . $formattedStartDate;
 
         DB::beginTransaction();
 

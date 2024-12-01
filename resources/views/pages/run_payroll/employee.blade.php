@@ -235,7 +235,7 @@
             Swal.fire({
                 icon: 'success',
                 title: 'Berhasil',
-                text: 'Data berhasil disimpan.'
+                text: 'Employee Selected.'
             }).then(() => {
                 Close()
             });

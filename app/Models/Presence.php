@@ -52,4 +52,21 @@ class Presence extends Model
     {
         return $this->belongsTo(Employee::class, 'employed_id', 'id');
     }
+
+    /**
+     * Menghitung jumlah hari kerja berdasarkan employee_id dan tanggal
+     *
+     * @param int $employeeId
+     * @param string $startDate
+     * @param string $endDate
+     * @return int
+     */
+    public static function getTotalHadir($employeeId, $startDate, $endDate)
+    {
+        return self::where('employed_id', $employeeId)
+            ->whereBetween('tanggal', [$startDate, $endDate])
+            ->whereNotNull('jam_masuk')
+            ->whereNotNull('jam_pulang')
+            ->count();
+    }
 }

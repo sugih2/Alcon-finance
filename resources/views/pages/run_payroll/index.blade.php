@@ -123,37 +123,91 @@
         }
 
         function runpayroll() {
+            event.preventDefault();
 
             const employeeIds = selectedEmployees.map(employee => employee.id);
+            const startDate = $('#periode').val();
+            const endDate = $('#periode_end').val();
 
+            if (!startDate || !endDate) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validation Error',
+                    text: 'Please select both start and end dates.',
+                });
+                return false;
+            }
+            const description = $('#floatingTextarea').val();
             const payload = {
-                efektif_date: document.getElementById('periode').value,
-                end_date: document.getElementById('periode_end').value,
-                description: document.getElementById('floatingTextarea').value,
+                start_date: startDate,
+                end_date: endDate,
+                description: description,
                 employee_ids: employeeIds,
             };
+            console.log('Payload:', payload);
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                }
+            });
 
-            console.log(payload);
-
-            fetch('/run-payroll/store', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
-                    },
-                    body: JSON.stringify(payload),
-                })
-                .then(response => response.json())
-                .then(data => {
+            $.ajax({
+                url: "/run-payroll/store",
+                type: "POST",
+                data: JSON.stringify(payload),
+                contentType: "application/json",
+                processData: false,
+                cache: false,
+                success: function(data) {
                     if (data.success) {
-                        alert('Payroll processed successfully!');
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: 'Payroll processed successfully!',
+                            confirmButtonText: 'OK',
+                        });
                     } else {
-                        alert('Failed to process payroll');
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Failed to process payroll.',
+                        });
                     }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
+                },
+                error: function(xhr) {
+                    console.error('Error:', xhr);
+                    let errorMessage = 'Error occurred while processing your request. Please try again later.';
+
+                    if (xhr.status === 422) {
+                        const response = xhr.responseJSON;
+
+                        if (response.message) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Validation Error',
+                                text: response.message,
+                            });
+                        } else if (response.errors) {
+                            let errorList = '';
+                            $.each(response.errors, function(key, value) {
+                                errorList += `<li>${value[0]}</li>`;
+                            });
+
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Validation Errors',
+                                html: `<ul>${errorList}</ul>`,
+                            });
+                        }
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: errorMessage,
+                        });
+                    }
+                }
+            });
         }
     </script>
 
