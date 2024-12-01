@@ -9828,7 +9828,7 @@ fieldset:disabled .btn {
 }
 
 .bg-primary {
-    background-color: #7AB2D3 !important;
+    background-color: red !important;
 }
 
 .bg-secondary {
@@ -26018,10 +26018,4 @@ pre[class*="language-"] {
     .ps {
         overflow: auto !important;
     }
-}
-
-div.dt-container div.dt-layout-table > div{
-  display: block !important;
-    overflow: auto !important;
-    max-height: 400px !important;
 }
