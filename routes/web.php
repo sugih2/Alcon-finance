@@ -126,6 +126,7 @@ Route::group(['prefix' => 'componen', 'middleware' => 'auth'], function () {
 	Route::get('/list', [ParamComponenController::class, 'list'])->name('componen.list');
 	Route::get('/get-componen-name', [ParamComponenController::class, 'getComponenName'])->name('componen.name');
 	Route::get('/componen-list', [ParamComponenController::class, 'getComponentList'])->name('componen.getlist');
+	Route::get('/getform/{componentType}', [ParamComponenController::class, 'getform'])->name('componen.getform');
 });
 Route::group(['prefix' => 'pra-payroll', 'middleware' => 'auth'], function () {
 	Route::get('/', [PraPayrollController::class, 'index'])->middleware('auth')->name('prapayroll.index');

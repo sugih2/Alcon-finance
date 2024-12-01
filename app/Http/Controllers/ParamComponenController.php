@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\ParamComponen;
+use App\Models\Regency;
+use App\Models\Position;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
@@ -56,7 +58,10 @@ class ParamComponenController extends Controller
         try {
             $param_componen = new ParamComponen();
             $param_componen->name = $request->name;
-            $param_componen->type = $request->type;
+            $param_componen->id_position = $request->id_position;
+            $param_componen->id_regency = $request->id_regency;
+            $param_componen->componen = $request->componen;
+            $param_componen->type = $request->type; 
             $param_componen->amount = $request->amount;
             $param_componen->status = "Active";
             $param_componen->save();
@@ -95,5 +100,39 @@ class ParamComponenController extends Controller
         });
         
         return response()->json($component);
+    }
+
+    public function getform($componentType)
+    {
+        if ($componentType == 'allowance') {
+            $regency = Regency::select('id', 'name')->get();
+        } elseif ($componentType == 'benefit') {
+            $level_jabatan = ParLevelJabatan::select('id', 'nama')->get();
+            $cabang = Cabang::select('id', 'nama')
+                ->orderBy('nama', 'asc')
+                ->get();
+        } elseif ($componentType == 'deduction') {
+            $level_jabatan = ParLevelJabatan::select('id', 'nama')->get();
+            $cabang = Cabang::select('id', 'nama')
+                ->orderBy('nama', 'asc')
+                ->get(); 
+        } elseif ($componentType == 'phl'){
+            //$phl = PhlLevel::select('id', 'level')->get();
+            $kota = Kota::select('id', 'name')->get();
+        } else {
+            $position = Position::select('id', 'name')->get();
+        }
+
+        if ($componentType == 'allowance') {
+            return view('pages.param_componen.allowance', compact('regency'));
+        } elseif ($componentType == 'benefit') {
+            return view('parcom.benefit_form', compact('level_jabatan', 'cabang'));
+        } elseif ($componentType == 'deduction') {
+            return view('parcom.deduction_form', compact('level_jabatan', 'cabang'));
+        } elseif ($componentType == 'phl') {
+            return view('parcom.phl_form', compact('kota'));
+        } else {
+            return view('pages.param_componen.salary', compact('position'));
+        }
     }
 }
