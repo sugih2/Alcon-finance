@@ -184,7 +184,7 @@ class PresenceController extends Controller
     //     ]);
     // }
 
-    
+
     public function processImport(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -204,11 +204,11 @@ class PresenceController extends Controller
             return response()->json(['error' => $errorMessages], 400);
         }
 
-        try 
-        {
+        try {
             Log::info('Request All: ', $request->all());
             $file = $request->file('file');
             $data = [];
+            $getStatus = [];
 
             if ($file->getClientOriginalExtension() === 'xml') {
                 $fileContent = file_get_contents($file);
@@ -221,7 +221,12 @@ class PresenceController extends Controller
                 }
 
                 if (isset($xml->ROWS->ROW)) {
+
+                    // Mengecek apakah NIP ada di database Employee
+
                     foreach ($xml->ROWS->ROW as $row) {
+                        $nip = (string) $row['dbg_scanlogpegawai_nip'];
+                        $isEmployee = Employee::where('nip', $nip)->exists();
                         $data[] = [
                             'tanggal_scan' => (string) $row['dbg_scanlogscan_date'] ?? null,
                             'tanggal' => (string) $row['dbg_scanlogtgl'] ?? null,
@@ -229,9 +234,14 @@ class PresenceController extends Controller
                             'nip' => (string) $row['dbg_scanlogpegawai_nip'] ?? null,
                             'nama' => (string) $row['dbg_scanlogpegawai_nama'] ?? null,
                             'sn' => (string) $row['dbg_scanlogsn'] ?? null,
+                            'status_karyawan' => $isEmployee ? 'Karyawan' : 'Bukan Karyawan',
                         ];
+
+                        $getStatus[] = [
+                            'status_karyawan' => $isEmployee ? 'Karyawan' : 'Bukan Karyawan'
+                        ];
+                        Log::info('Data Presensi:' . json_encode($nip, $isEmployee));
                     }
-                    Log::info('Data Presensi:' . json_encode($data));
                 } else {
                     Log::warning('Invalid XML structure');
                     return response()->json(['error' => 'Invalid XML structure'], 400);
@@ -240,11 +250,33 @@ class PresenceController extends Controller
                 $data = Excel::toArray([], $file)[0];
             }
 
+
+
+
+
             $filteredData = array_filter($data, function ($item) use ($request) {
                 return $item['tanggal'] >= $request->start_date && $item['tanggal'] <= $request->end_date;
             });
 
             Log::info('Filtered Data: ' . json_encode($filteredData));
+            $uniqueData = [];
+
+            foreach ($filteredData as $itemssss) {
+                $key = $itemssss['nip']; // Gunakan NIP sebagai kunci unik
+
+                // Jika kombinasi nip belum ada di hasil, tambahkan
+                if (!isset($uniqueData[$key])) {
+                    $uniqueData[$key] = $itemssss;
+                }
+            }
+
+            $uniqueData = array_values($uniqueData);
+            $statuses = array_map(function ($item) {
+                return $item['status_karyawan'];
+            }, $uniqueData);
+
+            // Output data unik
+            log::info("CEKKKK SOUND : " . json_encode($statuses, JSON_PRETTY_PRINT));
 
             // Grupkan Data Berdasarkan NIP dan Tanggal
             $groupedData = [];
@@ -274,7 +306,7 @@ class PresenceController extends Controller
                 $jamMasuk = null;
                 $presensiStatus = null;
 
-                
+
 
 
                 // Filter jam pulang
@@ -300,6 +332,11 @@ class PresenceController extends Controller
                 } elseif ($jamPulang) {
                     $presensiStatus = 'MissingIn';
                 }
+                // foreach ($data as &$rows) {
+                //     $employee = Employee::where('nip', $rows['nip'])->first();
+                //     $row['status_karyawan'] = $employee ? 'karyawan' : 'bukan karyawan';
+                //     Log::info('Data Presensi:', ['nip' => $rows['nip']]);
+                // }
 
                 // Tambahkan ke final
                 if ($jamMasuk || $jamPulang) {
@@ -311,6 +348,12 @@ class PresenceController extends Controller
                         'jam_pulang' => $jamPulang,
                         'presensi_status' => $presensiStatus,
                         'sn' => $items[0]['sn'],
+                        'status_karyawan' => array_values(array_column(
+                            array_filter($uniqueData, function ($item) use ($nip) {
+                                return $item['nip'] === $nip; // Filter berdasarkan NIP
+                            }),
+                            'status_karyawan' // Ambil kolom `status_karyawan`
+                        )) ?? null // Ambil elemen pertama, jika ada
                     ];
                 }
             }
@@ -441,13 +484,14 @@ class PresenceController extends Controller
             foreach ($request->data as $row) {
                 // Cari id karyawan berdasarkan nip
                 $employee = Employee::where('nip', $row['nip'])->first();
-        
+
                 if (!$employee) {
                     // Skip jika employee tidak ditemukan
                     Log::warning("Employee dengan NIP {$row['nip']} tidak ditemukan.");
                     return response()->json(['error' => "Employee dengan NIP {$row['nip']} tidak ditemukan."], 404);
                 }
-        
+
+
                 // Simpan data presensi
                 $presemsi = Presence::create([
                     'employed_id' => $employee->id, // ID karyawan
@@ -469,7 +513,5 @@ class PresenceController extends Controller
             Log::error('Error: ' . $e->getMessage());
             return response()->json(['error' => 'Gagal menyimpan data presensi'], 500);
         }
-
-       
     }
 }
