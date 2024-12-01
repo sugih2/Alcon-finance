@@ -203,7 +203,7 @@ class PresenceController extends Controller
 
             return response()->json(['error' => $errorMessages], 400);
         }
-
+        $errors = [];
         try {
             Log::info('Request All: ', $request->all());
             $file = $request->file('file');
@@ -226,7 +226,27 @@ class PresenceController extends Controller
 
                     foreach ($xml->ROWS->ROW as $row) {
                         $nip = (string) $row['dbg_scanlogpegawai_nip'];
+                        $tanggal = (string) $row['dbg_scanlogtgl'];
+
+                        // Mengecek apakah NIP ada di database Employee
                         $isEmployee = Employee::where('nip', $nip)->exists();
+                        $employee = Employee::where('nip', $nip)->first();
+                        $employee_id = $employee->id;
+                        // Mengecek apakah NIP dan tanggal sudah pernah diimpor sebelumnya
+                        $exists = Presence::where('employed_id', $employee_id)
+                            ->where('tanggal', $tanggal)
+                            ->exists();
+
+                        // Array untuk menampung error
+
+
+                        // Jika data sudah ada, tambahkan pesan error
+                        if ($exists) {
+                            $errors[] = "NIP {$nip} dengan tanggal {$tanggal} sudah pernah diimpor.";
+                            log::info('cek error : ', ['cek' => $errors]);  // Menampilkan error dalam log
+                        }
+
+                        // Menambahkan data ke dalam array $data
                         $data[] = [
                             'tanggal_scan' => (string) $row['dbg_scanlogscan_date'] ?? null,
                             'tanggal' => (string) $row['dbg_scanlogtgl'] ?? null,
@@ -235,12 +255,13 @@ class PresenceController extends Controller
                             'nama' => (string) $row['dbg_scanlogpegawai_nama'] ?? null,
                             'sn' => (string) $row['dbg_scanlogsn'] ?? null,
                             'status_karyawan' => $isEmployee ? 'Karyawan' : 'Bukan Karyawan',
+                            'validasi_tanggal' => $errors ? implode(', ', $errors) : null  // Menambahkan pesan error jika ada
                         ];
 
+                        // Menambahkan status karyawan ke dalam array $getStatus
                         $getStatus[] = [
                             'status_karyawan' => $isEmployee ? 'Karyawan' : 'Bukan Karyawan'
                         ];
-                        Log::info('Data Presensi:' . json_encode($nip, $isEmployee));
                     }
                 } else {
                     Log::warning('Invalid XML structure');
@@ -274,14 +295,32 @@ class PresenceController extends Controller
             $statuses = array_map(function ($item) {
                 return $item['status_karyawan'];
             }, $uniqueData);
+            $cekCek = array_map(function ($item) {
+                return $item['nip'];
+            }, $uniqueData);
+            $idEmploye = Employee::whereIn('nip', $cekCek)->get();
+            $cek_id_employee = $idEmploye->pluck('id')->toArray();
 
             // Output data unik
             log::info("CEKKKK SOUND : " . json_encode($statuses, JSON_PRETTY_PRINT));
+            log::info('cek nip awal : ', ['cek' => $cek_id_employee]);
 
             // Grupkan Data Berdasarkan NIP dan Tanggal
             $groupedData = [];
             foreach ($filteredData as $item) {
                 $key = $item['nip'] . '|' . $item['tanggal'];
+                // $nips = $item['nip'];
+                // $tanggals = $item['tanggal'];
+                // log::info('cek nip : ', ['cek' => $tanggals]);
+                // $exists = Presence::whereIn('employed_id', $cek_id_employee)
+                //     ->where('tanggal',  $tanggals)
+                //     ->get();
+                // if ($exists) {
+                //     $errors[] =  "  NIP {$nips} dengan tanggal {$tanggals} sudah pernah diimpor.";
+                //     log::info('cek error : ', ['cek' => $errors]);
+                //     // $row['validasi_tanggal'] =  $errors;
+                // }
+
                 if (!isset($groupedData[$key])) {
                     $groupedData[$key] = [];
                 }
@@ -340,6 +379,13 @@ class PresenceController extends Controller
 
                 // Tambahkan ke final
                 if ($jamMasuk || $jamPulang) {
+                    $errorMessage = null;
+                    foreach ($errors as $error) {
+                        if (strpos($error, $nip) !== false && strpos($error, $tanggal) !== false) {
+                            $errorMessage = $error;  // Menyimpan pesan error
+                            break;
+                        }
+                    }
                     $finalData[] = [
                         'nip' => $nip,
                         'nama' => $items[0]['nama'],
@@ -353,11 +399,13 @@ class PresenceController extends Controller
                                 return $item['nip'] === $nip; // Filter berdasarkan NIP
                             }),
                             'status_karyawan' // Ambil kolom `status_karyawan`
-                        )) ?? null // Ambil elemen pertama, jika ada
+                        )) ?? null, // Ambil elemen pertama, jika ada
+                        'validasi_error' => $errorMessage,
                     ];
                 }
             }
-
+            $tanggall = Presence::get();
+            Log::info('CEK Tangal : ', $tanggall->toArray());
             Log::info('Final Data: ' . json_encode($finalData, JSON_PRETTY_PRINT));
 
             return response()->json(['data' => $finalData]);
