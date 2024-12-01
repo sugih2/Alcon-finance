@@ -191,6 +191,7 @@ const filteredData = Object.values(uniqueData);
                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">NIP</th>
                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nama</th>
                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Status Karyawan</th>
+                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Validasi tanggal</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -202,6 +203,7 @@ const filteredData = Object.values(uniqueData);
                     <td>${item.nip || '-'}</td>
                     <td>${item.nama || '-'}</td>
                     <td>${item.status_karyawan[0] || '-'}</td>
+                    <td>${item.validasi_error || '-'}</td>
                 </tr>
             `;
             });
@@ -238,6 +240,7 @@ function showFullDetails(nip) {
                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Jam Masuk</th>
                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Jam Pulang</th>
                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Status</th>
+                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Validasi Tanggal</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -250,6 +253,7 @@ function showFullDetails(nip) {
                     <td>${item.jam_masuk || '-'}</td>
                     <td>${item.jam_pulang || '-'}</td>
                     <td>${item.presensi_status || '-'}</td>
+                    <td>${item.validasi_error || '-'}</td>
                 </tr>
             `;
             });
