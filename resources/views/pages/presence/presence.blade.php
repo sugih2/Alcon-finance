@@ -152,7 +152,7 @@
                 contentType: false,
                 success: function(response) {
                     // Debug log untuk memeriksa data yang diterima
-                    console.log(response);
+                    console.log("cek UHUYY : ",response);
 
                     if (response.data && response.data.length > 0) {
                         generateTable(response.data);
@@ -181,27 +181,29 @@ data.forEach(item => {
         uniqueData[item.nip] = item; // Simpan entri pertama untuk setiap NIP
     }
 });
-
 // Ambil nilai objek uniqueData dan ubah menjadi array untuk pemrosesan lebih lanjut
 const filteredData = Object.values(uniqueData);
-            let tableHtml = `
-            <table class="table align-items-center mb-0">
-                <thead>
-                    <tr>
-                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">NIP</th>
-                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nama</th>
-                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Status Karyawan</th>
-                    </tr>
-                </thead>
-                <tbody>
-        `;
-
-        filteredData .forEach(item => {
-                tableHtml += `
+let tableHtml = `
+<table class="table align-items-center mb-0">
+    <thead>
+        <tr>
+            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">NIP</th>
+            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nama</th>
+            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Status Karyawan</th>
+            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Validasi Data</th>
+            </tr>
+            </thead>
+            <tbody>
+                `;
+                
+                filteredData .forEach(item => {
+                    console.log("ada apa ini", item)
+                    tableHtml += `
                  <tr class="clickable-row" data-nip="${item.nip}">
                     <td>${item.nip || '-'}</td>
                     <td>${item.nama || '-'}</td>
                     <td>${item.status_karyawan[0] || '-'}</td>
+                    <td>${item.validasi_data[0] || '-'}</td>
                 </tr>
             `;
             });
@@ -238,6 +240,7 @@ function showFullDetails(nip) {
                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Jam Masuk</th>
                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Jam Pulang</th>
                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Status</th>
+                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Validasi Tanggal</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -250,6 +253,7 @@ function showFullDetails(nip) {
                     <td>${item.jam_masuk || '-'}</td>
                     <td>${item.jam_pulang || '-'}</td>
                     <td>${item.presensi_status || '-'}</td>
+                    <td>${item.validasi_error || '-'}</td>
                 </tr>
             `;
             });
