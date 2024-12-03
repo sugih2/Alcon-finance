@@ -204,12 +204,13 @@ class PresenceController extends Controller
             return response()->json(['error' => $errorMessages], 400);
         }
         $errors = [];
+        $importedCount = 0;
+        $validasiData = [];
         try {
             Log::info('Request All: ', $request->all());
             $file = $request->file('file');
             $data = [];
             $getStatus = [];
-
             if ($file->getClientOriginalExtension() === 'xml') {
                 $fileContent = file_get_contents($file);
                 $fileContent = preg_replace('/<\?xml:stylesheet(.*?)\?>/', '<?xml-stylesheet\1?>', $fileContent);
@@ -223,7 +224,7 @@ class PresenceController extends Controller
                 if (isset($xml->ROWS->ROW)) {
 
                     // Mengecek apakah NIP ada di database Employee
-
+                    $importedCounts = [];
                     foreach ($xml->ROWS->ROW as $row) {
                         $nip = (string) $row['dbg_scanlogpegawai_nip'];
                         $tanggal = (string) $row['dbg_scanlogtgl'];
@@ -242,10 +243,19 @@ class PresenceController extends Controller
 
                         // Jika data sudah ada, tambahkan pesan error
                         if ($exists) {
-                            $errors[] = "NIP {$nip} dengan tanggal {$tanggal} sudah pernah diimpor.";
-                            log::info('cek error : ', ['cek' => $errors]);  // Menampilkan error dalam log
+                            // Tambahkan counter untuk NIP terkait
+                            if (!isset($importedCounts[$nip])) {
+                                $importedCounts[$nip] = 0;
+                            }
+                            $importedCounts[$nip]++;
+                            $errors[] = "Data dengan NIP {$nip} dan tanggal {$tanggal} sudah pernah diimport.";
                         }
 
+                        // foreach ($importedCounts as $nip => $count) {
+                        //     if ($count > 0) {
+                        //         $validasiData = "Ada {$count} data dengan NIP {$nip} yang sudah diimport sebelumnya.";
+                        //     }
+                        // }
                         // Menambahkan data ke dalam array $data
                         $data[] = [
                             'tanggal_scan' => (string) $row['dbg_scanlogscan_date'] ?? null,
@@ -255,9 +265,8 @@ class PresenceController extends Controller
                             'nama' => (string) $row['dbg_scanlogpegawai_nama'] ?? null,
                             'sn' => (string) $row['dbg_scanlogsn'] ?? null,
                             'status_karyawan' => $isEmployee ? 'Karyawan' : 'Bukan Karyawan',
-                            'validasi_tanggal' => $errors ? implode(', ', $errors) : null  // Menambahkan pesan error jika ada
+                            'validasi_tanggal' => $errors ? implode(', ', $errors) : null, // Menambahkan pesan error jika ada
                         ];
-
                         // Menambahkan status karyawan ke dalam array $getStatus
                         $getStatus[] = [
                             'status_karyawan' => $isEmployee ? 'Karyawan' : 'Bukan Karyawan'
@@ -270,6 +279,17 @@ class PresenceController extends Controller
             } else {
                 $data = Excel::toArray([], $file)[0];
             }
+            foreach ($importedCounts as $nip => $count) {
+                if ($count > 0) {
+                    $validasiData[] = "Ada {$count} data dengan NIP {$nip} yang sudah diimport sebelumnya.";
+                }
+            };
+
+            foreach ($data as &$rows) {
+                $rows['validasi_data'] = $validasiData;
+            }
+
+            log::info('Final errors: ', ['Bismillah : ' => $data]);
 
 
 
@@ -381,7 +401,7 @@ class PresenceController extends Controller
                 if ($jamMasuk || $jamPulang) {
                     $errorMessage = null;
                     foreach ($errors as $error) {
-                        if (strpos($error, $nip) !== false && strpos($error, $tanggal) !== false) {
+                        if (strpos($error, $tanggal) !== false) {
                             $errorMessage = $error;  // Menyimpan pesan error
                             break;
                         }
@@ -401,6 +421,9 @@ class PresenceController extends Controller
                             'status_karyawan' // Ambil kolom `status_karyawan`
                         )) ?? null, // Ambil elemen pertama, jika ada
                         'validasi_error' => $errorMessage,
+                        'validasi_data' =>  array_values(array_filter($validasiData, function ($error) use ($nip) {
+                            return str_contains($error, "NIP {$nip}"); // Filter pesan berdasarkan NIP
+                        })), // Hanya ambil pesan validasi yang sesuai dengan NIP
                     ];
                 }
             }
