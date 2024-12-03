@@ -289,7 +289,6 @@ class PresenceController extends Controller
                 $rows['validasi_data'] = $validasiData;
             }
 
-            log::info('Final errors: ', ['Bismillah : ' => $data]);
 
 
 
@@ -323,23 +322,12 @@ class PresenceController extends Controller
 
             // Output data unik
             log::info("CEKKKK SOUND : " . json_encode($statuses, JSON_PRETTY_PRINT));
-            log::info('cek nip awal : ', ['cek' => $cek_id_employee]);
 
             // Grupkan Data Berdasarkan NIP dan Tanggal
             $groupedData = [];
             foreach ($filteredData as $item) {
                 $key = $item['nip'] . '|' . $item['tanggal'];
-                // $nips = $item['nip'];
-                // $tanggals = $item['tanggal'];
-                // log::info('cek nip : ', ['cek' => $tanggals]);
-                // $exists = Presence::whereIn('employed_id', $cek_id_employee)
-                //     ->where('tanggal',  $tanggals)
-                //     ->get();
-                // if ($exists) {
-                //     $errors[] =  "  NIP {$nips} dengan tanggal {$tanggals} sudah pernah diimpor.";
-                //     log::info('cek error : ', ['cek' => $errors]);
-                //     // $row['validasi_tanggal'] =  $errors;
-                // }
+
 
                 if (!isset($groupedData[$key])) {
                     $groupedData[$key] = [];
@@ -391,12 +379,7 @@ class PresenceController extends Controller
                 } elseif ($jamPulang) {
                     $presensiStatus = 'MissingIn';
                 }
-                // foreach ($data as &$rows) {
-                //     $employee = Employee::where('nip', $rows['nip'])->first();
-                //     $row['status_karyawan'] = $employee ? 'karyawan' : 'bukan karyawan';
-                //     Log::info('Data Presensi:', ['nip' => $rows['nip']]);
-                // }
-
+      
                 // Tambahkan ke final
                 if ($jamMasuk || $jamPulang) {
                     $errorMessage = null;
@@ -423,12 +406,11 @@ class PresenceController extends Controller
                         'validasi_error' => $errorMessage,
                         'validasi_data' =>  array_values(array_filter($validasiData, function ($error) use ($nip) {
                             return str_contains($error, "NIP {$nip}"); // Filter pesan berdasarkan NIP
-                        })), // Hanya ambil pesan validasi yang sesuai dengan NIP
+                        })), 
                     ];
                 }
             }
             $tanggall = Presence::get();
-            Log::info('CEK Tangal : ', $tanggall->toArray());
             Log::info('Final Data: ' . json_encode($finalData, JSON_PRETTY_PRINT));
 
             return response()->json(['data' => $finalData]);
