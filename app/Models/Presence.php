@@ -69,4 +69,6 @@ class Presence extends Model
             ->whereNotNull('jam_pulang')
             ->count();
     }
-}
+
+    
+    }
