@@ -62,8 +62,7 @@
                                         <td>{{ $presence->sn }}</td>
                                         <td class="align-middle text-end">
                                             <button type="button" class="btn btn-link text-primary mb-0"
-                                                data-bs-toggle="modal" data-bs-target="#editPresenceModal"
-                                                data-id="{{ $presence->id }}">Edit</button>
+                                                data-bs-toggle="modal" onclick="editPresence({{ $presence->id }})">Edit</button>
                                             <button type="button" class="btn btn-link text-danger mb-0"
                                                 data-bs-toggle="modal" data-bs-target="#deletePresenceModal"
                                                 data-id="{{ $presence->id }}">Delete</button>
@@ -78,15 +77,24 @@
         </div>
     </div>
 
-{{-- <!-- Modal untuk menampilkan data lengkap -->
- <div id="detailModal" class="modal">
+{{-- Modal Edit --}}
+<div class="modal fade" id="EditPresenceModal" tabindex="-1" aria-labelledby="addParamPositionModalLabel"
+aria-hidden="true">
+<div class="modal-dialog">
     <div class="modal-content">
-        <span class="close" onclick="closeModal()">&times;</span>
-        <p id="modal-content"></p>
+        <div class="modal-header">
+            <h5 class="modal-title" id="addParamPositionModalLabel">Edit Absensi</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <div id="editPresence"></div>
+        </div>
     </div>
-</div>  --}}
+</div>
+</div>
+{{-- Modal Edit End --}}
 <div id="detailModal" class="modal" >
-        <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
+        <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel">Select Component</h5>
@@ -376,5 +384,74 @@ function showFullDetails(nip) {
         function closeModal() {
     document.getElementById('detailModal').style.display = 'none';
 }
+
+function editPresence(id) {
+            $.ajax({
+                url: "{{ url('/presence/edit') }}/" + id,
+                type: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    $("#editPresence").html(response.html);
+                    $('#EditPresenceModal').modal('show');
+                },
+                error: function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to open create position form. Please try again later.',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            });
+        }
+        async function StoreEditPresence(id) {
+            event.preventDefault();
+
+            const form = document.getElementById('FormEditPresence');
+            const formData = new FormData(form);
+            const submitButton = document.getElementById('btn-submit');
+
+            submitButton.disabled = true;
+
+            try {
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                const response = await fetch('/presence/update/' + id, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Gagal menyimpan data.');
+                }
+
+                const data = await response.json();
+                console.log('Sukses:', data);
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil',
+                    text: 'Data berhasil disimpan'
+                }).then(() => {
+                    location.reload();
+                });
+
+                form.reset();
+
+            } catch (error) {
+                console.error('Error:', error);
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal',
+                    text: error.message || 'Data gagal disimpan'
+                });
+            } finally {
+                submitButton.disabled = false;
+            }
+        }
     </script>
 @endsection

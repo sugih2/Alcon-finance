@@ -25,9 +25,9 @@ class RunPayrollController extends Controller
     {
         $validatedData = $request->validate([
             'employees' => 'required|array',
-            'employees.*.id' => 'required|exists:employees,id', 
-            'employees.*.nama_lengkap' => 'required|string', 
-            'employees.*.nomor_induk_karyawan' => 'required|string', 
+            'employees.*.id' => 'required|exists:employees,id',
+            'employees.*.nama_lengkap' => 'required|string',
+            'employees.*.nomor_induk_karyawan' => 'required|string',
         ]);
 
         $employeeIds = collect($validatedData['employees'])->pluck('id')->toArray();
@@ -37,7 +37,7 @@ class RunPayrollController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'ID karyawan berhasil disimpan ke dalam session.',
-            'data' => session('selected_employee_ids'), 
+            'data' => session('selected_employee_ids'),
         ]);
     }
 
@@ -52,7 +52,7 @@ class RunPayrollController extends Controller
         ]);
     }
 
-##RUN PAYROLL PROCESS##
+    ##RUN PAYROLL PROCESS##
     public function store(Request $request)
     {
         Log::info("Request: " . json_encode($request->all()));
@@ -79,16 +79,16 @@ class RunPayrollController extends Controller
 
         //Log::info("Start Date: $startDate, End Date: $endDate");
         $activeTransactions = MasterPayroll::where('efektif_date', '<=', $endDate)
-        ->where(function ($query) use ($startDate, $endDate) {
-            $query->whereNull('end_date')
-                ->orWhereBetween('end_date', [$startDate, $endDate])
-                ->orWhere('end_date', '>', $startDate);
-        })
-        ->whereHas('detailPayroll.employee', function ($query) use ($employeeIds) {
-            $query->whereIn('id', $employeeIds);
-        })
-        ->with(['detailPayroll.employee', 'detailPayroll.component'])
-        ->get();
+            ->where(function ($query) use ($startDate, $endDate) {
+                $query->whereNull('end_date')
+                    ->orWhereBetween('end_date', [$startDate, $endDate])
+                    ->orWhere('end_date', '>', $startDate);
+            })
+            ->whereHas('detailPayroll.employee', function ($query) use ($employeeIds) {
+                $query->whereIn('id', $employeeIds);
+            })
+            ->with(['detailPayroll.employee', 'detailPayroll.component'])
+            ->get();
 
         Log::info("Active Transactions: " . json_encode($activeTransactions, JSON_PRETTY_PRINT));
 
@@ -132,7 +132,7 @@ class RunPayrollController extends Controller
             //     $existingData = $combinedData->get($employeeId);
 
             //     $existingData['components']['salary'] += $employeeData['components']['salary'];
-                
+
             //     foreach ($employeeData['components']['allowance'] as $key => $value) {
             //         if (!isset($existingData['components']['allowance'][$key])) {
             //             $existingData['components']['allowance'][$key] = 0;
@@ -214,8 +214,8 @@ class RunPayrollController extends Controller
 
                 //Log::info("Employee ID: $employeeId - Component Name: " . $tunjanganKaryawan['param_componen']->nama . " - Calculated Value: $hasil");
 
-                
-    
+
+
                 $componentName = $tunjanganKaryawan['param_componen']->nama;
                 switch ($tunjanganKaryawan['param_componen']->komponen) {
                     case 'Salary':
@@ -287,7 +287,7 @@ class RunPayrollController extends Controller
             // $id_transaksi_payment = $this->generateTransaksiPaymentId();
             // $description = 'Payroll untuk periode ' . $startDate . ' ke ' . $endDate;
             $amount_transaksi = $combinedData->sum(function ($employeeData) {
-                return $employeeData['components']['salary'] 
+                return $employeeData['components']['salary']
                     + array_sum($employeeData['components']['allowance'])
                     + array_sum($employeeData['components']['benefit'])
                     - array_sum($employeeData['components']['deduction']);
@@ -336,7 +336,7 @@ class RunPayrollController extends Controller
         }
         return $namedArray;
     }
-##END RUN PAYROLL PROCESS##
+    ##END RUN PAYROLL PROCESS##
 
 
 

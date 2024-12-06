@@ -28,6 +28,7 @@ class PresenceController extends Controller
     public function edit($id)
     {
         $presence = Presence::find($id);
+        $presence->tanggal = Carbon::parse($presence->tanggal)->format('Y-m-d');
         $html = view('pages.presence.edit', compact('presence'))->render();
 
         return response()->json([
@@ -78,10 +79,12 @@ class PresenceController extends Controller
 
     public function update(Request $request, $id)
     {
+        log::info('Cik Nempo Data:', $request->all());
         $validator = Validator::make($request->all(), [
-            'employee_id' => 'required|integer|exists:employees,id',
-            'date' => 'required|date',
-            'status' => 'required|string|in:Present,Absent,Sick,Leave',
+            // 'employed_id' => 'required|integer|exists:employees,id',
+            // 'tanggal' => 'required|date',
+            'tanggal' => 'required|date',
+            // 'status' => 'required|string',
         ]);
 
         if ($validator->fails()) {
@@ -95,10 +98,11 @@ class PresenceController extends Controller
         try {
             $presence = Presence::findOrFail($id);
             $presence->update([
-                'employee_id' => $request->employee_id,
-                'date' => $request->date,
-                'status' => $request->status,
-                'remarks' => $request->remarks,
+                // 'employed_id' => $request->employed_id,
+                // 'tanggal_scan' => $request->tanggal_scan,
+                'tanggal' => $request->tanggal,
+                // 'status' => $request->presensi_status,
+                // 'remarks' => $request->remarks,
             ]);
 
             return response()->json([
@@ -379,7 +383,7 @@ class PresenceController extends Controller
                 } elseif ($jamPulang) {
                     $presensiStatus = 'MissingIn';
                 }
-      
+
                 // Tambahkan ke final
                 if ($jamMasuk || $jamPulang) {
                     $errorMessage = null;
@@ -406,7 +410,7 @@ class PresenceController extends Controller
                         'validasi_error' => $errorMessage,
                         'validasi_data' =>  array_values(array_filter($validasiData, function ($error) use ($nip) {
                             return str_contains($error, "NIP {$nip}"); // Filter pesan berdasarkan NIP
-                        })), 
+                        })),
                     ];
                 }
             }
@@ -538,25 +542,10 @@ class PresenceController extends Controller
                 // Cari id karyawan berdasarkan nip
                 $employee = Employee::where('nip', $row['nip'])->first();
 
-                $employee_id = $employee->id;
-                $tanggal = $row['tanggal'];
-                
-
                 if (!$employee) {
                     // Skip jika employee tidak ditemukan
                     Log::warning("Employee dengan NIP {$row['nip']} tidak ditemukan.");
                     return response()->json(['error' => "Employee dengan NIP {$row['nip']} tidak ditemukan."], 404);
-                }
-                $exists = Presence::where('employed_id', $employee_id)
-                ->where('tanggal', $tanggal)
-                ->exists();
-
-                if ($exists) {
-                // Jika data sudah ada, kembalikan respons error
-                Log::warning("Presensi untuk employed_id {$employee_id} pada tanggal {$tanggal} sudah ada.");
-                return response()->json([
-                    'error' => "Ada Data Yang Sudah Pernah Di Import"
-                ], 400); // Gunakan HTTP status code 400 untuk bad request
                 }
 
 
@@ -571,7 +560,7 @@ class PresenceController extends Controller
                     'presensi_status' => $row['presensi_status'],
                     'sn' => $row['sn'], // Serial number
                 ]);
-                // Log::info("Data presensi untuk NIP {$row['nip']} pada tanggal {$row['tanggal']} berhasil disimpan.");
+                Log::info("Data presensi untuk NIP {$row['nip']} pada tanggal {$row['tanggal']} berhasil disimpan.");
             }
 
             DB::commit();
