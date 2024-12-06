@@ -14,10 +14,11 @@
                 </div>
                 <div class="card-body px-0 pt-0 pb-2">
                     <div class="table-responsive p-0">
-                        <table class="table align-items-center mb-0">
+                        <table class="table align-items-center mb-0" id="parampositionTable">
                             <thead>
                                 <tr>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">No
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                        No
                                     </th>
                                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                         Name</th>
@@ -89,6 +90,27 @@
     </div>
 
     <script>
+        $(document).ready(function() {
+            $('#parampositionTable').DataTable({
+                responsive: true,
+                pageLength: 5,
+                pagingType: 'simple_numbers',
+                language: {
+                    search: "Cari:",
+                    lengthMenu: "Tampilkan _MENU_ entri",
+                    info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+                    infoEmpty: "Tidak ada entri",
+                    zeroRecords: "Tidak ada entri yang cocok",
+                    // paginate: {
+                    //     first: "Pertama",
+                    //     last: "Terakhir",
+                    //     next: "Berikutnya",
+                    //     previous: "Sebelumnya"
+                    // }
+                }
+            });
+        });
+
         function editParamPosition(id) {
             $.ajax({
                 url: "{{ url('/paramposition/edit') }}/" + id,
