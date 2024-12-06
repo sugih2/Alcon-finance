@@ -15,7 +15,7 @@
                 <div class="card-body px-0 pt-0 pb-2">
                     <div class="container">
                         <div class="table-responsive p-0">
-                            <table class="table align-items-center mb-0">
+                            <table class="table align-items-center mb-0" id="projectTable">
                                 <thead>
                                     <tr>
                                         <th
@@ -37,6 +37,9 @@
                                         <th
                                             class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                                             Daerah/Kota</th>
+                                        <th
+                                            class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                            Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -113,6 +116,28 @@
     </div>
 
     <script>
+          $(document).ready(function() {
+            $('#projectTable').DataTable({
+                responsive: true,
+                pageLength: 5,
+                scrollX:true,
+                pagingType: 'simple_numbers',
+                language: {
+                    search: "Cari:",
+                    lengthMenu: "Tampilkan _MENU_ entri",
+                    info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+                    infoEmpty: "Tidak ada entri",
+                    zeroRecords: "Tidak ada entri yang cocok",
+                    // paginate: {
+                    //     first: "Pertama",
+                    //     last: "Terakhir",
+                    //     next: "Berikutnya",
+                    //     previous: "Sebelumnya"
+                    // }
+                }
+            });
+        });
+
         function createProject() {
             $.ajax({
                 url: "{{ url('/project/create') }}",

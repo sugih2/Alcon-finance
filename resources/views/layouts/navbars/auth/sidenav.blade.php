@@ -16,7 +16,7 @@
                     href="{{ route('home') }}">
                     <div
                         class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="ni ni-tv-2 text-primary text-sm opacity-10"></i>
+                        <i class="ni ni-tv-2 text-dark text-sm opacity-10"></i>
                     </div>
                     <span class="nav-link-text ms-1">Dashboard</span>
                 </a>
@@ -126,7 +126,7 @@
                     href="{{ route('employee.index') }}">
                     <div
                         class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="ni ni-single-02 text-dark text-sm opacity-10"></i>
+                        <i class="ni ni-building text-dark text-sm opacity-10"></i>
                     </div>
                     <span class="nav-link-text ms-1">Employee</span>
                 </a>
@@ -136,7 +136,7 @@
                     href="{{ route('position.index') }}">
                     <div
                         class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="ni ni-single-02 text-dark text-sm opacity-10"></i>
+                        <i class="ni ni-circle-08 text-dark text-sm opacity-10"></i>
                     </div>
                     <span class="nav-link-text ms-1">Position</span>
                 </a>
@@ -146,7 +146,7 @@
                     href="{{ route('project.index') }}">
                     <div
                         class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="ni ni-single-02 text-dark text-sm opacity-10"></i>
+                        <i class="ni ni-books text-dark text-sm opacity-10"></i>
                     </div>
                     <span class="nav-link-text ms-1">Project</span>
                 </a>
@@ -156,7 +156,7 @@
                     href="{{ route('group.index') }}">
                     <div
                         class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="ni ni-single-02 text-dark text-sm opacity-10"></i>
+                        <i class="ni ni-briefcase-24 text-dark text-sm opacity-10"></i>
                     </div>
                     <span class="nav-link-text ms-1">Group</span>
                 </a>
@@ -169,7 +169,7 @@
                     href="{{ route('prapayroll.index') }}">
                     <div
                         class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="ni ni-single-02 text-dark text-sm opacity-10"></i>
+                        <i class="ni ni-chart-bar-32 text-dark text-sm opacity-10"></i>
                     </div>
                     <span class="nav-link-text ms-1">Pra Payroll</span>
                 </a>
@@ -179,7 +179,7 @@
                     href="{{ route('runpayroll.index') }}">
                     <div
                         class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="ni ni-single-02 text-dark text-sm opacity-10"></i>
+                        <i class="ni ni-calendar-grid-58 text-dark text-sm opacity-10"></i>
                     </div>
                     <span class="nav-link-text ms-1">Run Payroll</span>
                 </a>
@@ -188,7 +188,7 @@
                 <a class="nav-link " href="">
                     <div
                         class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="ni ni-single-02 text-dark text-sm opacity-10"></i>
+                        <i class="ni ni-money-coins text-dark text-sm opacity-10"></i>
                     </div>
                     <span class="nav-link-text ms-1">Payroll History</span>
                 </a>
@@ -201,7 +201,7 @@
                     href="{{ route('paramposition.index') }}">
                     <div
                         class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="ni ni-single-02 text-dark text-sm opacity-10"></i>
+                        <i class="ni ni-ungroup text-dark text-sm opacity-10"></i>
                     </div>
                     <span class="nav-link-text ms-1">Position</span>
                 </a>
@@ -211,7 +211,7 @@
                     href="{{ route('presence.index') }}">
                     <div
                         class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="ni ni-single-02 text-dark text-sm opacity-10"></i>
+                        <i class="ni ni-time-alarm text-dark text-sm opacity-10"></i>
                     </div>
                     <span class="nav-link-text ms-1">Absensi</span>
                 </a>
@@ -221,7 +221,7 @@
                     href="{{ route('componen.index') }}">
                     <div
                         class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="ni ni-single-02 text-dark text-sm opacity-10"></i>
+                        <i class="ni ni-tag text-dark text-sm opacity-10"></i>
                     </div>
                     <span class="nav-link-text ms-1">Component</span>
                 </a>

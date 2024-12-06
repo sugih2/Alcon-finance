@@ -37,15 +37,24 @@
                         <table class="table align-items-center mb-0" id="presenceTable">
                             <thead>
                                 <tr>
-                                    <th>No</th>
-                                    <th>Employee Name</th>
-                                    <th>Tanggal Scan</th>
-                                    <th>Tanggal</th>
-                                    <th>Jam Masuk</th>
-                                    <th>Jam Pulang</th>
-                                    <th>SN</th>
-                                    <th>Status</th>
-                                    <th>Action</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                        No</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                        Employee Name</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                        Tanggal Scan</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                        Tanggal</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                        Jam Masuk</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                        Jam Pulang</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                        SN</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                        Status</th>
+                                    <th class="text-uppercase text-center text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                        Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -203,7 +212,7 @@ let tableHtml = `
             </thead>
             <tbody>
                 `;
-                
+
                 filteredData .forEach(item => {
                     console.log("ada apa ini", item)
                     tableHtml += `
@@ -238,8 +247,8 @@ function showFullDetails(nip) {
     if (selectedItems.length > 0) {
         // Membuat konten modal dengan mengelompokkan data berdasarkan NIP
         let modalContent = `<h4>Data untuk NIP: ${nip}</h4>`;
-        
-        
+
+
             modalContent += `
             <table class="table align-items-center mb-0">
                 <thead>
@@ -252,7 +261,7 @@ function showFullDetails(nip) {
                     </tr>
                 </thead>
                 <tbody>
-                
+
             `;
             selectedItems.forEach(item => {
                 modalContent += `
@@ -366,18 +375,22 @@ function showFullDetails(nip) {
         $(document).ready(function() {
             $('#presenceTable').DataTable({
                 responsive: true,
+                                responsive: true,
+                pageLength: 5,
+                scrollX:true,
+                pagingType: 'simple_numbers',
                 language: {
                     search: "Cari:",
                     lengthMenu: "Tampilkan _MENU_ entri",
                     info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
                     infoEmpty: "Menampilkan 0 sampai 0 dari 0 entri",
                     zeroRecords: "Tidak ditemukan data",
-                    paginate: {
-                        first: "Pertama",
-                        last: "Terakhir",
-                        next: "Selanjutnya",
-                        previous: "Sebelumnya"
-                    }
+                    // paginate: {
+                    //     first: "Pertama",
+                    //     last: "Terakhir",
+                    //     next: "Selanjutnya",
+                    //     previous: "Sebelumnya"
+                    // }
                 }
             });
         });
