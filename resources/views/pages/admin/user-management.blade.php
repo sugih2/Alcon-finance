@@ -48,7 +48,9 @@
                                 $('#rolesTable').DataTable({
                                     // Sesuaikan dengan opsi DataTables yang diinginkan
                                     responsive: true,
-                                    paginate: false,
+                                    scrollX: true,
+                                    pageLength: 5,
+                                    pagingType: 'simple_numbers',
                                     searching: false,
                                     info: false
                                 });
@@ -94,9 +96,12 @@
                             $(document).ready(function() {
                                 $('#menuTable').DataTable({
                                     responsive: true,
+                                    scrollX: true,
+                                    pageLength: 5,
+                                    pagingType: 'simple_numbers',
                                     paginate: false,
                                     searching: false,
-                                    info: false
+                                    info: false,
                                 });
                             });
                         </script>
@@ -135,6 +140,8 @@
             $('#usersTable').DataTable({
                 processing: true,
                 serverSide: true,
+                pageLength: 5,
+                pagingType: 'simple_numbers',
                 searching: false,
                 ajax: '{{ route('users.data') }}',
                 columns: [
@@ -179,9 +186,7 @@
                         }
                     }
                 ],
-                language: {
-                    processing: '<div class="spinner-border" role="status"><span class="sr-only">Loading...</span></div>'
-                }
+
             });
         });
         </script>

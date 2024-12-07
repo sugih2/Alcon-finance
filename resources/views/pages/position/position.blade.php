@@ -15,7 +15,7 @@
                 <div class="card-body px-0 pt-0 pb-2">
                     <div class="container">
                         <div class="table-responsive p-0">
-                            <table class="table align-items-center mb-0" id="positionTable" >
+                            <table class="table align-items-center mb-3" id="positionTable"  >
                                 <thead>
                                     <tr>
                                         <th
@@ -111,18 +111,20 @@
         $(document).ready(function() {
             $('#positionTable').DataTable({
                 responsive: true,
+                pageLength: 5,
+                pagingType: 'simple_numbers',
                 language: {
                     search: "Cari:",
                     lengthMenu: "Tampilkan _MENU_ entri",
                     info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
                     infoEmpty: "Tidak ada entri",
                     zeroRecords: "Tidak ada entri yang cocok",
-                    paginate: {
-                        first: "Pertama",
-                        last: "Terakhir",
-                        next: "Berikutnya",
-                        previous: "Sebelumnya"
-                    }
+                    // paginate: {
+                    //     first: "Pertama",
+                    //     last: "Terakhir",
+                    //     next: "Berikutnya",
+                    //     previous: "Sebelumnya"
+                    // }
                 }
             });
         });
