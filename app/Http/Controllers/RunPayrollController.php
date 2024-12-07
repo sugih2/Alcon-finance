@@ -28,9 +28,9 @@ class RunPayrollController extends Controller
     {
         $validatedData = $request->validate([
             'employees' => 'required|array',
-            'employees.*.id' => 'required|exists:employees,id', 
-            'employees.*.nama_lengkap' => 'required|string', 
-            'employees.*.nomor_induk_karyawan' => 'required|string', 
+            'employees.*.id' => 'required|exists:employees,id',
+            'employees.*.nama_lengkap' => 'required|string',
+            'employees.*.nomor_induk_karyawan' => 'required|string',
         ]);
 
         $employeeIds = collect($validatedData['employees'])->pluck('id')->toArray();
@@ -40,7 +40,7 @@ class RunPayrollController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'ID karyawan berhasil disimpan ke dalam session.',
-            'data' => session('selected_employee_ids'), 
+            'data' => session('selected_employee_ids'),
         ]);
     }
 
@@ -55,7 +55,7 @@ class RunPayrollController extends Controller
         ]);
     }
 
-##RUN PAYROLL PROCESS##
+    ##RUN PAYROLL PROCESS##
     public function store(Request $request)
     {
         //Log::info("Request: " . json_encode($request->all()));
@@ -360,7 +360,7 @@ class RunPayrollController extends Controller
             $prefix = 'MA';
             $id_transaksi_payment = PayrollHistory::generateIdTransaksiPayment($prefix);
             $amount_transaksi = $combinedData->sum(function ($employeeData) {
-                return $employeeData['components']['salary'] 
+                return $employeeData['components']['salary']
                     + array_sum($employeeData['components']['allowance'])
                     - array_sum($employeeData['components']['deduction']);
             });
@@ -408,7 +408,7 @@ class RunPayrollController extends Controller
         }
         return $namedArray;
     }
-##END RUN PAYROLL PROCESS##
+    ##END RUN PAYROLL PROCESS##
 
 
 

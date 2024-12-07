@@ -38,33 +38,22 @@
                             <table class="table align-items-center mb-0" id="presenceTable">
                                 <thead>
                                     <tr>
-                                        <th
-                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                            No</th>
-                                        <th
-                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                            Employee Name</th>
-                                        <th
-                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                            Tanggal Scan</th>
-                                        <th
-                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                            Tanggal</th>
-                                        <th
-                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                            Jam Masuk</th>
-                                        <th
-                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                            Jam Pulang</th>
-                                        <th
-                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                            SN</th>
-                                        <th
-                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                            Status</th>
-                                        <th
-                                            class="text-uppercase text-center text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                            Action</th>
+                                        <td>{{ $index++ }}</td>
+                                        <td>{{ $presence->employee->name }}</td>
+                                        <td>{{ $presence->tanggal_scan }}</td>
+                                        <td>{{ $presence->tanggal }}</td>
+                                        <td>{{ $presence->jam_masuk }}</td>
+                                        <td>{{ $presence->jam_pulang }}</td>
+                                        <td>{{ $presence->status_karyawan }}</td>
+                                        <td>{{ $presence->sn }}</td>
+                                        <td class="align-middle text-end">
+                                            <button type="button" class="btn btn-link text-primary mb-0"
+                                                data-bs-toggle="modal"
+                                                onclick="editPresence({{ $presence->id }})">Edit</button>
+                                            <button type="button" class="btn btn-link text-danger mb-0"
+                                                data-bs-toggle="modal" data-bs-target="#deletePresenceModal"
+                                                data-id="{{ $presence->id }}">Delete</button>
+                                        </td>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -101,10 +90,17 @@
     {{-- <!-- Modal untuk menampilkan data lengkap -->
  <div id="detailModal" class="modal">
     <div class="modal-content">
-        <span class="close" onclick="closeModal()">&times;</span>
-        <p id="modal-content"></p>
+        <div class="modal-header">
+            <h5 class="modal-title" id="addParamPositionModalLabel">Edit Absensi</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <div id="editPresence"></div>
+        </div>
     </div>
-</div>  --}}
+</div>
+</div>
+{{-- Modal Edit End --}}
     <div id="detailModal" class="modal">
         <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
             <div class="modal-content">
@@ -400,6 +396,75 @@
 
         function closeModal() {
             document.getElementById('detailModal').style.display = 'none';
+        }
+
+        function editPresence(id) {
+            $.ajax({
+                url: "{{ url('/presence/edit') }}/" + id,
+                type: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    $("#editPresence").html(response.html);
+                    $('#EditPresenceModal').modal('show');
+                },
+                error: function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to open create position form. Please try again later.',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            });
+        }
+        async function StoreEditPresence(id) {
+            event.preventDefault();
+
+            const form = document.getElementById('FormEditPresence');
+            const formData = new FormData(form);
+            const submitButton = document.getElementById('btn-submit');
+
+            submitButton.disabled = true;
+
+            try {
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                const response = await fetch('/presence/update/' + id, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Gagal menyimpan data.');
+                }
+
+                const data = await response.json();
+                console.log('Sukses:', data);
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil',
+                    text: 'Data berhasil disimpan'
+                }).then(() => {
+                    location.reload();
+                });
+
+                form.reset();
+
+            } catch (error) {
+                console.error('Error:', error);
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal',
+                    text: error.message || 'Data gagal disimpan'
+                });
+            } finally {
+                submitButton.disabled = false;
+            }
         }
     </script>
 @endsection
