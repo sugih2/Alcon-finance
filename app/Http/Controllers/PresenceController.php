@@ -82,7 +82,7 @@ class PresenceController extends Controller
         log::info('Cik Nempo Data:', $request->all());
         $validator = Validator::make($request->all(), [
             // 'employed_id' => 'required|integer|exists:employees,id',
-            // 'tanggal' => 'required|date',
+            'tanggal' => 'required|date',
             'tanggal' => 'required|date',
             // 'status' => 'required|string',
         ]);
@@ -99,7 +99,7 @@ class PresenceController extends Controller
             $presence = Presence::findOrFail($id);
             $presence->update([
                 // 'employed_id' => $request->employed_id,
-                // 'tanggal_scan' => $request->tanggal_scan,
+                'tanggal_scan' => $request->tanggal_scan,
                 'tanggal' => $request->tanggal,
                 // 'status' => $request->presensi_status,
                 // 'remarks' => $request->remarks,

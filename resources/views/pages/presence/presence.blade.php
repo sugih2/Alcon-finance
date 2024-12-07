@@ -33,10 +33,24 @@
                     </button>
                 </div>
                 <div class="card-body px-0 pt-0 pb-2">
-                    <div class="container">
-                        <div class="table-responsive p-0">
-                            <table class="table align-items-center mb-0" id="presenceTable">
-                                <thead>
+                    <div class="table-responsive p-0">
+                        <table class="table align-items-center mb-0" id="presenceTable">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Employee Name</th>
+                                    <th>Tanggal Scan</th>
+                                    <th>Tanggal</th>
+                                    <th>Jam Masuk</th>
+                                    <th>Jam Pulang</th>
+                                    <th>SN</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @php $index = 1; @endphp
+                                @foreach ($presences as $presence)
                                     <tr>
                                         <td>{{ $index++ }}</td>
                                         <td>{{ $presence->employee->name }}</td>
@@ -55,54 +69,33 @@
                                                 data-id="{{ $presence->id }}">Delete</button>
                                         </td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    @php $index = 1; @endphp
-                                    @foreach ($presences as $presence)
-                                        <tr>
-                                            <td>{{ $index++ }}</td>
-                                            <td>{{ $presence->employee->name }}</td>
-                                            <td>{{ $presence->tanggal_scan }}</td>
-                                            <td>{{ $presence->tanggal }}</td>
-                                            <td>{{ $presence->jam_masuk }}</td>
-                                            <td>{{ $presence->jam_pulang }}</td>
-                                            <td>{{ $presence->status_karyawan }}</td>
-                                            <td>{{ $presence->sn }}</td>
-                                            <td class="align-middle text-end">
-                                                <button type="button" class="btn btn-link text-primary mb-0"
-                                                    data-bs-toggle="modal" data-bs-target="#editPresenceModal"
-                                                    data-id="{{ $presence->id }}">Edit</button>
-                                                <button type="button" class="btn btn-link text-danger mb-0"
-                                                    data-bs-toggle="modal" data-bs-target="#deletePresenceModal"
-                                                    data-id="{{ $presence->id }}">Delete</button>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
+                                @endforeach
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    {{-- <!-- Modal untuk menampilkan data lengkap -->
- <div id="detailModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h5 class="modal-title" id="addParamPositionModalLabel">Edit Absensi</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-            <div id="editPresence"></div>
+    {{-- Modal Edit --}}
+    <div class="modal fade" id="EditPresenceModal" tabindex="-1" aria-labelledby="addParamPositionModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addParamPositionModalLabel">Edit Absensi</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="editPresence"></div>
+                </div>
+            </div>
         </div>
     </div>
-</div>
-</div>
-{{-- Modal Edit End --}}
+    {{-- Modal Edit End --}}
     <div id="detailModal" class="modal">
-        <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
+        <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel">Select Component</h5>
@@ -260,7 +253,7 @@
                     </tr>
                 </thead>
                 <tbody>
-
+                
             `;
                     selectedItems.forEach(item => {
                         modalContent += `
@@ -374,22 +367,18 @@
         $(document).ready(function() {
             $('#presenceTable').DataTable({
                 responsive: true,
-                responsive: true,
-                pageLength: 5,
-                scrollX: true,
-                pagingType: 'simple_numbers',
                 language: {
                     search: "Cari:",
                     lengthMenu: "Tampilkan _MENU_ entri",
                     info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
                     infoEmpty: "Menampilkan 0 sampai 0 dari 0 entri",
                     zeroRecords: "Tidak ditemukan data",
-                    // paginate: {
-                    //     first: "Pertama",
-                    //     last: "Terakhir",
-                    //     next: "Selanjutnya",
-                    //     previous: "Sebelumnya"
-                    // }
+                    paginate: {
+                        first: "Pertama",
+                        last: "Terakhir",
+                        next: "Selanjutnya",
+                        previous: "Sebelumnya"
+                    }
                 }
             });
         });
