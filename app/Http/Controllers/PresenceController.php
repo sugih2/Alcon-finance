@@ -82,9 +82,11 @@ class PresenceController extends Controller
         log::info('Cik Nempo Data:', $request->all());
         $validator = Validator::make($request->all(), [
             // 'employed_id' => 'required|integer|exists:employees,id',
+            'tanggal_scan' => 'required|date',
             'tanggal' => 'required|date',
-            'tanggal' => 'required|date',
-            // 'status' => 'required|string',
+            'jam_masuk' => 'nullable|date_format:H:i:s',
+            'jam_pulang' => 'nullable|date_format:H:i:s',
+            'status' => 'required|string',
         ]);
 
         if ($validator->fails()) {
@@ -97,11 +99,27 @@ class PresenceController extends Controller
 
         try {
             $presence = Presence::findOrFail($id);
+            $status = $presence->presensi_status; // Default ke status sebelumnya
+            if ($request->jam_masuk) {
+                $jamMasuk = Carbon::createFromFormat('H:i:s', $request->jam_masuk);
+                $jamDelapan = Carbon::createFromTime(8, 0, 0); // Jam 08:00:00
+
+                if ($jamMasuk->greaterThan($jamDelapan)) {
+                    $status = 'Late';
+                } else {
+                    $status = 'EarlyIn';
+                }
+            } elseif ($request->jam_masuk === null && $request->jam_pulang !== null) {
+                $status = 'MissingIn';
+            }
+
             $presence->update([
                 // 'employed_id' => $request->employed_id,
                 'tanggal_scan' => $request->tanggal_scan,
                 'tanggal' => $request->tanggal,
-                // 'status' => $request->presensi_status,
+                'jam_masuk' => $request->jam_masuk,
+                'jam_pulang' => $request->jam_pulang,
+                'presensi_status' => $status,
                 // 'remarks' => $request->remarks,
             ]);
 
@@ -232,15 +250,23 @@ class PresenceController extends Controller
                     foreach ($xml->ROWS->ROW as $row) {
                         $nip = (string) $row['dbg_scanlogpegawai_nip'];
                         $tanggal = (string) $row['dbg_scanlogtgl'];
-
+                        $exists = [];
                         // Mengecek apakah NIP ada di database Employee
                         $isEmployee = Employee::where('nip', $nip)->exists();
-                        $employee = Employee::where('nip', $nip)->first();
-                        $employee_id = $employee->id;
+
+                        if ($isEmployee) {
+                            $employee = Employee::where('nip', $nip)->first();
+                            $employee_id = $employee->id;
+
+                            $exists = Presence::where('employed_id', $employee_id)
+                                ->where('tanggal', $tanggal)
+                                ->exists();
+                            log::info("CEK BROUUU : ", ['ceck data' => $employee]);
+                        } else {
+                            $error[] = "cek";
+                        }
+
                         // Mengecek apakah NIP dan tanggal sudah pernah diimpor sebelumnya
-                        $exists = Presence::where('employed_id', $employee_id)
-                            ->where('tanggal', $tanggal)
-                            ->exists();
 
                         // Array untuk menampung error
 
@@ -542,10 +568,25 @@ class PresenceController extends Controller
                 // Cari id karyawan berdasarkan nip
                 $employee = Employee::where('nip', $row['nip'])->first();
 
+                $employee_id = $employee->id;
+                $tanggal = $row['tanggal'];
+
+
                 if (!$employee) {
                     // Skip jika employee tidak ditemukan
                     Log::warning("Employee dengan NIP {$row['nip']} tidak ditemukan.");
                     return response()->json(['error' => "Employee dengan NIP {$row['nip']} tidak ditemukan."], 404);
+                }
+                $exists = Presence::where('employed_id', $employee_id)
+                    ->where('tanggal', $tanggal)
+                    ->exists();
+
+                if ($exists) {
+                    // Jika data sudah ada, kembalikan respons error
+                    Log::warning("Presensi untuk employed_id {$employee_id} pada tanggal {$tanggal} sudah ada.");
+                    return response()->json([
+                        'error' => "Ada Data Yang Sudah Pernah Di Import"
+                    ], 400); // Gunakan HTTP status code 400 untuk bad request
                 }
 
 
@@ -560,7 +601,7 @@ class PresenceController extends Controller
                     'presensi_status' => $row['presensi_status'],
                     'sn' => $row['sn'], // Serial number
                 ]);
-                Log::info("Data presensi untuk NIP {$row['nip']} pada tanggal {$row['tanggal']} berhasil disimpan.");
+                // Log::info("Data presensi untuk NIP {$row['nip']} pada tanggal {$row['tanggal']} berhasil disimpan.");
             }
 
             DB::commit();
