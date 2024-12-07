@@ -36,6 +36,7 @@ use App\Http\Controllers\PresenceController;
 use App\Http\Controllers\ParamComponenController;
 use App\Http\Controllers\PraPayrollController;
 use App\Http\Controllers\RunPayrollController;
+use App\Http\Controllers\PayrollHistoryController;
 
 Route::get('/data', [ExampleController::class, 'getData'])->middleware('auth')->name('data.index');
 
@@ -157,6 +158,12 @@ Route::group(['prefix' => 'run-payroll', 'middleware' => 'auth'], function () {
 	Route::get('/employee', [RunPayrollController::class, 'employee'])->name('runpayroll.employee');
 	Route::get('/get-selected-employees', [RunPayrollController::class, 'getSelectedEmployees'])->name('runpayroll.employee');
 	Route::post('/store-employee', [RunPayrollController::class, 'storeselectkar'])->name('runpayroll.storeselectkar');
+});
+Route::group(['prefix' => 'history-payroll', 'middleware' => 'auth'], function () {
+	Route::get('/', [PayrollHistoryController::class, 'index'])->middleware('auth')->name('historypayroll.index');
+	Route::post('/store', [PayrollHistoryController::class, 'store'])->name('historypayroll.store');
+	Route::get('/employee', [PayrollHistoryController::class, 'employee'])->name('historypayroll.');
+	Route::get('/detail/{id}', [PayrollHistoryController::class, 'showDetails'])->name('historypayroll.detail');
 });
 
 

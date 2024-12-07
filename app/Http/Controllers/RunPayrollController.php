@@ -7,7 +7,10 @@ use Illuminate\Support\Facades\Log;
 use App\Models\Employee;
 use App\Models\MasterPayroll;
 use App\Models\Presence;
+use App\Models\PayrollHistory;
+use App\Models\PayrollHistoryDetail;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 
 class RunPayrollController extends Controller
 {
@@ -55,7 +58,7 @@ class RunPayrollController extends Controller
     ##RUN PAYROLL PROCESS##
     public function store(Request $request)
     {
-        Log::info("Request: " . json_encode($request->all()));
+        //Log::info("Request: " . json_encode($request->all()));
 
         $validator = Validator::make($request->all(), [
             'description' => 'required|string',
@@ -72,195 +75,262 @@ class RunPayrollController extends Controller
             ], 422);
         }
 
-        $description = $request->input('description');
-        $startDate = $request->input('start_date');
-        $endDate = $request->input('end_date');
-        $employeeIds = $request->input('employee_ids');
+        try {
+            $description = $request->input('description');
+            $startDate = $request->input('start_date');
+            $endDate = $request->input('end_date');
+            $employeeIds = $request->input('employee_ids');
 
-        //Log::info("Start Date: $startDate, End Date: $endDate");
-        $activeTransactions = MasterPayroll::where('efektif_date', '<=', $endDate)
+            //Log::info("Description: $description, Start Date: $startDate, End Date: $endDate, Employee IDs: " . json_encode($employeeIds));
+            $activeTransactions = MasterPayroll::where('efektif_date', '<=', $endDate)
             ->where(function ($query) use ($startDate, $endDate) {
                 $query->whereNull('end_date')
                     ->orWhereBetween('end_date', [$startDate, $endDate])
                     ->orWhere('end_date', '>', $startDate);
             })
-            ->whereHas('detailPayroll.employee', function ($query) use ($employeeIds) {
-                $query->whereIn('id', $employeeIds);
-            })
-            ->with(['detailPayroll.employee', 'detailPayroll.component'])
+            ->with(['detailPayroll' => function ($query) use ($employeeIds) {
+                $query->whereIn('id_employee', $employeeIds)
+                    ->with(['employee', 'component']);
+            }])
             ->get();
 
-        Log::info("Active Transactions: " . json_encode($activeTransactions, JSON_PRETTY_PRINT));
+            //Log::info("Active Transactions: " . json_encode($activeTransactions, JSON_PRETTY_PRINT));
 
-        $combinedData = collect([]);
+            $combinedData = collect([]);
 
-        foreach ($activeTransactions as $settingTunjangan) {
-            $groupedData = [
-                'transaksi' => $settingTunjangan,
-                'karyawan' => $settingTunjangan->detailPayroll->map(function ($tunjanganKaryawan) {
-                    return [
-                        'karyawan' => $tunjanganKaryawan->employee,
-                        'param_componen' => $tunjanganKaryawan->component,
-                        'nilai' => $tunjanganKaryawan->amount,
-                    ];
-                }),
-            ];
-            //Log::info("Grouped Data: " . json_encode($groupedData, JSON_PRETTY_PRINT));
+            foreach ($activeTransactions as $settingTunjangan) {
+                $groupedData = [
+                    'transaksi' => $settingTunjangan,
+                    'karyawan' => $settingTunjangan->detailPayroll->map(function ($tunjanganKaryawan) {
+                        return [
+                            'karyawan' => $tunjanganKaryawan->employee,
+                            'param_componen' => $tunjanganKaryawan->component,
+                            'nilai' => $tunjanganKaryawan->amount,
+                        ];
+                    }),
+                ];
+                //Log::info("Grouped Data: " . json_encode($groupedData, JSON_PRETTY_PRINT));
 
-            $groupedData = collect([$groupedData]);
-            $groupedData = $this->calculatePresensiAndSalaries($groupedData, $startDate, $endDate);
+                $groupedData = collect([$groupedData]);
+                $groupedData = $this->calculatePresensiAndSalaries($groupedData, $startDate, $endDate);
+                //Log::info("Grouped Data FINAL: " . json_encode($groupedData, JSON_PRETTY_PRINT));
 
-            // foreach ($groupedData->first()['karyawan'] as $employeeData) {
-            //     $employeeId = $employeeData['karyawan']->id;
+                foreach ($groupedData->first()['karyawan'] as $employeeData) {
+                    $employeeId = $employeeData['karyawan']->id;
 
-            //     if (!$combinedData->has($employeeId)) {
-            //         $combinedData->put($employeeId, [
-            //             'karyawan' => $employeeData['karyawan'],
-            //             'components' => [
-            //                 'salary' => 0,
-            //                 'allowance' => [],
-            //                 'benefit' => [],
-            //                 'deduction' => [],
-            //             ],
-            //             'total_pendapatan' => 0,
-            //             'total_potongan' => 0,
-            //             'gaji_bruto' => 0,
-            //             'gaji_bersih' => 0,
-            //         ]);
-            //     }
+                    if (!$combinedData->has($employeeId)) {
+                        $combinedData->put($employeeId, [
+                            'karyawan' => $employeeData['karyawan'],
+                            'components' => [
+                                'salary' => 0,
+                                'allowance' => [],
+                                'benefit' => [],
+                                'deduction' => [],
+                            ],
+                            'total_pendapatan' => 0,
+                            'total_potongan' => 0,
+                            'gaji_bruto' => 0,
+                            'gaji_bersih' => 0,
+                        ]);
+                    }
 
-            //     $existingData = $combinedData->get($employeeId);
+                    $existingData = $combinedData->get($employeeId);
 
-            //     $existingData['components']['salary'] += $employeeData['components']['salary'];
+                    $existingData['components']['salary'] += $employeeData['components']['salary'];
+                    
+                    foreach ($employeeData['components']['allowance'] as $key => $value) {
+                        if (!isset($existingData['components']['allowance'][$key])) {
+                            $existingData['components']['allowance'][$key] = 0;
+                        }
+                        $existingData['components']['allowance'][$key] += $value;
+                    }
+                    foreach ($employeeData['components']['deduction'] as $key => $value) {
+                        if (!isset($existingData['components']['deduction'][$key])) {
+                            $existingData['components']['deduction'][$key] = 0;
+                        }
+                        $existingData['components']['deduction'][$key] += $value;
+                    }
 
-            //     foreach ($employeeData['components']['allowance'] as $key => $value) {
-            //         if (!isset($existingData['components']['allowance'][$key])) {
-            //             $existingData['components']['allowance'][$key] = 0;
-            //         }
-            //         $existingData['components']['allowance'][$key] += $value;
-            //     }
-            //     foreach ($employeeData['components']['benefit'] as $key => $value) {
-            //         if (!isset($existingData['components']['benefit'][$key])) {
-            //             $existingData['components']['benefit'][$key] = 0;
-            //         }
-            //         $existingData['components']['benefit'][$key] += $value;
-            //     }
-            //     foreach ($employeeData['components']['deduction'] as $key => $value) {
-            //         if (!isset($existingData['components']['deduction'][$key])) {
-            //             $existingData['components']['deduction'][$key] = 0;
-            //         }
-            //         $existingData['components']['deduction'][$key] += $value;
-            //     }
+                    $existingData['total_pendapatan'] += $employeeData['total_pendapatan'] ?? 0;
+                    $existingData['total_potongan'] += $employeeData['total_potongan'] ?? 0;
+                    $existingData['gaji_bruto'] += $employeeData['gaji_bruto'] ?? 0;
+                    $existingData['gaji_bersih'] += $employeeData['gaji_bersih'] ?? 0;
+                    $combinedData->put($employeeId, $existingData);
+                }
+            }
 
-            //     $existingData['total_pendapatan'] += $employeeData['total_pendapatan'] ?? 0;
-            //     $existingData['total_potongan'] += $employeeData['total_potongan'] ?? 0;
-            //     $existingData['gaji_bruto'] += $employeeData['gaji_bruto'] ?? 0;
-            //     $existingData['gaji_bersih'] += $employeeData['gaji_bersih'] ?? 0;
-            //     $combinedData->put($employeeId, $existingData);
-            // }
+            $this->insertCombinedPayrollData($combinedData, $startDate, $endDate , $description);
+
+            return response()->json(['success' => true, 'message' => 'Payroll process completed successfully.']);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while processing payroll. Please try again later.'
+            ], 500);
         }
-
-        // $this->insertCombinedPayrollData($combinedData, $startDate, $endDate , $description);
-
-        // Log the combined data
-        //Log::info('Combined Data: ' . json_encode($combinedData, JSON_PRETTY_PRINT));
-
-        return response()->json(['message' => 'Payroll process completed successfully.']);
     }
+
+    // private function calculatePresensiAndSalaries($groupedData, $startDate, $endDate)
+    // {
+    //     return $groupedData->map(function ($item) use ($startDate, $endDate) {
+    //         $employeeData = $item['karyawan']->map(function ($tunjanganKaryawan) use ($startDate, $endDate) {
+    //             $employee = $tunjanganKaryawan['karyawan'];
+    //             $employeeId = $employee->id;
+
+    //             $jumlahHariKerja = Presence::getTotalHadir($employeeId, $startDate, $endDate);
+    //             Log::info("Jumlah hari kerja: $jumlahHariKerja");
+
+    //             if (!$jumlahHariKerja) {
+    //                 Log::warning("No presensi data found for employee ID: $employeeId in period: $startDate to $endDate");
+    //                 return [
+    //                     'karyawan' => $tunjanganKaryawan['karyawan'],
+    //                     'param_componen' => $tunjanganKaryawan['param_componen'],
+    //                     'nilai' => $tunjanganKaryawan['nilai'],
+    //                     'presensi' => null,
+    //                     'salary' => 0,
+    //                     'components' => [
+    //                         'salary' => 0,
+    //                         'allowance' => [],
+    //                         'deduction' => [],
+    //                     ],
+    //                     'total_pendapatan' => 0,
+    //                     'total_potongan' => 0,
+    //                     'gaji_bruto' => 0,
+    //                     'gaji_bersih' => 0,
+    //                 ];
+    //             }
+
+    //             $components = [
+    //                 'salary' => 0,
+    //                 'allowance' => [],
+    //                 'deduction' => [],
+    //             ];
+    
+                // $componentName = $tunjanganKaryawan['param_componen']->name;
+                // $componentType = $tunjanganKaryawan['param_componen']->componen;
+               
+                // $nilai = $tunjanganKaryawan['nilai'];
+                // $hasil = $nilai * $jumlahHariKerja;
+
+                // switch ($componentType) {
+                //     case 'Salary':
+                //         $components['salary'] += $hasil;
+                //         break;
+    
+                //     case 'Allowance':
+                //         if (!isset($components['allowance'][$componentName])) {
+                //             $components['allowance'][$componentName] = 0;
+                //         }
+                //         $components['allowance'][$componentName] += $hasil;
+                //         break;
+    
+                //     case 'Deduction':
+                //         if (!isset($components['deduction'][$componentName])) {
+                //             $components['deduction'][$componentName] = 0;
+                //         }
+                //         $components['deduction'][$componentName] += $nilai;
+                //         break;
+    
+                //     default:
+                //         Log::warning("Unknown component type '{$componentType}' for employee ID {$employeeId}");
+                // }
+
+    //             // Hitung total pendapatan dan potongan
+    //             $totalPendapatan = $components['salary'] + array_sum($components['allowance']);
+    //             $totalPotongan = array_sum($components['deduction']);
+
+    //             $gajiBruto = $totalPendapatan;
+    //             $gajiBersih = $gajiBruto - $totalPotongan;
+
+    //             return [
+    //                 'karyawan' => $tunjanganKaryawan['karyawan'],
+    //                 'param_componen' => $tunjanganKaryawan['param_componen'],
+    //                 'nilai' => $tunjanganKaryawan['nilai'],
+    //                 'presensi' => [
+    //                     'working_days' => $jumlahHariKerja,
+    //                 ],
+    //                 'salary' => $components['salary'],
+    //                 'components' => $components,
+    //                 'total_pendapatan' => $totalPendapatan,
+    //                 'total_potongan' => $totalPotongan,
+    //                 'gaji_bruto' => $gajiBruto,
+    //                 'gaji_bersih' => $gajiBersih,
+    //             ];
+    //         });
+
+    //         return [
+    //             'transaksi' => $item['transaksi'],
+    //             'karyawan' => $employeeData,
+    //         ];
+    //     });
+    // }
 
     private function calculatePresensiAndSalaries($groupedData, $startDate, $endDate)
     {
         return $groupedData->map(function ($item) use ($startDate, $endDate) {
             $employeeData = $item['karyawan']->map(function ($tunjanganKaryawan) use ($startDate, $endDate) {
                 $employee = $tunjanganKaryawan['karyawan'];
-                $employeeId = $tunjanganKaryawan['karyawan']->id;
+                $employeeId = $employee->id;
+                $nilaiPerHari = $tunjanganKaryawan['nilai'];
+                $componentType = $tunjanganKaryawan['param_componen']->componen;
+                $componentName = $tunjanganKaryawan['param_componen']->name;
 
-                $jumlahHariKerja = Presence::getTotalHadir($employeeId, $startDate, $endDate);
-                Log::info("Masuk Kerja: " . json_encode($jumlahHariKerja, JSON_PRETTY_PRINT));
-                if (!$jumlahHariKerja) {
-                    Log::warning("No presensi data found for employee ID: $employeeId in period: $startDate to $endDate");
-                    // return [
-                    //     'karyawan' => $tunjanganKaryawan['karyawan'],
-                    //     'param_componen' => $tunjanganKaryawan['param_componen'],
-                    //     'nilai' => $tunjanganKaryawan['nilai'],
-                    //     'presensi' => null,
-                    //     'salary' => 0,
-                    //     'components' => [
-                    //         'salary' => 0,
-                    //         'allowance' => [],
-                    //         'benefit' => [],
-                    //         'deduction' => [],
-                    //     ]
-                    // ];
+                $attendance = [
+                    'attendance_details' => [],
+                    'total_earnings' => 0,
+                    'total_deductions' => 0,
+                ];
+
+                if ($componentType === 'Salary') {
+                    $attendance = Presence::calculateAttendanceAndDeductions($employeeId, $startDate, $endDate, $nilaiPerHari, $componentType);
                 }
-                // Logging values for presensi and prorate calculations
-                //Log::info("Employee ID: $employeeId - Prorate: $prorate, Working Days: $workingDays, Prorate Days: $prorateDays");
+    
+                $attendanceDetails = $attendance['attendance_details'];
+                $totalEarnings = $attendance['total_earnings'];
+                $totalDeductions = $attendance['total_deductions'];
+
+                //Log::info("Total penghasilan: $totalEarnings, Total potongan: $totalDeductions");
 
                 $components = [
                     'salary' => 0,
                     'allowance' => [],
-                    'benefit' => [],
                     'deduction' => [],
                 ];
 
-                $statusTunjangan = $tunjanganKaryawan['param_componen']->status_tunjangan;
-                $nilai = $tunjanganKaryawan['nilai'];
-                $hasil = 0;
-                if ($prorateDays > 0 && $workingDays > 0) {
-                    $hasil = ($statusTunjangan === 'Tetap') ? ($nilai / $prorate) * $prorateDays : ($nilai / $prorate) * $workingDays;
-                }
-                $rumustetap = 0;
-                $rumustetap = ($nilai / $prorate) * $prorateDays;
-
-                //Log::info("Employee ID: $employeeId - Component Name: " . $tunjanganKaryawan['param_componen']->nama . " - Calculated Value: $hasil");
-
-
-
-                $componentName = $tunjanganKaryawan['param_componen']->nama;
-                switch ($tunjanganKaryawan['param_componen']->komponen) {
+                switch ($componentType) {
                     case 'Salary':
-                        $components['salary'] += $rumustetap;
+                        $components['salary'] = $totalEarnings;
                         break;
+
                     case 'Allowance':
                         if (!isset($components['allowance'][$componentName])) {
                             $components['allowance'][$componentName] = 0;
                         }
-                        if ($statusTunjangan === 'Flat') {
-                            $components['allowance'][$componentName] += $nilai;
-                        } else {
-                            $components['allowance'][$componentName] += $hasil;
-                        }
+                        $components['allowance'][$componentName] += $totalEarnings;
                         break;
-                    case 'Benefit':
-                        if (!isset($components['benefit'][$componentName])) {
-                            $components['benefit'][$componentName] = 0;
-                        }
-                        $components['benefit'][$componentName] += $nilai;
-                        break;
+
                     case 'Deduction':
                         if (!isset($components['deduction'][$componentName])) {
                             $components['deduction'][$componentName] = 0;
                         }
-                        $components['deduction'][$componentName] += $nilai;
+                        $components['deduction'][$componentName] += $totalDeductions;
                         break;
+
+                    default:
+                        Log::warning("Unknown component type '{$componentType}' for employee ID {$employeeId}");
                 }
 
-                $totalPendapatan = $components['salary'] + array_sum($components['allowance']) + array_sum($components['benefit']);
+                $totalPendapatan = $components['salary'] + array_sum($components['allowance']);
                 $totalPotongan = array_sum($components['deduction']);
                 $gajiBruto = $totalPendapatan;
                 $gajiBersih = $gajiBruto - $totalPotongan;
-
-                //Log::info("Employee ID: $employeeId - Total Pendapatan: $totalPendapatan, Total Potongan: $totalPotongan, Gaji Bruto: $gajiBruto, Gaji Bersih: $gajiBersih");
 
                 return [
                     'karyawan' => $tunjanganKaryawan['karyawan'],
                     'param_componen' => $tunjanganKaryawan['param_componen'],
                     'nilai' => $tunjanganKaryawan['nilai'],
-                    'presensi' => [
-                        'prorate' => $prorate,
-                        'working_days' => $workingDays,
-                    ],
-                    'salary' => $hasil,
+                    'presensi' => $attendanceDetails,
+                    'salary' => $components['salary'],
                     'components' => $components,
                     'total_pendapatan' => $totalPendapatan,
                     'total_potongan' => $totalPotongan,
@@ -276,20 +346,22 @@ class RunPayrollController extends Controller
         });
     }
 
+
+
+
+
     private function insertCombinedPayrollData($combinedData, $startDate, $endDate, $description)
     {
+        //Log::info("Combined Dataaaaa: " . json_encode($combinedData, JSON_PRETTY_PRINT));
 
         DB::beginTransaction();
 
         try {
             $prefix = 'MA';
             $id_transaksi_payment = PayrollHistory::generateIdTransaksiPayment($prefix);
-            // $id_transaksi_payment = $this->generateTransaksiPaymentId();
-            // $description = 'Payroll untuk periode ' . $startDate . ' ke ' . $endDate;
             $amount_transaksi = $combinedData->sum(function ($employeeData) {
                 return $employeeData['components']['salary']
                     + array_sum($employeeData['components']['allowance'])
-                    + array_sum($employeeData['components']['benefit'])
                     - array_sum($employeeData['components']['deduction']);
             });
 
@@ -305,11 +377,11 @@ class RunPayrollController extends Controller
 
             foreach ($combinedData as $employeeData) {
                 PayrollHistoryDetail::create([
+                    'id_payroll_history' => $payrollHistory->id,
                     'id_transaksi_payment' => $id_transaksi_payment,
-                    'id_karyawan' => $employeeData['karyawan']->id,
+                    'employee_id' => $employeeData['karyawan']->id,
                     'salary' => $employeeData['components']['salary'],
                     'allowance' => json_encode($this->convertComponentToNamedArray($employeeData['components']['allowance'])),
-                    'benefit' => json_encode($this->convertComponentToNamedArray($employeeData['components']['benefit'])),
                     'deduction' => json_encode($this->convertComponentToNamedArray($employeeData['components']['deduction'])),
                     'total_pendapatan' => $employeeData['total_pendapatan'],
                     'total_potongan' => $employeeData['total_potongan'],

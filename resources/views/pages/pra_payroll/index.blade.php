@@ -103,7 +103,8 @@
                                             <td>{{ $c->id_transaksi }}</td>
                                             <td>{{ $c->employee->name }}</td>
                                             <td>{{ $c->component->name }}</td>
-                                            <td>{{ $c->amount }}</td>
+                                            {{-- <td>{{ $c->amount }}</td> --}}
+                                            <td>Rp. {{ number_format($c->amount, 0, ',', '.') }}
 
                                             <td class="align-middle text-end">
                                                 <button type="button" class="btn btn-link text-primary mb-0"
