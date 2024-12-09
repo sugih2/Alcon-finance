@@ -1,0 +1,39 @@
+<form id="FormPresence">
+    @csrf
+    <div class="mb-3">
+        <label for="employe_name" class="form-label">Position</label>
+        <select name="employe_name" id="employe_name" required>
+            <option value="" selected>Employe Name</option>
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="nip" class="form-label">NIP</label>
+        <input type="text" class="form-control" id="nip" name="nip" placeholder="NIP" required>
+    </div>
+    <div class="mb-3">
+        <label for="nik" class="form-label">NIK</label>
+        <input type="number" class="form-control" id="nik" name="nik" placeholder="NIK" required>
+    </div>
+    <div class="mb-3">
+        <label for="name" class="form-label">Name Employee</label>
+        <input type="text" class="form-control" id="name" name="name" placeholder="Name Employee" required>
+    </div>
+    <div class="mb-3">
+        <label for="birth_date" class="form-label">Brith Date</label>
+        <input type="date" class="form-control" id="birth_date" name="birth_date" placeholder="Brith Date" required>
+    </div>
+    <div class="mb-3">
+        <label for="address" class="form-label">Address</label>
+        <input type="text" class="form-control" id="address" name="address" placeholder="Address" required>
+    </div>
+    <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input type="text" class="form-control" id="email" name="email" placeholder="Email" required>
+    </div>
+    <div class="mb-3">
+        <label for="phone" class="form-label">Phone Number</label>
+        <input type="number" class="form-control" id="phone" name="phone" placeholder="Phone Number" required>
+    </div>
+
+    <button type="button" id="btn-submit" onclick="StoreEmployee()" class="btn btn-primary">Simpan</button>
+</form>
