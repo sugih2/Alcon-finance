@@ -7,33 +7,24 @@
         </select>
     </div>
     <div class="mb-3">
-        <label for="nip" class="form-label">NIP</label>
-        <input type="text" class="form-control" id="nip" name="nip" placeholder="NIP" required>
+        <label for="tanggal_scan" class="form-label">Tanggal Scan</label>
+        <input type="datetime-local" class="form-control" id="tanggal_scan" name="tanggal_scan" 
+               value="{{ date('Y-m-d\TH:i:s', strtotime($shifts->tanggal_scan)) }}">
     </div>
     <div class="mb-3">
-        <label for="nik" class="form-label">NIK</label>
-        <input type="number" class="form-control" id="nik" name="nik" placeholder="NIK" required>
+        <label for="tanggal" class="form-label">Tanggal</label>
+        <input type="datetime-local" class="form-control" id="tanggal" name="tanggal" 
+               value="{{ date('Y-m-d\TH:i:s', strtotime($shifts->tanggal)) }}">
     </div>
     <div class="mb-3">
-        <label for="name" class="form-label">Name Employee</label>
-        <input type="text" class="form-control" id="name" name="name" placeholder="Name Employee" required>
+        <label for="jam_masuk" class="form-label">Jam Masuk </label>
+        <input type="time" class="form-control" id="jam_masuk" name="jam_masuk" 
+            value="{{ $presence->jam_masuk }}" >
     </div>
     <div class="mb-3">
-        <label for="birth_date" class="form-label">Brith Date</label>
-        <input type="date" class="form-control" id="birth_date" name="birth_date" placeholder="Brith Date" required>
+        <label for="jam_pulang" class="form-label">Jam Pulang </label>
+        <input type="time" class="form-control" id="jam_pulang" name="jam_pulang" 
+            value="{{ $presence->jam_pulang }}" >
     </div>
-    <div class="mb-3">
-        <label for="address" class="form-label">Address</label>
-        <input type="text" class="form-control" id="address" name="address" placeholder="Address" required>
-    </div>
-    <div class="mb-3">
-        <label for="email" class="form-label">Email</label>
-        <input type="text" class="form-control" id="email" name="email" placeholder="Email" required>
-    </div>
-    <div class="mb-3">
-        <label for="phone" class="form-label">Phone Number</label>
-        <input type="number" class="form-control" id="phone" name="phone" placeholder="Phone Number" required>
-    </div>
-
     <button type="button" id="btn-submit" onclick="StoreEmployee()" class="btn btn-primary">Simpan</button>
 </form>
