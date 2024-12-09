@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Route;
 // });
 
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\SettingShiftController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\LoginController;
@@ -37,6 +38,7 @@ use App\Http\Controllers\ParamComponenController;
 use App\Http\Controllers\PraPayrollController;
 use App\Http\Controllers\RunPayrollController;
 use App\Http\Controllers\PayrollHistoryController;
+use App\Models\SettingShift;
 
 Route::get('/data', [ExampleController::class, 'getData'])->middleware('auth')->name('data.index');
 
@@ -117,6 +119,11 @@ Route::group(['prefix' => 'presence', 'middleware' => 'auth'], function () {
 	Route::delete('/delete/{id}', [PresenceController::class, 'destroy'])->name('presence.delete');
 	Route::post('/process-import', [PresenceController::class, 'processImport'])->name('presence.processImport');
 	Route::post('/store-import', [PresenceController::class, 'storeImport'])->name('presence.storeImport');
+});
+Route::group(['prefix' => 'shift', 'middleware' => 'auth'], function () {
+	Route::get('/', [SettingShiftController::class, 'index'])->middleware('auth')->name('shift.index');
+	Route::get('/edit/{id}', [SettingShiftController::class, 'edit'])->name('shift.edit');
+	Route::post('/update/{id}', [SettingShiftController::class, 'update'])->name('shift.update');
 });
 Route::group(['prefix' => 'componen', 'middleware' => 'auth'], function () {
 	Route::get('/', [ParamComponenController::class, 'index'])->middleware('auth')->name('componen.index');

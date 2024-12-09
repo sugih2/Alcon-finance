@@ -218,6 +218,16 @@
                 </a>
             </li>
             <li class="nav-item">
+                <a class="nav-link {{ Route::currentRouteName() == 'shift.index' ? 'active' : '' }}"
+                    href="{{ route('shift.index') }}">
+                    <div
+                        class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                        <i class="ni ni-time-alarm text-dark text-sm opacity-10"></i>
+                    </div>
+                    <span class="nav-link-text ms-1">Setting Shift</span>
+                </a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link {{ Route::currentRouteName() == 'componen.index' ? 'active' : '' }}"
                     href="{{ route('componen.index') }}">
                     <div
