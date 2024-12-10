@@ -65,7 +65,7 @@
                                                 data-bs-toggle="modal" data-bs-target="#editModal"
                                                 onclick="editPresence({{ $presence->id }})">Edit</button>
                                             <button type="button" class="btn btn-link text-danger mb-0"
-                                                data-bs-toggle="modal" data-bs-target="#deletePresenceModal"
+                                                data-bs-toggle="modal" data-bs-target="#deletePresenceModal" onclick="deletePresence({{ $presence->id }})"
                                                 data-id="{{ $presence->id }}">Delete</button>
                                         </td>
                                     </tr>
@@ -458,5 +458,59 @@
                 submitButton.disabled = false;
             }
         }
+        async function deletePresence(id) {
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+    // Menampilkan konfirmasi sebelum menghapus data
+    const result = await Swal.fire({
+        title: 'Apakah Anda yakin?',
+        text: 'Data ini akan dihapus secara permanen!',
+        icon: 'warning',
+        showCancelButton: true,  // Menampilkan tombol batal
+        confirmButtonText: 'Ya, hapus!',
+        cancelButtonText: 'Batal',
+        reverseButtons: true  // Menempatkan tombol Batal di sebelah kiri
+    });
+
+    // Jika pengguna mengklik "Ya, hapus!", lanjutkan proses penghapusan
+    if (result.isConfirmed) {
+        try {
+            const response = await fetch('/presence/delete/' + id, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                const errorData = await response.text(); // Ambil teks respons
+                throw new Error(errorData || 'Gagal menghapus data.');
+            }
+
+            const data = await response.json();
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: 'Absen berhasil dihapus.',
+                confirmButtonText: 'OK'
+            }).then(() => {
+                // Tindakan setelah sukses (misalnya reload atau perbarui tampilan)
+                location.reload();  // Bisa diganti sesuai kebutuhan
+            });
+
+        } catch (error) {
+            console.error('Error:', error);
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal',
+                text: error.message || 'Terjadi kesalahan saat menghapus absen.',
+                confirmButtonText: 'Coba Lagi'
+            });
+        }
+    }
+}
+
     </script>
 @endsection
