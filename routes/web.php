@@ -175,6 +175,8 @@ Route::group(['prefix' => 'history-payroll', 'middleware' => 'auth'], function (
 
 
 
+
+
 Route::get('/', function () {
 	return redirect('/dashboard');
 })->middleware('auth');

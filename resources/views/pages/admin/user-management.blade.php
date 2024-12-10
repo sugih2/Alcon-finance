@@ -111,7 +111,7 @@
         </div>
 
         <div class="col-md-8">
-            <div class="card mb-4">
+            <div class="card mb-3">
                 <div class="card-header pb-0 d-flex justify-content-between align-items-center">
                     <h6>Users</h6>
                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">

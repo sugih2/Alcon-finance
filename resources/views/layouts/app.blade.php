@@ -42,6 +42,19 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.1.0/css/buttons.foundation.css">
     <script src="https://cdn.datatables.net/v/dt/dt-2.1.8/datatables.min.js"></script>
 
+    {{-- @push('scripts')
+        <script src="{{ asset('assets/datatables/jquery.dataTables.min.js')}}"> </script>
+    @endpush
+
+    @push('styles')
+         <link href="{{ asset('assets/datatables/jquery.dataTables.min.css')}}" rel="stylesheet"/>
+    @endpush --}}
+
+
+
+    <script src="/assets/js/plugins/datatables.js"></script>
+
+
     {{-- SweetAlert --}}
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 

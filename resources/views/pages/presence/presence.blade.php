@@ -62,7 +62,7 @@
                                         <td>{{ $presence->sn }}</td>
                                         <td class="align-middle text-end">
                                             <button type="button" class="btn btn-link text-primary mb-0"
-                                                data-bs-toggle="modal"
+                                                data-bs-toggle="modal" data-bs-target="#editModal"
                                                 onclick="editPresence({{ $presence->id }})">Edit</button>
                                             <button type="button" class="btn btn-link text-danger mb-0"
                                                 data-bs-toggle="modal" data-bs-target="#deletePresenceModal"
@@ -137,7 +137,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-primary" onclick="submitImportForm()">Proses Data</button>
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="closeModalImportPresence()">Tutup</button>
                     </div>
                 </form>
             </div>
@@ -385,6 +385,9 @@
 
         function closeModal() {
             document.getElementById('detailModal').style.display = 'none';
+        }
+        function closeModalImportPresence() {
+            document.getElementById('importModal').style.display = 'none';
         }
 
         function editPresence(id) {
