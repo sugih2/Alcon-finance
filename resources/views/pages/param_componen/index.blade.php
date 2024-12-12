@@ -242,6 +242,8 @@
             event.preventDefault();
 
             var selectedPosition = $('#id_regency').val();
+            var cityName = $('#id_regency option:selected').text();
+            var selectedCategory = $('input[name="category"]:checked').next('label').text().trim().replace(/\s+/g, ' ');
             if (!selectedPosition) {
                 Swal.fire({
                     icon: 'error',
@@ -250,11 +252,20 @@
                 });
                 return false;
             }
-
+            if (!selectedCategory) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validation Error',
+                    text: 'Please select a category.',
+                });
+                return false;
+            }
+            var formattedName = `Tunjangan ${selectedCategory} ${cityName}`;
             var rawValue = $('#nilai').val().replace(/\./g, '');
             $('#nilai').val(rawValue);
             var form = $('#allowanceForm')[0];
             var formData = new FormData(form);
+            formData.append('name', formattedName);
 
             formData.forEach(function(value, key) {
                 console.log(`${key}: ${value}`);

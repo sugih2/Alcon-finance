@@ -61,6 +61,7 @@ class ParamComponenController extends Controller
             $param_componen->id_position = $request->id_position;
             $param_componen->id_regency = $request->id_regency;
             $param_componen->componen = $request->componen;
+            $param_componen->category = $request->category;
             $param_componen->type = $request->type; 
             $param_componen->amount = $request->amount;
             $param_componen->status = "Active";

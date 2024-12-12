@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class ParamComponen extends Model
 {
     use HasFactory;
-    protected $fillable = ['name', 'id_regency', 'id_position', 'componen', 'type', 'amount', 'status'];
+    protected $fillable = ['name', 'id_regency', 'id_position', 'componen', 'type', 'category', 'amount', 'status'];
 
     public function regency()
     {
