@@ -57,7 +57,9 @@
 
                                             <td class="align-middle text-end">
                                                 <button type="button" class="btn btn-link text-info mb-0"
-                                                    onclick="DetailPayroll({{ $e->id }})">Detail</button>
+                                                    onclick="window.location.href='{{ route('historypayrollDetail.index', ['id' => $e->id]) }}'">
+                                                    Detail
+                                                </button>
                                                 <button type="button" class="btn btn-link text-primary mb-0"
                                                     onclick="editEmployee({{ $e->id }})">Edit</button>
                                                 <button type="button" class="btn btn-link text-danger mb-0"
