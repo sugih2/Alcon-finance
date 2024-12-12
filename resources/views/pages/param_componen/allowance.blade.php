@@ -29,9 +29,16 @@
     <div class="row mb-3">
         <div class="col-6">
             <div class="form-group">
-                <label for="nama">Nama Componen</label>
-                <input type="text" class="form-control" id="nama" name="name"
-                    placeholder="Masukan Nama Komponen">
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="category" id="category1" value="TLK"
+                        required>
+                    <label class="form-check-label" for="category1"> Luar Kota </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="category" id="category2" value="UM"
+                        required>
+                    <label class="form-check-label" for="category2"> Uang Makan </label>
+                </div>
             </div>
         </div>
     </div>

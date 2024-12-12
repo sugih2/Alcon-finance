@@ -9,8 +9,10 @@ use App\Models\MasterPayroll;
 use App\Models\Presence;
 use App\Models\PayrollHistory;
 use App\Models\PayrollHistoryDetail;
+use App\Models\AttendanceDetail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class RunPayrollController extends Controller
 {
@@ -113,7 +115,7 @@ class RunPayrollController extends Controller
 
                 $groupedData = collect([$groupedData]);
                 $groupedData = $this->calculatePresensiAndSalaries($groupedData, $startDate, $endDate);
-                //Log::info("Grouped Data FINAL: " . json_encode($groupedData, JSON_PRETTY_PRINT));
+               //Log::info("Grouped Data FINAL: " . json_encode($groupedData, JSON_PRETTY_PRINT));
 
                 foreach ($groupedData->first()['karyawan'] as $employeeData) {
                     $employeeId = $employeeData['karyawan']->id;
@@ -127,6 +129,7 @@ class RunPayrollController extends Controller
                                 'benefit' => [],
                                 'deduction' => [],
                             ],
+                            'presensi' => [],
                             'total_pendapatan' => 0,
                             'total_potongan' => 0,
                             'gaji_bruto' => 0,
@@ -155,125 +158,37 @@ class RunPayrollController extends Controller
                     $existingData['total_potongan'] += $employeeData['total_potongan'] ?? 0;
                     $existingData['gaji_bruto'] += $employeeData['gaji_bruto'] ?? 0;
                     $existingData['gaji_bersih'] += $employeeData['gaji_bersih'] ?? 0;
+                    foreach ($employeeData['presensi'] as $presence) {
+                        $existingData['presensi'][] = $presence;
+                    }
                     $combinedData->put($employeeId, $existingData);
                 }
             }
 
+            //Log::info("Combined Data First: " . json_encode($combinedData, JSON_PRETTY_PRINT));
             $this->insertCombinedPayrollData($combinedData, $startDate, $endDate , $description);
 
             return response()->json(['success' => true, 'message' => 'Payroll process completed successfully.']);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'An error occurred while processing payroll. Please try again later.'
+                'message' => 'An error occurred while processing payroll. Please try again later. ',
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
-
-    // private function calculatePresensiAndSalaries($groupedData, $startDate, $endDate)
-    // {
-    //     return $groupedData->map(function ($item) use ($startDate, $endDate) {
-    //         $employeeData = $item['karyawan']->map(function ($tunjanganKaryawan) use ($startDate, $endDate) {
-    //             $employee = $tunjanganKaryawan['karyawan'];
-    //             $employeeId = $employee->id;
-
-    //             $jumlahHariKerja = Presence::getTotalHadir($employeeId, $startDate, $endDate);
-    //             Log::info("Jumlah hari kerja: $jumlahHariKerja");
-
-    //             if (!$jumlahHariKerja) {
-    //                 Log::warning("No presensi data found for employee ID: $employeeId in period: $startDate to $endDate");
-    //                 return [
-    //                     'karyawan' => $tunjanganKaryawan['karyawan'],
-    //                     'param_componen' => $tunjanganKaryawan['param_componen'],
-    //                     'nilai' => $tunjanganKaryawan['nilai'],
-    //                     'presensi' => null,
-    //                     'salary' => 0,
-    //                     'components' => [
-    //                         'salary' => 0,
-    //                         'allowance' => [],
-    //                         'deduction' => [],
-    //                     ],
-    //                     'total_pendapatan' => 0,
-    //                     'total_potongan' => 0,
-    //                     'gaji_bruto' => 0,
-    //                     'gaji_bersih' => 0,
-    //                 ];
-    //             }
-
-    //             $components = [
-    //                 'salary' => 0,
-    //                 'allowance' => [],
-    //                 'deduction' => [],
-    //             ];
-    
-                // $componentName = $tunjanganKaryawan['param_componen']->name;
-                // $componentType = $tunjanganKaryawan['param_componen']->componen;
-               
-                // $nilai = $tunjanganKaryawan['nilai'];
-                // $hasil = $nilai * $jumlahHariKerja;
-
-                // switch ($componentType) {
-                //     case 'Salary':
-                //         $components['salary'] += $hasil;
-                //         break;
-    
-                //     case 'Allowance':
-                //         if (!isset($components['allowance'][$componentName])) {
-                //             $components['allowance'][$componentName] = 0;
-                //         }
-                //         $components['allowance'][$componentName] += $hasil;
-                //         break;
-    
-                //     case 'Deduction':
-                //         if (!isset($components['deduction'][$componentName])) {
-                //             $components['deduction'][$componentName] = 0;
-                //         }
-                //         $components['deduction'][$componentName] += $nilai;
-                //         break;
-    
-                //     default:
-                //         Log::warning("Unknown component type '{$componentType}' for employee ID {$employeeId}");
-                // }
-
-    //             // Hitung total pendapatan dan potongan
-    //             $totalPendapatan = $components['salary'] + array_sum($components['allowance']);
-    //             $totalPotongan = array_sum($components['deduction']);
-
-    //             $gajiBruto = $totalPendapatan;
-    //             $gajiBersih = $gajiBruto - $totalPotongan;
-
-    //             return [
-    //                 'karyawan' => $tunjanganKaryawan['karyawan'],
-    //                 'param_componen' => $tunjanganKaryawan['param_componen'],
-    //                 'nilai' => $tunjanganKaryawan['nilai'],
-    //                 'presensi' => [
-    //                     'working_days' => $jumlahHariKerja,
-    //                 ],
-    //                 'salary' => $components['salary'],
-    //                 'components' => $components,
-    //                 'total_pendapatan' => $totalPendapatan,
-    //                 'total_potongan' => $totalPotongan,
-    //                 'gaji_bruto' => $gajiBruto,
-    //                 'gaji_bersih' => $gajiBersih,
-    //             ];
-    //         });
-
-    //         return [
-    //             'transaksi' => $item['transaksi'],
-    //             'karyawan' => $employeeData,
-    //         ];
-    //     });
-    // }
 
     private function calculatePresensiAndSalaries($groupedData, $startDate, $endDate)
     {
         return $groupedData->map(function ($item) use ($startDate, $endDate) {
             $employeeData = $item['karyawan']->map(function ($tunjanganKaryawan) use ($startDate, $endDate) {
+                Log::info("Tunjangan Karyawan: " . json_encode($tunjanganKaryawan, JSON_PRETTY_PRINT));
                 $employee = $tunjanganKaryawan['karyawan'];
                 $employeeId = $employee->id;
                 $nilaiPerHari = $tunjanganKaryawan['nilai'];
                 $componentType = $tunjanganKaryawan['param_componen']->componen;
                 $componentName = $tunjanganKaryawan['param_componen']->name;
+                $idComponent = $tunjangankaryawan['param_componen']->id;
 
                 $attendance = [
                     'attendance_details' => [],
@@ -281,14 +196,15 @@ class RunPayrollController extends Controller
                     'total_deductions' => 0,
                 ];
 
-                if ($componentType === 'Salary') {
-                    $attendance = Presence::calculateAttendanceAndDeductions($employeeId, $startDate, $endDate, $nilaiPerHari, $componentType);
-                }
+            
+                $attendance = Presence::calculateAttendanceAndDeductions($employeeId, $startDate, $endDate, $nilaiPerHari, $componentType, $idComponent);
+                Log::info("Attendance: " . json_encode($attendance, JSON_PRETTY_PRINT));
     
                 $attendanceDetails = $attendance['attendance_details'];
                 $totalEarnings = $attendance['total_earnings'];
                 $totalDeductions = $attendance['total_deductions'];
 
+                //Log::info("attendanceDetails: " . json_encode($attendanceDetails, JSON_PRETTY_PRINT));
                 //Log::info("Total penghasilan: $totalEarnings, Total potongan: $totalDeductions");
 
                 $components = [
@@ -346,10 +262,6 @@ class RunPayrollController extends Controller
         });
     }
 
-
-
-
-
     private function insertCombinedPayrollData($combinedData, $startDate, $endDate, $description)
     {
         //Log::info("Combined Dataaaaa: " . json_encode($combinedData, JSON_PRETTY_PRINT));
@@ -376,7 +288,7 @@ class RunPayrollController extends Controller
             ]);
 
             foreach ($combinedData as $employeeData) {
-                PayrollHistoryDetail::create([
+                $payrollHistoryDetail = PayrollHistoryDetail::create([
                     'id_payroll_history' => $payrollHistory->id,
                     'id_transaksi_payment' => $id_transaksi_payment,
                     'employee_id' => $employeeData['karyawan']->id,
@@ -388,6 +300,16 @@ class RunPayrollController extends Controller
                     'gaji_bruto' => $employeeData['gaji_bruto'],
                     'gaji_bersih' => $employeeData['gaji_bersih']
                 ]);
+
+                foreach ($employeeData['presensi'] as $attendanceDetail) {
+                    AttendanceDetail::create([
+                        'id_payroll_history_detail' => $payrollHistoryDetail->id,
+                        'tanggal' => Carbon::parse($attendanceDetail['tanggal'])->format('Y-m-d'),
+                        'earnings' => $attendanceDetail['earnings'],
+                        'deductions' => $attendanceDetail['deductions'],
+                        'deduction_reason' => $attendanceDetail['deduction_reason'] ?? null
+                    ]);
+                }
             }
 
             DB::commit();

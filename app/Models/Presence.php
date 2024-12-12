@@ -97,16 +97,22 @@ class Presence extends Model
 
             $dailyDeductions = 0;
             $dailyEarnings = $nilaiPerHari;
+            $deductionReason = null;
 
             // Cek kehadiran
             if (is_null($presence->jam_masuk) || is_null($presence->jam_pulang)) {
                 $dailyDeductions += $nilaiPerHari * 0.5;
+                $deductionReason = 'Tidak hadir atau jam masuk/pulang kosong';
                 Log::info('Tidak hadir atau jam masuk/pulang kosong', ['dailyDeductions' => $dailyDeductions]);
             } else {
                 // Validasi dan perhitungan keterlambatan
                 $lateMinutes = self::calculateLateMinutes($presence->tanggal, $presence->jam_masuk, $shiftJamMasuk);
                 if ($lateMinutes !== null) {
-                    $dailyDeductions += self::calculateDeductionsForLateness($lateMinutes, $nilaiPerHari);
+                    $deductionAmount = self::calculateDeductionsForLateness($lateMinutes, $nilaiPerHari);
+                    if ($deductionAmount > 0) {
+                        $dailyDeductions += $deductionAmount;
+                        $deductionReason = "Terlambat $lateMinutes menit";
+                    }
                     Log::info('Menghitung keterlambatan', [
                         'scheduledTime' => $shiftJamMasuk,
                         'actualTime' => $presence->jam_masuk,
@@ -127,11 +133,19 @@ class Presence extends Model
             $totalEarnings += max(0, $dailyEarnings); // Pastikan penghasilan tidak negatif
             $totalDeductions += $dailyDeductions;
 
-            // Simpan detail harian
+            Log::info("Menambahkan data ke attendanceDetails", [
+                'tanggal' => $presence->tanggal,
+                'earnings' => $dailyEarnings,
+                'deductions' => $dailyDeductions,
+                'deduction_reason' => $deductionReason,
+            ]);
+
+            // Simpan detail harian ke array
             $attendanceDetails[] = [
                 'tanggal' => $presence->tanggal,
                 'earnings' => $dailyEarnings,
                 'deductions' => $dailyDeductions,
+                'deduction_reason' => $deductionReason,
             ];
         }
 
@@ -146,6 +160,7 @@ class Presence extends Model
             'total_deductions' => $totalDeductions,
         ];
     }
+
 
     /**
      * Menghitung menit keterlambatan.
