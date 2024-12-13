@@ -16,10 +16,13 @@ class PraPayrollController extends Controller
     public function index()
     {
         $masterPayrolls = MasterPayroll::all();
-        $detailPayrolls = DetailPayroll::all();
-        return view('pages.pra_payroll.index', compact('masterPayrolls', 'detailPayrolls'));
+        return view('pages.pra_payroll.index', compact('masterPayrolls'));
     }
-
+    public function indexDetail()
+    {
+        $detailPayrolls = DetailPayroll::all();
+        return view('pages.pra_payroll.detail', compact('detailPayrolls'));
+    }
     public function adjusment()
     {
         return view('pages.adjusment.index');
@@ -41,9 +44,9 @@ class PraPayrollController extends Controller
         $finalEmployeeData = [];
         foreach ($employeeData as $employee) {
             $employeeId = $employee['id'];
-    
+
             $karyawan = Employee::findOrFail($employeeId);
-    
+
             $finalEmployeeData[] = [
                 'id' => $karyawan->id,
                 'nama_lengkap' => $karyawan->name,
@@ -166,8 +169,8 @@ class PraPayrollController extends Controller
 
             foreach ($request->employeedata as $employee) {
                 foreach ($employee['components'] as $component) {
-                    $amount = isset($component['new_amount']) && !empty($component['new_amount']) 
-                        ? $component['new_amount'] 
+                    $amount = isset($component['new_amount']) && !empty($component['new_amount'])
+                        ? $component['new_amount']
                         : $component['last_amount'];
 
                     DetailPayroll::create([

@@ -39,11 +39,12 @@ class PresenceController extends Controller
 
     public function store(Request $request)
     {
+        log::info('Cik Nempo Data:', ['cek' => $request->employed_id]);
         // Validasi input
         $validator = Validator::make($request->all(), [
-            'employee_id' => 'required|integer|exists:employees,id', // Validasi karyawan
-            'date' => 'required|date',
-            'status' => 'required|string|in:Present,Absent,Sick,Leave', // Contoh status presensi
+            'employed_id' => 'required|integer', // Validasi karyawan
+            // 'date' => 'required|date',
+            // 'status' => 'required|string|in:Present,Absent,Sick,Leave', // Contoh status presensi
         ]);
 
         if ($validator->fails()) {
@@ -54,20 +55,54 @@ class PresenceController extends Controller
             ], 422);
         }
 
+
         try {
             // Simpan data presensi
-            $presence = Presence::create([
-                'employee_id' => $request->employee_id,
-                'date' => $request->date,
-                'status' => $request->status,
-                'remarks' => $request->remarks,
-            ]);
+            $status = ""; // Default ke status sebelumnya
+            if ($request->jam_masuk) {
+                $jamMasuk = Carbon::createFromFormat('H:i:s', $request->jam_masuk);
+                $jamDelapan = Carbon::createFromTime(8, 0, 0); // Jam 08:00:00
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Data presensi berhasil disimpan',
-                'data' => $presence,
-            ], 201);
+                if ($jamMasuk->greaterThan($jamDelapan)) {
+                    $status = 'Late';
+                } else {
+                    $status = 'EarlyIn';
+                }
+            } elseif ($request->jam_masuk === null && $request->jam_pulang !== null) {
+                $status = 'MissingIn';
+            }
+            $exists = Presence::where('employed_id', $request->employed_id)
+                ->where('tanggal', $request->tanggal)
+                ->exists();
+            $employes = Employee::where('id', $request->employed_id)->first();
+
+            if ($exists) {
+                Log::warning("Presensi untuk employed_id {$request->employed_id} pada tanggal {$request->tanggal} sudah ada.");
+                return response()->json([
+                    'error' => "Presensi Karyawan Dengan Nama : {$employes->name} 
+                    Pada Tanggal {$request->tanggal} sudah ada"
+                ], 400);
+            } else {
+                $presence = Presence::create([
+                    'employed_id' => $request->employed_id,
+                    'code_upload' => "UP001",
+                    'jam_masuk' => $request->jam_masuk,
+                    'jam_pulang' => $request->jam_pulang,
+                    'tanggal_scan' => $request->tanggal_scan,
+                    'tanggal' => $request->tanggal,
+                    'presensi_status' => $status,
+                    'sn' => "-"
+                    // 'date' => $request->date,
+                    // 'status' => $request->status,
+                    // 'remarks' => $request->remarks,
+                ]);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Data presensi berhasil disimpan',
+                    'data' => $presence,
+                ], 201);
+            }
         } catch (\Exception $e) {
             Log::error("Error: " . $e->getMessage());
             return response()->json([
@@ -79,7 +114,7 @@ class PresenceController extends Controller
 
     public function update(Request $request, $id)
     {
-        log::info('Cik Nempo Data:', $request->all());
+
         $validator = Validator::make($request->all(), [
             // 'employed_id' => 'required|integer|exists:employees,id',
             'tanggal_scan' => 'required|date',
@@ -158,7 +193,7 @@ class PresenceController extends Controller
 
     public function list()
     {
-        $presences = Presence::select('id', 'employee_id', 'date', 'status')->get();
+        $presences = Employee::select('id', 'name', 'nip')->get();
         return response()->json($presences);
     }
 
