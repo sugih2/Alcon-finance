@@ -1,18 +1,13 @@
 @extends('../layouts.app')
 
+
 @section('content')
-    @include('../layouts.navbars.auth.topnav', ['title' => 'Pra Payroll Master'])
-    @include('sweetalert::alert')
+@include('../layouts.navbars.auth.topnav', ['title' => 'Pra Payroll Detail'])
+@include('sweetalert::alert')
     <div class="row mt-4 mx-4">
         <div class="col-md-12">
             <div class="card mb-4">
-                <div class="card-header pb-0 d-flex justify-content-between align-items-center">
-                    <h6></h6>
-                    <button type="button" class="btn btn-primary"
-                        onclick="window.location.href='{{ route('adjusment.index') }}'">
-                        Adjusment
-                    </button>
-                </div>
+
                 <div class="card-body px-0 pt-0 pb-2">
                     <div class="container">
                         <div class="table-responsive p-0">
@@ -29,17 +24,14 @@
                                         </th>
                                         <th
                                             class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                            Type
+                                            Name Employee
                                         </th>
                                         <th
                                             class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                            Efektif Date</th>
+                                            Name Component</th>
                                         <th
                                             class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                            End Date</th>
-                                        <th
-                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                            Description</th>
+                                            Amount</th>
                                         <th
                                             class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                             Action</th>
@@ -47,14 +39,15 @@
                                 </thead>
                                 <tbody>
                                     @php $index = 1; @endphp
-                                    @foreach ($masterPayrolls as $c)
+                                    @foreach ($detailPayrolls as $c)
                                         <tr>
                                             <td class="align-middle text-center">{{ $index++ }}</td>
                                             <td>{{ $c->id_transaksi }}</td>
-                                            <td>{{ $c->type }}</td>
-                                            <td>{{ $c->efektif_date }}</td>
-                                            <td>{{ $c->end_date }}</td>
-                                            <td>{{ $c->description }}</td>
+                                            <td>{{ $c->employee->name }}</td>
+                                            <td>{{ $c->component->name }}</td>
+                                            {{-- <td>{{ $c->amount }}</td> --}}
+                                            <td>Rp. {{ number_format($c->amount, 0, ',', '.') }}
+
                                             <td class="align-middle text-end">
                                                 <button type="button" class="btn btn-link text-primary mb-0"
                                                     onclick="editComponen({{ $c->id }})">Edit</button>
@@ -67,8 +60,6 @@
                                 </tbody>
                             </table>
                         </div>
-
-                      
                     </div>
                 </div>
             </div>

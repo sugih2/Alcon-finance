@@ -619,7 +619,8 @@ async function StorePresence() {
 
                 if (!response.ok) {
                     const errorData = await response.json();
-                    throw new Error(errorData.message || 'Gagal menyimpan data.');
+                    console.log("cek", errorData)
+                    throw new Error(errorData.error|| 'Gagal menyimpan data.');
                 }
 
                 const data = await response.json();

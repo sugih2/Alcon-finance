@@ -12,7 +12,7 @@
     </div>
     <div class="mb-3">
         <label for="tanggal" class="form-label">Tanggal</label>
-        <input type="datetime-local" step="1" class="form-control" id="tanggal" name="tanggal" >
+        <input type="date"  class="form-control" id="tanggal" name="tanggal" >
     </div>
     <div class="mb-3">
         <label for="jam_masuk" class="form-label">Jam Masuk </label>
