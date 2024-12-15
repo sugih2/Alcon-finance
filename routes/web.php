@@ -138,6 +138,7 @@ Route::group(['prefix' => 'componen', 'middleware' => 'auth'], function () {
 });
 Route::group(['prefix' => 'pra-payroll', 'middleware' => 'auth'], function () {
 	Route::get('/', [PraPayrollController::class, 'index'])->middleware('auth')->name('prapayroll.index');
+	Route::get('/index/detail', [PraPayrollController::class, 'indexDetail'])->name('prapayroll.index-detail');
 	Route::post('/store', [PraPayrollController::class, 'store'])->name('prapayroll.store');
 	Route::get('/create', [PraPayrollController::class, 'create'])->name('prapayroll.create');
 	Route::get('/edit/{id}', [PraPayrollController::class, 'edit'])->name('prapayroll.edit');
