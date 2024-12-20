@@ -14,10 +14,25 @@ class PayrollHistoryDetail extends Model
         'id_transaksi_payment', 
         'employee_id', 'salary', 
         'allowance', 'deduction', 
-        'total_pendapatan', 
+        'total_pendapatan', 'total_overtime',
         'total_potongan', 'gaji_bruto', 
         'gaji_bersih'
     ];
+    
+    protected $casts = [
+        'allowance' => 'array',
+        'deduction' => 'array',
+    ];
+    
+    public function getAllowanceAttribute($value)
+    {
+        return json_decode($value, true) ?? [];
+    }
+
+    public function getDeductionAttribute($value)
+    {
+        return json_decode($value, true) ?? [];
+    }
 
     public function payrollHistory()
     {
