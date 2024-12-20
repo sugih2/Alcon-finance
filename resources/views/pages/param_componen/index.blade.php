@@ -411,6 +411,77 @@
             });
         }
 
+        function creatededuction() {
+            event.preventDefault();
+
+            var rawValue = $('#nilai').val().replace(/\./g, '');
+            $('#nilai').val(rawValue);
+            var form = $('#deductionForm')[0];
+            var formData = new FormData(form);
+
+            formData.forEach(function(value, key) {
+                console.log(`${key}: ${value}`);
+            });
+
+            // $.ajaxSetup({
+            //     headers: {
+            //         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            //     }
+            // });
+
+            // $.ajax({
+            //     url: "{{ url('/componen/store') }}",
+            //     data: formData,
+            //     cache: false,
+            //     processData: false,
+            //     contentType: false,
+            //     type: 'POST',
+            //     success: function(data, textStatus, xhr) {
+            //         Swal.fire({
+            //             icon: 'success',
+            //             title: data.message,
+            //             confirmButtonText: 'OK',
+            //         }).then((result) => {
+            //             if (result.isConfirmed) {
+            //                 $('#closeButton').trigger('click');
+            //             }
+            //         });
+            //     },
+            //     error: function(xhr, textStatus, errorThrown) {
+            //         var errorMessage = "Error occurred while processing your request. Please try again later.";
+
+            //         if (xhr.status === 422) {
+            //             var response = xhr.responseJSON;
+
+            //             if (response.message) {
+            //                 Swal.fire({
+            //                     icon: 'error',
+            //                     title: 'Validation Error',
+            //                     text: response.message,
+            //                 });
+            //             } else if (response.errors) {
+            //                 var errorList = '';
+            //                 $.each(response.errors, function(key, value) {
+            //                     errorList += '<li>' + value[0] + '</li>';
+            //                 });
+
+            //                 Swal.fire({
+            //                     icon: 'error',
+            //                     title: 'Validation Errors',
+            //                     html: '<ul>' + errorList + '</ul>',
+            //                 });
+            //             }
+            //         } else {
+            //             Swal.fire({
+            //                 icon: 'error',
+            //                 title: 'Error',
+            //                 text: errorMessage,
+            //             });
+            //         }
+            //     },
+            // });
+        }
+
         async function StoreComponen() {
             event.preventDefault();
 

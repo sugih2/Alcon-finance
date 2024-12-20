@@ -45,13 +45,38 @@ class ParamComponenController extends Controller
             'amount' => 'required|numeric',
         ]);
 
-        // Jika validasi gagal, kirim response error
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
                 'message' => $validator->errors()->first(),
                 'errors'  => $validator->errors()
             ], 422);
+        }
+
+        if ($request->componen === 'Allowance') {
+            $existingCategory = ParamComponen::where('id_regency', $request->id_regency)
+                                        ->where('category', $request->category)
+                                        ->first();
+
+            if ($existingCategory) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "Kategori '{$request->category}' untuk Regency '{$existingCategory->regency->name}' sudah ada. Silakan gunakan kategori lain."
+                ], 422);
+            }
+        }
+
+        if ($request->componen === 'Salary') {
+            $existingParam = ParamComponen::where('id_position', $request->id_position)
+                                        ->where('componen', 'Salary')
+                                        ->first();
+        
+            if ($existingParam) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Komponen "Salary" untuk posisi ini sudah ada. Silakan pilih posisi atau komponen lain.'
+                ], 422);
+            }
         }
 
         DB::beginTransaction();
@@ -113,10 +138,7 @@ class ParamComponenController extends Controller
                 ->orderBy('nama', 'asc')
                 ->get();
         } elseif ($componentType == 'deduction') {
-            $level_jabatan = ParLevelJabatan::select('id', 'nama')->get();
-            $cabang = Cabang::select('id', 'nama')
-                ->orderBy('nama', 'asc')
-                ->get(); 
+            
         } elseif ($componentType == 'phl'){
             //$phl = PhlLevel::select('id', 'level')->get();
             $kota = Kota::select('id', 'name')->get();
@@ -129,7 +151,7 @@ class ParamComponenController extends Controller
         } elseif ($componentType == 'benefit') {
             return view('parcom.benefit_form', compact('level_jabatan', 'cabang'));
         } elseif ($componentType == 'deduction') {
-            return view('parcom.deduction_form', compact('level_jabatan', 'cabang'));
+            return view('pages.param_componen.deduction');
         } elseif ($componentType == 'phl') {
             return view('parcom.phl_form', compact('kota'));
         } else {
