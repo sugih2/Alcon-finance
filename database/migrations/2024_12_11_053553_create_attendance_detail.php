@@ -15,16 +15,21 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('id_payroll_history_detail');
             $table->date('tanggal');
-            $table->decimal('earnings', 10, 2)->default(0);
-            $table->decimal('deductions', 10, 2)->default(0);
+            $table->json('earnings')->nullable();
+            $table->json('deductions')->nullable();
+            $table->decimal('overtime_earnings', 10, 2)->nullable();
+            $table->time('overtime_hours')->nullable();
             $table->string('deduction_reason')->nullable();
             $table->timestamps();
-
-            $table->foreign('id_payroll_history_detail')->references('id')->on('payroll_history_details')->onDelete('cascade');
+            $table->foreign('id_payroll_history_detail')
+                ->references('id')
+                ->on('payroll_history_details')
+                ->onDelete('cascade');
             
             $table->index(['id_payroll_history_detail', 'tanggal']);
         });
     }
+
 
     /**
      * Reverse the migrations.

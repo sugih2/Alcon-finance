@@ -175,6 +175,7 @@ Route::group(['prefix' => 'history-payroll', 'middleware' => 'auth'], function (
 });
 Route::group(['prefix' => 'history-payroll-detail', 'middleware' => 'auth'], function () {
 	Route::get('/{id}', [PayrollHistoryController::class, 'showDetails'])->middleware('auth')->name('historypayrollDetail.index');
+	Route::get('/detail-attendance/{id}', [PayrollHistoryController::class, 'showAttendanceDetails'])->name('historypayrollDetail.getDetail');
 });
 
 

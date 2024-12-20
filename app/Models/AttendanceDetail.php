@@ -14,8 +14,25 @@ class AttendanceDetail extends Model
         'tanggal',
         'earnings',
         'deductions',
+        'overtime_earnings',
+        'overtime_hours',
         'deduction_reason',
     ];
+
+    protected $casts = [
+        'earnings' => 'array',
+        'deductions' => 'array',
+    ];
+
+    public function getEarningsAttribute($value)
+    {
+        return json_decode($value, true) ?? [];
+    }
+
+    public function getDeductionsAttribute($value)
+    {
+        return json_decode($value, true) ?? [];
+    }
 
     public function payrollHistoryDetail()
     {
