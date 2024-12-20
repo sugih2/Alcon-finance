@@ -144,7 +144,7 @@
                 description: description,
                 employee_ids: employeeIds,
             };
-            console.log('Payload:', payload);
+            //console.log('Payload:', payload);
             $.ajaxSetup({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
@@ -177,6 +177,9 @@
                 error: function(xhr) {
                     console.error('Error:', xhr);
                     let errorMessage = 'Error occurred while processing your request. Please try again later.';
+                    if (xhr.status === 500 && xhr.responseJSON && xhr.responseJSON.error) {
+                        errorMessage = xhr.responseJSON.error;
+                    }
 
                     if (xhr.status === 422) {
                         const response = xhr.responseJSON;
