@@ -39,25 +39,26 @@
                                 </thead>
                                 <tbody>
                                     @php $index = 1; @endphp
-                                    @foreach ($detailPayrolls as $c)
-                                        <tr>
-                                            <td class="align-middle text-center">{{ $index++ }}</td>
-                                            <td>{{ $c->id_transaksi }}</td>
-                                            <td>{{ $c->employee->name }}</td>
-                                            <td>{{ $c->component->name }}</td>
-                                            {{-- <td>{{ $c->amount }}</td> --}}
-                                            <td>Rp. {{ number_format($c->amount, 0, ',', '.') }}
-
-                                            <td class="align-middle text-end">
-                                                <button type="button" class="btn btn-link text-primary mb-0"
-                                                    onclick="editComponen({{ $c->id }})">Edit</button>
-                                                <button type="button" class="btn btn-link text-danger mb-0"
-                                                    data-bs-toggle="modal" data-bs-target="#deleteRoleModal"
-                                                    data-id="{{ $c->id }}">Delete</button>
-                                            </td>
-                                        </tr>
+                                    @foreach ($detailPayrolls as $id_employee => $payrolls)
+                                        @foreach ($payrolls as $payroll)
+                                            <tr>
+                                                <td class="align-middle text-center">{{ $index++ }}</td>
+                                                <td>{{ $payroll->id_transaksi }}</td>
+                                                <td>{{ $payroll->employee->name ?? 'N/A' }}</td>
+                                                <td>{{ $payroll->component->name ?? 'N/A' }}</td>
+                                                <td>Rp. {{ number_format($payroll->amount, 0, ',', '.') }}</td>
+                                                <td class="align-middle text-end">
+                                                    <button type="button" class="btn btn-link text-primary mb-0"
+                                                        onclick="editDetail({{ $payroll->id }})">Edit</button>
+                                                    <button type="button" class="btn btn-link text-danger mb-0"
+                                                        data-bs-toggle="modal" data-bs-target="#deleteRoleModal"
+                                                        data-id="{{ $payroll->id }}">Delete</button>
+                                                </td>
+                                            </tr>
+                                        @endforeach
                                     @endforeach
                                 </tbody>
+                                
                             </table>
                         </div>
                     </div>
@@ -65,40 +66,23 @@
             </div>
         </div>
     </div>
+ <!-- Modal Edit -->
+ <div class="modal fade" id="EditDetailModal" tabindex="-1" aria-labelledby="EditDetailModalLabel"
+ aria-hidden="true">
+ <div class="modal-dialog">
+     <div class="modal-content">
+         <div class="modal-header">
+             <h5 class="modal-title" id="EditDetailModalLabel">Edit Pra Payroll Detail</h5>
+             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+         </div>
+         <div class="modal-body">
+             <div id="editDetail"></div>
+         </div>
+     </div>
+ </div>
+</div>
 
-
-
-    <!-- Modal Create -->
-    <div class="modal fade" id="addComponenModal" tabindex="-1" aria-labelledby="addComponenModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addComponenModalLabel">Tambah Componen</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div id="createComponen"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Edit -->
-    <div class="modal fade" id="EditComponenModal" tabindex="-1" aria-labelledby="EditComponenModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="EditComponenModalLabel">Edit Componen</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div id="editComponen"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
+</div>
     <script>
         $(document).ready(function() {
             $('#componenTable').DataTable({
@@ -119,59 +103,41 @@
             });
         });
 
-        function adjusment() {
+        function editDetail(id) {
             $.ajax({
-                url: "{{ url('/adjusment') }}",
-                type: 'GET',
-                dataType: 'html',
-                success: function() {
-
-
-                },
-                error: function() {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Failed to open create Componen form. Please try again later.',
-                        confirmButtonText: 'OK'
-                    });
-                }
-            });
-        }
-
-        function createComponen() {
-            $.ajax({
-                url: "{{ url('/componen/create') }}",
-                type: 'GET',
-                dataType: 'html',
-                success: function(data) {
-                    $("#createComponen").html(data);
-                    $('#addComponenModal').modal('show');
-                    $(document).ready(function() {
-
-                    });
-                },
-                error: function() {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Failed to open create Componen form. Please try again later.',
-                        confirmButtonText: 'OK'
-                    });
-                }
-            });
-        }
-
-        function editEmployee(id) {
-            $.ajax({
-                url: "{{ url('/employee/edit') }}/" + id,
+                url: "{{ url('/pra-payroll/edit/detail') }}/" + id,
                 type: 'GET',
                 dataType: 'json',
                 success: function(response) {
-                    $("#editComponen").html(response.html);
-                    $('#EditComponenModal').modal('show');
+                    console.log('tes', response.html)
+                    $("#editDetail").html(response.html);
+                    $('#EditDetailModal').modal('show');
                     $(document).ready(function() {
+                        $('#component').selectize({
+                            placeholder: response.param_name,
+                            valueField: 'id',
+                            labelField: 'name',
+                            searchField: 'name',
+                            preload: true,
+                            load: function(query, callback) {
+                                $.ajax({
+                                    url: '/pra-payroll/list',
+                                    type: 'GET',
+                                    dataType: 'json',
+                                    data: {
+                                        q: query
+                                    },
+                                    success: function(data) {
+                                        console.log("ekhmm",data)
+                                        callback(data);
+                                    },
+                                    error: function() {
 
+                                        callback();
+                                    }
+                                });
+                            }
+                        });
                     });
                 },
                 error: function() {
@@ -185,10 +151,10 @@
             });
         }
 
-        async function StoreComponen() {
+        async function StoreEditDetail() {
             event.preventDefault();
 
-            const form = document.getElementById('FormComponen');
+            const form = document.getElementById('FormEditDetailPraPayroll');
             const formData = new FormData(form);
             const submitButton = document.getElementById('btn-submit');
 

@@ -16,11 +16,13 @@ class PraPayrollController extends Controller
     public function index()
     {
         $masterPayrolls = MasterPayroll::all();
-        return view('pages.pra_payroll.index', compact('masterPayrolls'));
+        $detailPayrolls = DetailPayroll::all();
+        return view('pages.pra_payroll.index', compact('masterPayrolls', 'detailPayrolls'));
     }
     public function indexDetail()
     {
-        $detailPayrolls = DetailPayroll::all();
+        $detailPayrolls = DetailPayroll::select()->get()->groupBy('id_employee');
+        log::info('CEKK epribadedhh comeon ' . json_encode($detailPayrolls, JSON_PRETTY_PRINT));
         return view('pages.pra_payroll.detail', compact('detailPayrolls'));
     }
     public function adjusment()
@@ -36,6 +38,11 @@ class PraPayrollController extends Controller
     public function component()
     {
         return view('pages.adjusment.component');
+    }
+    public function list()
+    {
+        $presences = ParamComponen::select('id', 'name')->get();
+        return response()->json($presences);
     }
 
     public function storeselectkar(Request $request)
@@ -190,4 +197,32 @@ class PraPayrollController extends Controller
             return response()->json(['message' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
         }
     }
+    public function editDetail($id)
+    {
+        $details = DetailPayroll::find($id);
+        $paramComponent = ParamComponen::select('amount')
+            ->where('id', $details->id_component)
+            ->first();
+        log::info("CEK AMOUNT : ", ['CEk' => $paramComponent]);
+        $paramComponents = ParamComponen::where('id', $details->id_component)->first();
+        // log::info('cek cik : ', ['cek' => $details]);
+        $html = view('pages.pra_payroll.editDetail', compact('details', 'paramComponents'))->render();
+
+        return response()->json([
+            'html' => $html,
+            'detail_id' => $details->id,
+            'param_name' => $paramComponents->name,
+        ]);
+    }
+    // public function updateDetail(Request $request){
+    //     log::info("Cek Request : ", $request);
+    //     $validator = Validator::make($request->all(),[
+
+    //     ]);
+    //     try {
+
+    //     }catch{
+
+    //     }
+    // }
 }
