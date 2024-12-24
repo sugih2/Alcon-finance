@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 class PayrollHistory extends Model
 {
     use HasFactory;
-    protected $fillable = ['id_transaksi_payment', 'start_periode', 'end_periode', 'amount_transaksi', 'total_karyawan', 'status_payroll', 'description'];
+    protected $fillable = ['id_transaksi_payment', 'start_periode', 'end_periode', 'amount_transaksi', 'total_karyawan', 'status_payroll', 'description', 'id_user', 'locking'];
 
     public function detailPayroll()
     {
