@@ -10,96 +10,105 @@
 
                 <div class="card-body px-0 pt-0 pb-2">
                     <div class="container">
-                        <div class="table-responsive p-0">
-                            <table class="table align-items-center mb-0" id="componenTable">
+                        <div class="table-responsive">
+                            <!-- Tabel Utama -->
+                            <h5>Daftar Karyawan</h5>
+                            <table class="table" id="mainTable">
                                 <thead>
                                     <tr>
-                                        <th
-                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                            No
-                                        </th>
-                                        <th
-                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                            Id Transaksi
-                                        </th>
-                                        <th
-                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                            Name Employee
-                                        </th>
-                                        <th
-                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                            Name Component</th>
-                                        <th
-                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                            Amount</th>
-                                        <th
-                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                            Action</th>
+                                        <th>No</th>
+                                        <th>Id Transaksi</th>
+                                        <th>Nama Employee</th>
+                                        <th>Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @php $index = 1; @endphp
-                                    @foreach ($detailPayrolls as $c)
-                                        <tr>
-                                            <td class="align-middle text-center">{{ $index++ }}</td>
-                                            <td>{{ $c->id_transaksi }}</td>
-                                            <td>{{ $c->employee->name }}</td>
-                                            <td>{{ $c->component->name }}</td>
-                                            {{-- <td>{{ $c->amount }}</td> --}}
-                                            <td>Rp. {{ number_format($c->amount, 0, ',', '.') }}
-
-                                            <td class="align-middle text-end">
-                                                <button type="button" class="btn btn-link text-primary mb-0"
-                                                    onclick="editComponen({{ $c->id }})">Edit</button>
-                                                <button type="button" class="btn btn-link text-danger mb-0"
-                                                    data-bs-toggle="modal" data-bs-target="#deleteRoleModal"
-                                                    data-id="{{ $c->id }}">Delete</button>
+                                    @foreach ($detailPayrolls as $id_employee => $payrolls)
+                                        <tr style="cursor: pointer;">
+                                            <td>{{ $index++ }}</td>
+                                            <td>{{ $payrolls->first()->id_transaksi }}</td>
+                                            <td>{{ $payrolls->first()->employee->name ?? 'N/A' }}</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-primary" onclick="showComponents({{ $id_employee }})">Lihat Komponen</button>
                                             </td>
                                         </tr>
                                     @endforeach
                                 </tbody>
                             </table>
+                    
+                            <!-- Tabel Kedua -->
+                            <div class="mt-4">
+                                <h5>Detail Komponen</h5>
+                                <table class="table" id="componentTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Nama Komponen</th>
+                                            <th>Jumlah</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="componentTableBody">
+                                        @foreach ($detailPayrolls as $id_employee => $payrolls)
+                                            @foreach ($payrolls as $payroll)
+                                                <tr class="component-row" data-employee-id="{{ $id_employee }}" style="display: none;">
+                                                    <td>{{ $payroll->component->name ?? 'N/A' }}</td>
+                                                    <td>Rp. {{ number_format($payroll->amount, 0, ',', '.') }}</td>
+                                                    <td class="align-middle text-end">
+                                                        <button type="button" class="btn btn-link text-primary mb-0"
+                                                            onclick="editDetail({{ $payroll->id }})">Edit</button>
+                                                        <button type="button" class="btn btn-link text-danger mb-0"
+                                                            data-bs-toggle="modal" data-bs-target="#deleteRoleModal"
+                                                            >Delete</button>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
+                    
+                    
                 </div>
             </div>
         </div>
     </div>
+ <!-- Modal Edit -->
+ <div class="modal fade" id="EditDetailModal" tabindex="-1" aria-labelledby="EditDetailModalLabel"
+ aria-hidden="true">
+ <div class="modal-dialog">
+     <div class="modal-content">
+         <div class="modal-header">
+             <h5 class="modal-title" id="EditDetailModalLabel">Edit Pra Payroll Detail</h5>
+             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+         </div>
+         <div class="modal-body">
+             <div id="editDetail"></div>
+         </div>
+     </div>
+ </div>
+</div>
 
-
-
-    <!-- Modal Create -->
-    <div class="modal fade" id="addComponenModal" tabindex="-1" aria-labelledby="addComponenModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addComponenModalLabel">Tambah Componen</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div id="createComponen"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Edit -->
-    <div class="modal fade" id="EditComponenModal" tabindex="-1" aria-labelledby="EditComponenModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="EditComponenModalLabel">Edit Componen</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div id="editComponen"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
+</div>
     <script>
+      function showComponents(employeeId) {
+    // Sembunyikan semua baris komponen
+    document.querySelectorAll('.component-row').forEach((row) => {
+        row.style.display = 'none';
+    });
+
+    // Tampilkan baris komponen yang sesuai dengan employeeId
+    const selectedRows = document.querySelectorAll(`.component-row[data-employee-id="${employeeId}"]`);
+    selectedRows.forEach((row) => {
+        row.style.display = '';
+    });
+}
+
+
+
+
         $(document).ready(function() {
             $('#componenTable').DataTable({
                 responsive: true,
@@ -119,59 +128,43 @@
             });
         });
 
-        function adjusment() {
+        function editDetail(id) {
             $.ajax({
-                url: "{{ url('/adjusment') }}",
-                type: 'GET',
-                dataType: 'html',
-                success: function() {
-
-
-                },
-                error: function() {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Failed to open create Componen form. Please try again later.',
-                        confirmButtonText: 'OK'
-                    });
-                }
-            });
-        }
-
-        function createComponen() {
-            $.ajax({
-                url: "{{ url('/componen/create') }}",
-                type: 'GET',
-                dataType: 'html',
-                success: function(data) {
-                    $("#createComponen").html(data);
-                    $('#addComponenModal').modal('show');
-                    $(document).ready(function() {
-
-                    });
-                },
-                error: function() {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Failed to open create Componen form. Please try again later.',
-                        confirmButtonText: 'OK'
-                    });
-                }
-            });
-        }
-
-        function editEmployee(id) {
-            $.ajax({
-                url: "{{ url('/employee/edit') }}/" + id,
+                url: "{{ url('/pra-payroll/edit/detail') }}/" + id,
                 type: 'GET',
                 dataType: 'json',
                 success: function(response) {
-                    $("#editComponen").html(response.html);
-                    $('#EditComponenModal').modal('show');
+                    console.log('tes', response.html)
+                    $("#editDetail").html(response.html);
+                    $('#EditDetailModal').modal('show');
                     $(document).ready(function() {
+                        $('#component').selectize({
+                            placeholder: response.param_name,
+                            valueField: 'id',
+                            labelField: 'name',
+                            searchField: 'name',
+                            preload: true,
+                            load: function(query, callback) {
+                                $.ajax({
+                                    url: '/pra-payroll/list',
+                                    type: 'GET',
+                                    dataType: 'json',
+                                    data: {
+                                        q: query
+                                    },
+                                    success: function(data) {
+                                        const filteredData = data.filter(item => item.category === response.category);
+                                        console.log("cek data ", response)
+                                        callback(filteredData);
+                                    },
+                                    error: function() {
 
+                                        callback();
+                                    }
+                                });
+                            },
+                            
+                        });
                     });
                 },
                 error: function() {
@@ -185,10 +178,10 @@
             });
         }
 
-        async function StoreComponen() {
+        async function StoreEditDetail() {
             event.preventDefault();
 
-            const form = document.getElementById('FormComponen');
+            const form = document.getElementById('FormEditDetailPraPayroll');
             const formData = new FormData(form);
             const submitButton = document.getElementById('btn-submit');
 

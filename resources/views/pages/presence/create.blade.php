@@ -3,7 +3,7 @@
     <div class="mb-3">
         <label for="employed_id" class="form-label">Employee Name</label>
         <select name="employed_id" id="employeeName" required>
-            <option value="" selected>Employe uuuuu</option>
+            <option value="" selected>Employee Name</option>
         </select>
     </div>
     <div class="mb-3">

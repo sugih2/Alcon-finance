@@ -142,7 +142,9 @@ Route::group(['prefix' => 'pra-payroll', 'middleware' => 'auth'], function () {
 	Route::post('/store', [PraPayrollController::class, 'store'])->name('prapayroll.store');
 	Route::get('/create', [PraPayrollController::class, 'create'])->name('prapayroll.create');
 	Route::get('/edit/{id}', [PraPayrollController::class, 'edit'])->name('prapayroll.edit');
+	Route::get('/edit/detail/{id}', [PraPayrollController::class, 'editDetail'])->name('prapayroll.editDetail');
 	Route::post('/storeedit/{id}', [PraPayrollController::class, 'edit'])->name('prapayroll.storeedit');
+	Route::post('/storeedit/detail/{id}', [PraPayrollController::class, 'edit'])->name('prapayroll.storeedit');
 	Route::get('/list', [PraPayrollController::class, 'list'])->name('prapayroll.list');
 	Route::get('/get-componen-name', [PraPayrollController::class, 'getComponenName'])->name('prapayroll.name');
 });
