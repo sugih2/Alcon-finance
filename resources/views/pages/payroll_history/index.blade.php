@@ -60,12 +60,20 @@
                                                     onclick="window.location.href='{{ route('historypayrollDetail.index', ['id' => $e->id]) }}'">
                                                     Detail
                                                 </button>
-                                                <button type="button" class="btn btn-link text-primary mb-0"
-                                                    onclick="editEmployee({{ $e->id }})">Edit</button>
-                                                <button type="button" class="btn btn-link text-danger mb-0"
-                                                    data-bs-toggle="modal" data-bs-target="#deleteRoleModal"
-                                                    data-id="{{ $e->id }}">Delete</button>
+                                                <button class="btn btn-sm"
+                                                    onclick="locking({{ $e->id }}, {{ $e->locking }}, '{{ $e->start_periode }}', '{{ $e->end_periode }}')">
+                                                    <i>
+                                                        {!! $e->locking
+                                                            ? '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-lock-fill" viewBox="0 0 16 16">
+                                                                                                                                   <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2m3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2"/>
+                                                                                                                               </svg>'
+                                                            : '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-unlock-fill" viewBox="0 0 16 16">
+                                                                                                                                   <path d="M11 1a2 2 0 0 0-2 2v4a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h5V3a3 3 0 0 1 6 0v4a.5.5 0 0 1-1 0V3a2 2 0 0 0-2-2"/>
+                                                                                                                               </svg>' !!}
+                                                    </i>
+                                                </button>
                                             </td>
+
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -352,5 +360,97 @@
                 submitButton.disabled = false;
             }
         }
+
+        function locking(id, locking, startPeriode, endPeriode) {
+            let newLocking = locking === 1 ? 0 : 1;
+            const Request = {
+                id: id,
+                locking: newLocking,
+                startPeriode: startPeriode,
+                endPeriode: endPeriode
+            };
+
+            const data = JSON.stringify(Request);
+
+            Swal.fire({
+                title: newLocking ? "Confirm Lock" : "Confirm Unlock",
+                text: `Are you sure you want to ${newLocking ? 'lock' : 'unlock'} the data for the period ${startPeriode} - ${endPeriode}?`,
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: newLocking ? "Yes, Lock it!" : "Yes, Unlock it!",
+                cancelButtonText: "Cancel",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajaxSetup({
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                            'Content-Type': 'application/json',
+                        }
+                    });
+                    $.ajax({
+                        url: "{{ route('historypayroll.locking') }}",
+                        method: "POST",
+                        data: data,
+                        success: function(response) {
+                            if (response.success) {
+                                let button = $(`button[onclick*="${id}"]`);
+                                button.find('i').toggleClass('bi-lock bi-unlock');
+                                Swal.fire({
+                                    title: "Success!",
+                                    text: response.message,
+                                    icon: "success",
+                                    timer: 2000,
+                                });
+                            }
+                        },
+                        error: function(xhr) {
+                            if (xhr.status === 422) {
+                                var errors = xhr.responseJSON.error || {};
+                                var errorMessage = "Reason:\n";
+
+                                if (typeof errors === "object") {
+                                    for (var key in errors) {
+                                        if (errors.hasOwnProperty(key)) {
+                                            errorMessage += `- ${errors[key]}\n`;
+                                        }
+                                    }
+                                } else {
+                                    errorMessage += `- ${errors}\n`;
+                                }
+
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "Validation Error",
+                                    text: errorMessage,
+                                    customClass: {
+                                        content: 'text-left'
+                                    }
+                                });
+                            } else if (xhr.status === 500) {
+                                var serverErrorMessage = xhr.responseJSON.error ||
+                                    "An internal server error occurred.";
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "Server Error",
+                                    text: serverErrorMessage,
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "Unknown Error",
+                                    text: "An error occurred on the server. Please try again later.",
+                                });
+                            }
+                        }
+                    });
+                }
+            });
+        }
+
+        $(document).on('click', '.toggle-lock', function() {
+            locking($(this));
+        });
     </script>
 @endsection

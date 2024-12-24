@@ -172,6 +172,7 @@ Route::group(['prefix' => 'history-payroll', 'middleware' => 'auth'], function (
 	Route::post('/store', [PayrollHistoryController::class, 'store'])->name('historypayroll.store');
 	Route::get('/employee', [PayrollHistoryController::class, 'employee'])->name('historypayroll.');
 	Route::get('/detail/{id}', [PayrollHistoryController::class, 'showDetails'])->middleware('auth')->name('historypayroll.detail');
+	Route::post('/locking', [PayrollHistoryController::class, 'locking'])->name('historypayroll.locking');
 });
 Route::group(['prefix' => 'history-payroll-detail', 'middleware' => 'auth'], function () {
 	Route::get('/{id}', [PayrollHistoryController::class, 'showDetails'])->middleware('auth')->name('historypayrollDetail.index');
