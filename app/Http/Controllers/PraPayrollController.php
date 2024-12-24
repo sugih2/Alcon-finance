@@ -41,7 +41,7 @@ class PraPayrollController extends Controller
     }
     public function list()
     {
-        $presences = ParamComponen::select('id', 'name')->get();
+        $presences = ParamComponen::select('id', 'name', 'category')->get();
         return response()->json($presences);
     }
 
@@ -82,7 +82,7 @@ class PraPayrollController extends Controller
             if (isset($componentReq['id_com'])) {
                 $componentId = $componentReq['id_com'];
 
-                $componentData = ParamComponen::select('name', 'type', 'amount')
+                $componentData = ParamComponen::select('name', 'type', 'amount', 'componen')
                     ->findOrFail($componentId);
 
                 foreach ($employeeData as &$employee) {
@@ -200,18 +200,17 @@ class PraPayrollController extends Controller
     public function editDetail($id)
     {
         $details = DetailPayroll::find($id);
-        $paramComponent = ParamComponen::select('amount')
-            ->where('id', $details->id_component)
+        $paramComponent = ParamComponen::where('category', $details->component->category)
             ->first();
-        log::info("CEK AMOUNT : ", ['CEk' => $paramComponent]);
         $paramComponents = ParamComponen::where('id', $details->id_component)->first();
-        // log::info('cek cik : ', ['cek' => $details]);
+        log::info("CEK AMOUNT : ", ['CEk' => $paramComponents]);
         $html = view('pages.pra_payroll.editDetail', compact('details', 'paramComponents'))->render();
 
         return response()->json([
             'html' => $html,
             'detail_id' => $details->id,
-            'param_name' => $paramComponents->name,
+            'param_name' => $paramComponent->name,
+            'category' => $paramComponent->category,
         ]);
     }
     // public function updateDetail(Request $request){

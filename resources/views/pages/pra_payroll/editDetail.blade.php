@@ -19,7 +19,7 @@
     <div class="mb-3">
         <label for="Amount" class="form-label">Amount </label>
         <input type="text" class="form-control" id="Amount" name="Amount" 
-            value="{{ $details->amount }}" disabled>
+            value="{{ $details->amount  }}" disabled>
     </div>
     <div class="mb-3">
         <label for="new_amount" class="form-label">New Amount</label>
@@ -31,7 +31,17 @@
         id="btn-submit">Simpan</button>
 </form>
 <script>
+document.getElementById('component').addEventListener('change', function() {
+        console.log('cek amount : ', this.value)
+        const selectedValue = this.value; // Ambil nilai dari dropdown
+        const amountInput = document.getElementById('Amount'); // Ambil elemen input
 
+        if (selectedValue) {
+            amountInput.value = selectedValue; // Ubah nilai input
+        } else {
+            amountInput.value = "{{ $details->amount }}"; // Kembalikan ke nilai awal jika tidak ada yang dipilih
+        }
+    });
 document.getElementById('addNewAmountBtn').addEventListener('click', function(event) {
         event.preventDefault(); // Mencegah halaman refresh
         const inputField = document.getElementById('new_amount');

@@ -10,58 +10,67 @@
 
                 <div class="card-body px-0 pt-0 pb-2">
                     <div class="container">
-                        <div class="table-responsive p-0">
-                            <table class="table align-items-center mb-0" id="componenTable">
+                        <div class="table-responsive">
+                            <!-- Tabel Utama -->
+                            <h5>Daftar Karyawan</h5>
+                            <table class="table" id="mainTable">
                                 <thead>
                                     <tr>
-                                        <th
-                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                            No
-                                        </th>
-                                        <th
-                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                            Id Transaksi
-                                        </th>
-                                        <th
-                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                            Name Employee
-                                        </th>
-                                        <th
-                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                            Name Component</th>
-                                        <th
-                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                            Amount</th>
-                                        <th
-                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                            Action</th>
+                                        <th>No</th>
+                                        <th>Id Transaksi</th>
+                                        <th>Nama Employee</th>
+                                        <th>Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @php $index = 1; @endphp
                                     @foreach ($detailPayrolls as $id_employee => $payrolls)
-                                        @foreach ($payrolls as $payroll)
-                                            <tr>
-                                                <td class="align-middle text-center">{{ $index++ }}</td>
-                                                <td>{{ $payroll->id_transaksi }}</td>
-                                                <td>{{ $payroll->employee->name ?? 'N/A' }}</td>
-                                                <td>{{ $payroll->component->name ?? 'N/A' }}</td>
-                                                <td>Rp. {{ number_format($payroll->amount, 0, ',', '.') }}</td>
-                                                <td class="align-middle text-end">
-                                                    <button type="button" class="btn btn-link text-primary mb-0"
-                                                        onclick="editDetail({{ $payroll->id }})">Edit</button>
-                                                    <button type="button" class="btn btn-link text-danger mb-0"
-                                                        data-bs-toggle="modal" data-bs-target="#deleteRoleModal"
-                                                        data-id="{{ $payroll->id }}">Delete</button>
-                                                </td>
-                                            </tr>
-                                        @endforeach
+                                        <tr style="cursor: pointer;">
+                                            <td>{{ $index++ }}</td>
+                                            <td>{{ $payrolls->first()->id_transaksi }}</td>
+                                            <td>{{ $payrolls->first()->employee->name ?? 'N/A' }}</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-primary" onclick="showComponents({{ $id_employee }})">Lihat Komponen</button>
+                                            </td>
+                                        </tr>
                                     @endforeach
                                 </tbody>
-                                
                             </table>
+                    
+                            <!-- Tabel Kedua -->
+                            <div class="mt-4">
+                                <h5>Detail Komponen</h5>
+                                <table class="table" id="componentTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Nama Komponen</th>
+                                            <th>Jumlah</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="componentTableBody">
+                                        @foreach ($detailPayrolls as $id_employee => $payrolls)
+                                            @foreach ($payrolls as $payroll)
+                                                <tr class="component-row" data-employee-id="{{ $id_employee }}" style="display: none;">
+                                                    <td>{{ $payroll->component->name ?? 'N/A' }}</td>
+                                                    <td>Rp. {{ number_format($payroll->amount, 0, ',', '.') }}</td>
+                                                    <td class="align-middle text-end">
+                                                        <button type="button" class="btn btn-link text-primary mb-0"
+                                                            onclick="editDetail({{ $payroll->id }})">Edit</button>
+                                                        <button type="button" class="btn btn-link text-danger mb-0"
+                                                            data-bs-toggle="modal" data-bs-target="#deleteRoleModal"
+                                                            >Delete</button>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
+                    
+                    
                 </div>
             </div>
         </div>
@@ -84,6 +93,22 @@
 
 </div>
     <script>
+      function showComponents(employeeId) {
+    // Sembunyikan semua baris komponen
+    document.querySelectorAll('.component-row').forEach((row) => {
+        row.style.display = 'none';
+    });
+
+    // Tampilkan baris komponen yang sesuai dengan employeeId
+    const selectedRows = document.querySelectorAll(`.component-row[data-employee-id="${employeeId}"]`);
+    selectedRows.forEach((row) => {
+        row.style.display = '';
+    });
+}
+
+
+
+
         $(document).ready(function() {
             $('#componenTable').DataTable({
                 responsive: true,
@@ -128,15 +153,17 @@
                                         q: query
                                     },
                                     success: function(data) {
-                                        console.log("ekhmm",data)
-                                        callback(data);
+                                        const filteredData = data.filter(item => item.category === response.category);
+                                        console.log("cek data ", response)
+                                        callback(filteredData);
                                     },
                                     error: function() {
 
                                         callback();
                                     }
                                 });
-                            }
+                            },
+                            
                         });
                     });
                 },
