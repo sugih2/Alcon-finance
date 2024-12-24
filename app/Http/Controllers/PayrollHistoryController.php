@@ -89,6 +89,42 @@ class PayrollHistoryController extends Controller
             return redirect()->back()->with('error', 'Terjadi kesalahan.');
         }
     }
+
+    public function locking(Request $request)
+    {
+        Log::info("Request", ['data' => json_encode($request->all(), JSON_PRETTY_PRINT)]);
+        $validated = $request->validate([
+            'id' => 'required|exists:payroll_histories,id',
+            'locking' => 'required|boolean',
+            'startPeriode' => 'required|date',
+            'endPeriode' => 'required|date',
+        ]);
+        $existingPeriode = PayrollHistory::where('locking', true)
+            ->where('id', '!=', $validated['id'])
+            ->where(function ($query) use ($validated) {
+                $query->where('start_periode', '=', $validated['startPeriode'])
+                    ->where('end_periode', '=', $validated['endPeriode']);
+            })
+            ->first();
+        Log::info("Existing Periode", ['data' => json_encode($existingPeriode, JSON_PRETTY_PRINT)]);
+
+        if ($existingPeriode) {
+            return response()->json([
+                'success' => false,
+                'error' => 'There is already a locked payroll history for the selected period.',
+            ], 422);
+        }
+
+        $transaksi = PayrollHistory::find($validated['id']);
+        $transaksi->locking = $validated['locking'];
+        $transaksi->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Locking status updated successfully.',
+            'locking' => $transaksi->locking,
+        ]);
+    }
     
 
 

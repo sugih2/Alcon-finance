@@ -13,6 +13,7 @@ use App\Models\AttendanceDetail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class RunPayrollController extends Controller
 {
@@ -78,10 +79,25 @@ class RunPayrollController extends Controller
         }
 
         try {
+            $user = Auth::user();
             $description = $request->input('description');
             $startDate = $request->input('start_date');
             $endDate = $request->input('end_date');
             $employeeIds = $request->input('employee_ids');
+            
+            $lockedPayrolls = PayrollHistory::where('start_periode', '<=', $endDate)
+                ->where('end_periode', '>=', $startDate)
+                ->where('locking', true)
+                ->whereHas('detailPayroll', function ($query) use ($employeeIds) {
+                    $query->whereIn('employee_id', $employeeIds);
+                })
+                ->exists();
+
+            if ($lockedPayrolls) {
+                return response()->json([
+                    'message' => 'Payroll process cannot continue. One or more employees have locked payrolls in this period.'
+                ], 422);
+            }
 
             //Log::info("Description: $description, Start Date: $startDate, End Date: $endDate, Employee IDs: " . json_encode($employeeIds));
             $activeTransactions = MasterPayroll::where('efektif_date', '<=', $endDate)
@@ -229,7 +245,7 @@ class RunPayrollController extends Controller
             }
 
             //Log::info("Combined Data First: " . json_encode($combinedData, JSON_PRETTY_PRINT));
-            $this->insertCombinedPayrollData($combinedData, $startDate, $endDate , $description);
+            $this->insertCombinedPayrollData($combinedData, $startDate, $endDate , $description, $user);
 
             return response()->json(['success' => true, 'message' => 'Payroll process completed successfully.']);
         } catch (\Exception $e) {
@@ -327,7 +343,7 @@ class RunPayrollController extends Controller
         });
     }
 
-    private function insertCombinedPayrollData($combinedData, $startDate, $endDate, $description)
+    private function insertCombinedPayrollData($combinedData, $startDate, $endDate, $description, $user)
     {
         //Log::info("Combined Dataaaaa: " . json_encode($combinedData, JSON_PRETTY_PRINT));
 
@@ -347,7 +363,9 @@ class RunPayrollController extends Controller
                 'amount_transaksi' => $amount_transaksi,
                 'total_karyawan' => $combinedData->count(),
                 'status_payroll' => 'Pending',
-                'description' => $description
+                'description' => $description,
+                'id_user' => $user->id,
+                'locking' => false,
             ]);
 
             foreach ($combinedData as $employeeData) {
