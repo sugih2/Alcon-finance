@@ -170,8 +170,8 @@
                     <span class="expand-icon">▼</span>
                 </a>
                 <div class="panel" style="display: none; padding-left: 20px;">
-                    <a class="nav-link" href="{{ route('prapayroll.index-detail') }}">Detail</a>
                     <a class="nav-link" href="{{ route('prapayroll.index') }}">Master</a>
+                    <a class="nav-link" href="{{ route('prapayroll.index-detail') }}">Detail</a>
                 </div>
             </li>
             
