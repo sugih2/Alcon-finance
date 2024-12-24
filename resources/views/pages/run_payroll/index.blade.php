@@ -13,7 +13,7 @@
                     <div class="container">
                         <div class="container-setting">
 
-                            <form id=runpayroll>
+                            {{-- <form id=runpayroll>
                                 @csrf
                                 <div class="form-group">
                                     <label for="periode" class="col-form-label">Periode Start</label>
@@ -40,7 +40,41 @@
                                 <div class="d-flex justify-content-center"><button type="button"
                                         class="btn btn-outline-primary" onclick="runpayroll()">RunPayroll</button></div>
 
+                            </form> --}}
+                            <form id="runpayroll">
+                                @csrf
+                                <div class="form-group">
+                                    <label for="start_date" class="col-form-label">Start Date</label>
+                                    <input type="date" class="col-sm-2 form-control" id="start_date" name="start_date"
+                                        readonly>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="end_date" class="col-form-label">End Date</label>
+                                    <input type="date" class="col-sm-2 form-control" id="end_date" name="end_date"
+                                        readonly>
+                                </div>
+
+                                <button type="button" class="btn btn-outline-primary"
+                                    onclick="setDatesForPreviousWeeks()">Set Payroll Dates (2 Weeks Back)</button>
+
+                                <div class="form-group">
+                                    <label for="floatingTextarea" class="col-form-label">Description</label>
+                                    <textarea class="col-sm-5 form-control" placeholder="Optional" id="floatingTextarea" name="description"></textarea>
+                                </div>
+                                <button type="button" class="btn btn-outline-primary" onclick="showEmploySelected()">Add
+                                    Employee</button>
+                                <div id="selected-employees" class="mt-3">
+                                    <h5>Selected Employees:</h5>
+                                    <ul id="employee-list"></ul>
+                                </div>
+                                <div class="d-flex justify-content-center"><button type="button"
+                                        class="btn btn-outline-primary" onclick="runpayroll()">RunPayroll</button></div>
+
+
                             </form>
+
+
 
                         </div>
                     </div>
@@ -126,8 +160,8 @@
             event.preventDefault();
 
             const employeeIds = selectedEmployees.map(employee => employee.id);
-            const startDate = $('#periode').val();
-            const endDate = $('#periode_end').val();
+            const startDate = $('#start_date').val();
+            const endDate = $('#end_date').val();
 
             if (!startDate || !endDate) {
                 Swal.fire({
@@ -211,6 +245,58 @@
                     }
                 }
             });
+        }
+        //Week
+        function getPreviousWeeksDates(weeksBack = 2) {
+            const today = new Date(); // Tanggal hari ini
+            const year = today.getFullYear();
+            const month = today.getMonth() + 1; // Bulan berjalan
+            const firstDay = new Date(year, month - 1, 1); // Hari pertama bulan ini
+            const lastDay = new Date(year, month, 0); // Hari terakhir bulan ini
+
+            // Pastikan minggu dimulai dari hari Senin
+            let currentWeekStart = new Date(today);
+            while (currentWeekStart.getDay() !== 1) {
+                currentWeekStart.setDate(currentWeekStart.getDate() - 1);
+            }
+
+            // Pindahkan ke 2 minggu ke belakang
+            currentWeekStart.setDate(currentWeekStart.getDate() - 7 * weeksBack);
+
+            // Tanggal akhir untuk periode 2 minggu
+            let currentWeekEnd = new Date(currentWeekStart);
+            currentWeekEnd.setDate(currentWeekEnd.getDate() + (7 * 2 - 1)); // Periode 2 minggu
+
+            // Jika akhir periode melampaui akhir bulan, batasi tanggal akhirnya
+            if (currentWeekEnd > lastDay) {
+                currentWeekEnd = lastDay;
+            }
+
+            // Jika tanggal mulai sebelum awal bulan, batasi tanggal mulai
+            if (currentWeekStart < firstDay) {
+                currentWeekStart = firstDay;
+            }
+
+            // Format tanggal sebagai YYYY-MM-DD
+            return {
+                start: formatDate(currentWeekStart),
+                end: formatDate(currentWeekEnd),
+            };
+        }
+
+        function formatDate(date) {
+            const yyyy = date.getFullYear();
+            const mm = String(date.getMonth() + 1).padStart(2, '0');
+            const dd = String(date.getDate()).padStart(2, '0');
+            return `${yyyy}-${mm}-${dd}`;
+        }
+
+        function setDatesForPreviousWeeks() {
+            const weekDates = getPreviousWeeksDates(2); // Ambil 2 minggu ke belakang
+
+            // Set tanggal ke input field
+            document.getElementById("start_date").value = weekDates.start;
+            document.getElementById("end_date").value = weekDates.end;
         }
     </script>
 
