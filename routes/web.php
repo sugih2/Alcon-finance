@@ -38,7 +38,7 @@ use App\Http\Controllers\ParamComponenController;
 use App\Http\Controllers\PraPayrollController;
 use App\Http\Controllers\RunPayrollController;
 use App\Http\Controllers\PayrollHistoryController;
-use App\Models\SettingShift;
+
 
 Route::get('/data', [ExampleController::class, 'getData'])->middleware('auth')->name('data.index');
 
@@ -98,7 +98,7 @@ Route::group(['prefix' => 'employee', 'middleware' => 'auth'], function () {
 	Route::post('/store', [EmployeeController::class, 'store'])->name('employee.store');
 	Route::get('/create', [EmployeeController::class, 'create'])->name('employee.create');
 	Route::get('/edit/{id}', [EmployeeController::class, 'edit'])->name('employee.edit');
-	Route::post('/storeedit/{id}', [EmployeeController::class, 'edit'])->name('employee.storeedit');
+	Route::post('/update/{id}', [EmployeeController::class, 'update'])->name('employee.update');
 	Route::get('/list', [EmployeeController::class, 'list'])->name('employee.list');
 	Route::get('/list/pekerja', [EmployeeController::class, 'list_pekerja'])->name('employee.list-member');
 	Route::get('/list/kepala-pekerja', [EmployeeController::class, 'list_kepala_pekerja'])->name('employee.list-kepala-pekerja');

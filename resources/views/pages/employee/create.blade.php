@@ -2,7 +2,7 @@
     @csrf
     <div class="mb-3">
         <label for="nip" class="form-label">NIP</label>
-        <input type="text" class="form-control" id="nip" name="nip" placeholder="NIP" required>
+        <input type="text" class="form-control" id="nip" name="nip" placeholder="NIP" maxlength="10" required>
     </div>
     <div class="mb-3">
         <label for="nik" class="form-label">NIK</label>
@@ -27,7 +27,7 @@
     </div>
     <div class="mb-3">
         <label for="phone" class="form-label">Phone Number</label>
-        <input type="number" class="form-control" id="phone" name="phone" placeholder="Phone Number" required>
+        <input type="text" class="form-control" id="phone" name="phone" placeholder="Phone Number" maxlength="13" required>
     </div>
     <div class="mb-3">
         <label for="position" class="form-label">Position</label>
@@ -39,9 +39,9 @@
 </form>
 
 <script>
-    document.querySelectorAll('#nik, #nip').forEach((element) => {
+    document.querySelectorAll('#nik, #nip, #phone').forEach((element) => {
         element.addEventListener('input', function (e) {
-            e.target.value = e.target.value.replace(/[^0-9]/g, ''); 
+            e.target.value = e.target.value.replace(/[^0-9]/g, '');
         });
     });
 </script>

@@ -23,6 +23,12 @@ class UserManagementController extends Controller
         return view('pages.admin.user-management', compact('users', 'roles', 'menus'));
     }
 
+    public function roles_index()
+    {
+        $roles = Role::all();
+        return view('pages.admin.roles-management', compact('roles'));
+    }
+
     public function getDataUser()
     {
         $users = User::with('role')->select('users.*');
@@ -201,10 +207,10 @@ class UserManagementController extends Controller
     public function savePermissions(Request $request, $roleId)
     {
         $menus = Menu::all();
-    
+
         $menuPermissionsData = [];
         $rolePermissionsData = [];
-    
+
         foreach ($menus as $menu) {
             $menuPermissionsData[] = [
                 'menu_id' => $menu->id,
@@ -215,10 +221,10 @@ class UserManagementController extends Controller
                 'created_at' => now(),
                 'updated_at' => now(),
             ];
-    
+
             // Cek apakah menu_permission sudah ada
             $menuPermission = MenuPermission::where('menu_id', $menu->id)->first();
-    
+
             if ($menuPermission) {
                 $rolePermissionsData[] = [
                     'menu_permission_id' => $menuPermission->id,
@@ -228,13 +234,13 @@ class UserManagementController extends Controller
                 ];
             }
         }
-    
+
         // Buat atau perbarui menu_permissions
         MenuPermission::upsert($menuPermissionsData, ['menu_id'], ['updated_at']);
-    
+
         // Ambil semua menu_permissions terbaru
         $menuPermissions = MenuPermission::whereIn('menu_id', $menus->pluck('id'))->get();
-    
+
         foreach ($menuPermissions as $menuPermission) {
             $rolePermissionsData[] = [
                 'menu_permission_id' => $menuPermission->id,
@@ -243,10 +249,10 @@ class UserManagementController extends Controller
                 'updated_at' => now(),
             ];
         }
-    
+
         // Simpan role_permissions
         RolePermission::upsert($rolePermissionsData, ['menu_permission_id', 'role_id'], ['updated_at']);
-    
+
         return response()->json(['message' => 'Permissions saved successfully']);
     }
 }

@@ -27,9 +27,74 @@ class EmployeeController extends Controller
 
         return response()->json([
             'html' => $html,
+            'position_id' => $employee->id,
+        ]);
+    }
+
+    public function update(Request $request, $id)
+    {
+        log::info('Cik Nempo Data:', $request->all());
+        $validator = Validator::make($request->all(), [
+            'nip' => "max:10|unique:employees,nip,$id",
+            'nik' => "max:16|unique:employees,nik,$id",
+            'name' => 'string|max:25',
+            'birth_date' => 'date',
+            'address' => 'string',
+            'email' => "email|unique:employees,email,$id",
+            'phone' => 'max:13',
+            'position' => 'integer',
+            'status' => 'in:Aktif,NonAktif',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        try {
+            $employee = Employee::findOrFail($id);
+            log::info('Cik Nempo Data euy:', ['cek' => $employee]);
+            $employee->update([
+                'nip' => $request->nip,
+                'nik' => $request->nik,
+                'name' => $request->name,
+                'birth_date' => $request->birth_date,
+                'address' => $request->address,
+                'email' => $request->email,
+                'phone' => $request->phone,
+                'position_id' => $request->position,
+                'status' => $request->status,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'employee Berhasil',
+                'data' => $employee,
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error("Error: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal Edit Setting Shift',
+            ], 500);
+        }
+    }
+
+
+    public function storeEdit($id)
+    {
+        $employee = Employee::with('position')->find($id);
+        $html = view('pages.employee.edit', compact('employee'))->render();
+
+        return response()->json([
+            'html' => $html,
             'position_id' => $employee->position_id,
         ]);
     }
+
 
     public function store(Request $request)
     {
@@ -45,8 +110,8 @@ class EmployeeController extends Controller
             'address' => 'required|string',
             'email' => 'required|email|unique:employees,email',
             'phone' => 'required|max:13',
-            'position' => 'required|integer'
-
+            'position' => 'required|integer',
+            'status' => 'in:Aktif,NonAktif'
         ]);
 
         // Jika validasi gagal, kirim response error
@@ -68,7 +133,7 @@ class EmployeeController extends Controller
                 'address' => $request->address,
                 'email' => $request->email,
                 'phone' => $request->phone,
-                'position_id' => $request->position,
+                'position_id' => $request->position
                 // 'status' => $request->status
             ]);
 
