@@ -8,7 +8,7 @@
     <div class="mb-3">
         <label for="nik" class="form-label">NIK</label>
         <input type="number" class="form-control" id="nik" value="{{ $employee->nik }}" name="nik"
-            placeholder="NIK" required>
+            placeholder="Masukkan NIK" required min="0" oninput="this.value = this.value.slice(0, 16);">
     </div>
     <div class="mb-3">
         <label for="name" class="form-label">Name Employee</label>
@@ -36,9 +36,20 @@
             placeholder="Phone Number" required>
     </div>
     <div class="mb-3">
+        <label for="phone" class="form-label">Phone Number</label>
+        <input type="number" class="form-control" id="phone" value="{{ $employee->phone }}" name="phone"
+            placeholder="Phone Number" required>
+    </div>
+    <div class="mb-3">
         <label for="position" class="form-label">Position</label>
         <select name="position" id="position" required>
             <option value="" selected>Select Position</option>
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="status" class="form-label">Status</label>
+        <select name="status" id="status" required>
+            <option value="" selected>Select status</option>
         </select>
     </div>
     <button type="button" id="btn-submit" onclick="StoreEmployee()" class="btn btn-primary">Simpan</button>

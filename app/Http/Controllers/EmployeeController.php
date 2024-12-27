@@ -46,6 +46,7 @@ class EmployeeController extends Controller
             'email' => 'required|email|unique:employees,email',
             'phone' => 'required|max:13',
             'position' => 'required|integer'
+
         ]);
 
         // Jika validasi gagal, kirim response error
@@ -56,7 +57,7 @@ class EmployeeController extends Controller
                 'errors'  => $validator->errors()
             ], 422);
         }
-
+        log::info("data : ", $request->all());
         try {
             // Buat dan simpan data ke model
             $employees = Employee::create([
@@ -68,6 +69,7 @@ class EmployeeController extends Controller
                 'email' => $request->email,
                 'phone' => $request->phone,
                 'position_id' => $request->position,
+                // 'status' => $request->status
             ]);
 
             // Log data yang berhasil disimpan
@@ -93,7 +95,7 @@ class EmployeeController extends Controller
 
     public function list()
     {
-        $employees = Employee::select('id', 'name', 'nip')->get();
+        $employees = Employee::select('id', 'name', 'nip','status')->get();
         return response()->json($employees);
     }
 
@@ -126,20 +128,22 @@ class EmployeeController extends Controller
         //Log::info("Request: " . json_encode($request->all()));
 
         $employees = Employee::with(['position:id,name'])
-            ->select('id', 'name', 'nip', 'position_id')
+            ->select('id', 'name', 'nip', 'position_id','status')
             ->orderBy('name', 'asc')
             ->distinct()
             ->get();
+
 
         $employees = $employees->map(function ($employee) {
             return [
                 'id' => $employee->id,
                 'nama_lengkap' => $employee->name,
                 'nomor_induk_karyawan' => $employee->nip,
-                'jabatan_nama' => $employee->position->name
+                'jabatan_nama' => $employee->position->name,
+                'statu' => $employee->status
             ];
         });
-
+        log::info("CEK " , $employees);
         return response()->json($employees);
     }
 }
