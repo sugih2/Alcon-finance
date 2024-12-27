@@ -75,7 +75,8 @@ class Presence extends Model
     }
 
     public static function calculateAttendanceAndDeductions($employeeId, $startDate, $endDate, $nilaiPerHari, $componentType)
-    {   try {
+    {   
+        try {
             $presences = self::where('employed_id', $employeeId)
                 ->whereBetween('tanggal', [$startDate, $endDate])
                 ->get();
@@ -292,17 +293,57 @@ class Presence extends Model
     /**
      * Menghitung potongan berdasarkan menit keterlambatan.
      */
+    // private static function calculateDeductionsForLateness($lateMinutes, $nilaiPerHari)
+    // {
+    //     if ($lateMinutes > 0 && $lateMinutes <= 15) {
+    //         return $lateMinutes * 500;
+    //     } elseif ($lateMinutes > 15 && $lateMinutes <= 60) {
+    //         return 10000;
+    //     } elseif ($lateMinutes > 60) {
+    //         return $nilaiPerHari * 0.5;
+    //     }
+    //     return 0;
+    // }
+
     private static function calculateDeductionsForLateness($lateMinutes, $nilaiPerHari)
     {
-        if ($lateMinutes > 0 && $lateMinutes <= 15) {
-            return $lateMinutes * 500;
-        } elseif ($lateMinutes > 15 && $lateMinutes <= 60) {
-            return 10000;
-        } elseif ($lateMinutes > 60) {
-            return $nilaiPerHari * 0.5;
+        // Debugging input
+        Log::info("lateMinutes: $lateMinutes, nilaiPerHari: $nilaiPerHari");
+
+        // Ambil aturan potongan dari tabel database
+        $deductionRule = SettingAttendance::where('min_minutes', '<=', $lateMinutes)
+            ->where(function ($query) use ($lateMinutes) {
+                $query->where('max_minutes', '>=', $lateMinutes)
+                    ->orWhereNull('max_minutes');
+            })
+            ->first();
+
+        // Jika aturan ditemukan, hitung potongan
+        if ($deductionRule) {
+            Log::info("Rule ditemukan: " . json_encode($deductionRule));
+
+            // Jika aturan menggunakan tipe Fixed
+            if ($deductionRule->deduction_type === 'Fixed') {
+                if ($deductionRule->max_minutes === 15) {
+                    // Perhitungan setiap menit untuk aturan pertama
+                    return $lateMinutes * $deductionRule->deduction_value;
+                }
+                return $deductionRule->deduction_value;
+
+            } elseif ($deductionRule->deduction_type === 'Percentage') {
+                // Jika aturan menggunakan tipe Percentage
+                return $nilaiPerHari * $deductionRule->deduction_value;
+            }
+        } else {
+            Log::warning("Tidak ada aturan potongan ditemukan untuk lateMinutes: $lateMinutes");
         }
+
+        // Jika tidak ada aturan, tidak ada potongan
         return 0;
     }
+
+
+
 
 
 }

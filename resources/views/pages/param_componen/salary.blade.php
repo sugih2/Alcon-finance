@@ -26,7 +26,7 @@
     <div class="subtitle">
         <h6>Components Settings</h6>
     </div>
-    <div class="row mb-3">
+    {{-- <div class="row mb-3">
         <div class="col-6">
             <div class="form-group">
                 <label for="nama">Nama Componen</label>
@@ -34,7 +34,7 @@
                     placeholder="Masukan Nama Komponen">
             </div>
         </div>
-    </div>
+    </div> --}}
     <div class="row mb-3">
         <div class="col-6">
             <label for="nilai">Nilai</label>

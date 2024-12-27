@@ -35,7 +35,6 @@ class ParamComponenController extends Controller
 
     public function store(Request $request)
     {
-        // Log input request
         Log::info("Request: " . json_encode($request->all()));
 
         // Validasi input dengan Validator
