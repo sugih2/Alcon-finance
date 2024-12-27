@@ -93,6 +93,7 @@ Route::group(['prefix' => 'group', 'middleware' => 'auth'], function () {
 	Route::post('/store', [GroupController::class, 'store'])->name('group.store');
 	Route::get('/create', [GroupController::class, 'create'])->name('group.create');
 	Route::get('/edit/{id}', [GroupController::class, 'edit'])->name('group.edit');
+	Route::get('/list/{id}', [GroupController::class, 'listGroup'])->name('group.list');
 });
 Route::group(['prefix' => 'employee', 'middleware' => 'auth'], function () {
 	Route::get('/', [EmployeeController::class, 'index'])->middleware('auth')->name('employee.index');

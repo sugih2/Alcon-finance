@@ -100,7 +100,7 @@
     <script>
         function toggleComponents(employeeId) {
     const detailRow = document.getElementById(`detail-row-${employeeId}`);
-    if (detailRow.style.display === "none") {
+    if (detailRow.style.display === "none" ) {
         detailRow.style.display = "table-row";
     } else {
         detailRow.style.display = "none";

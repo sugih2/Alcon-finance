@@ -504,7 +504,7 @@
                 const errorData = await response.text(); // Ambil teks respons
                 throw new Error(errorData || 'Gagal menghapus data.');
             }
-
+            console.log("tess", response)
             const data = await response.json();
             Swal.fire({
                 icon: 'success',
