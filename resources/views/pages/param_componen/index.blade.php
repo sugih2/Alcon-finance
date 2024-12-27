@@ -333,8 +333,9 @@
         function createsalary() {
             event.preventDefault();
 
-            var selectedPosition = $('#id_position').val();
-            if (!selectedPosition) {
+            var selectedPosition = $('#id_position option:selected').text(); // Mengambil teks posisi terpilih
+            var selectedPositionId = $('#id_position').val(); // Mengambil ID posisi terpilih
+            if (!selectedPositionId) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Validation Error',
@@ -343,10 +344,15 @@
                 return false;
             }
 
-            var rawValue = $('#nilai').val().replace(/\./g, '');
+            var formattedName = `Gaji Pokok ${selectedPosition}`; // Format nama berdasarkan posisi
+            $('#nama').val(formattedName);
+
+            var rawValue = $('#nilai').val().replace(/\./g, ''); // Membersihkan nilai dari titik
             $('#nilai').val(rawValue);
+
             var form = $('#salaryForm')[0];
             var formData = new FormData(form);
+            formData.append('name', formattedName);
 
             formData.forEach(function(value, key) {
                 console.log(`${key}: ${value}`);

@@ -38,7 +38,8 @@ use App\Http\Controllers\ParamComponenController;
 use App\Http\Controllers\PraPayrollController;
 use App\Http\Controllers\RunPayrollController;
 use App\Http\Controllers\PayrollHistoryController;
-use App\Models\SettingShift;
+use App\Http\Controllers\ReportPayrollController;
+use App\Http\Controllers\SettingAttendanceController;
 
 Route::get('/data', [ExampleController::class, 'getData'])->middleware('auth')->name('data.index');
 
@@ -179,6 +180,14 @@ Route::group(['prefix' => 'history-payroll', 'middleware' => 'auth'], function (
 Route::group(['prefix' => 'history-payroll-detail', 'middleware' => 'auth'], function () {
 	Route::get('/{id}', [PayrollHistoryController::class, 'showDetails'])->middleware('auth')->name('historypayrollDetail.index');
 	Route::get('/detail-attendance/{id}', [PayrollHistoryController::class, 'showAttendanceDetails'])->name('historypayrollDetail.getDetail');
+});
+Route::group(['prefix' => 'report-payroll', 'middleware' => 'auth'], function () {
+	Route::get('/', [ReportPayrollController::class, 'index'])->middleware('auth')->name('reportpayroll.index');
+});
+Route::group(['prefix' => 'setting-attendance', 'middleware' => 'auth'], function () {
+	Route::get('/', [SettingAttendanceController::class, 'index'])->name('setattendance.index');
+	Route::get('/setattendance/{id}/edit', [SettingAttendanceController::class, 'edit'])->name('setattendance.edit');
+	Route::put('/setattendance/{id}', [SettingAttendanceController::class, 'update'])->name('setattendance.update');
 });
 
 
