@@ -22,7 +22,7 @@ class PraPayrollController extends Controller
     public function indexDetail()
     {
         $detailPayrolls = DetailPayroll::select()->get()->groupBy('id_employee');
-        log::info('CEKK epribadedhh comeon ' . json_encode($detailPayrolls, JSON_PRETTY_PRINT));
+        // log::info('CEKK epribadedhh comeon ' . json_encode($detailPayrolls, JSON_PRETTY_PRINT));
         return view('pages.pra_payroll.detail', compact('detailPayrolls'));
     }
     public function adjusment()
@@ -137,7 +137,7 @@ class PraPayrollController extends Controller
 
             return response()->json(['error' => $errorMessages], 400);
         }
-        Log::info("Request Data Input: " . json_encode($request->all(), JSON_PRETTY_PRINT));
+        // Log::info("Request Data Input: " . json_encode($request->all(), JSON_PRETTY_PRINT));
         try {
             DB::beginTransaction();
 
@@ -203,7 +203,7 @@ class PraPayrollController extends Controller
         $paramComponent = ParamComponen::where('category', $details->component->category)
             ->first();
         $paramComponents = ParamComponen::where('id', $details->id_component)->first();
-        log::info("CEK AMOUNT : ", ['CEk' => $paramComponents]);
+        // log::info("CEK AMOUNT : ", ['CEk' => $paramComponents]);
         $html = view('pages.pra_payroll.editDetail', compact('details', 'paramComponents'))->render();
 
         return response()->json([
@@ -211,17 +211,63 @@ class PraPayrollController extends Controller
             'detail_id' => $details->id,
             'param_name' => $paramComponent->name,
             'category' => $paramComponent->category,
+            'amount' => $paramComponent->amount
         ]);
     }
-    // public function updateDetail(Request $request){
-    //     log::info("Cek Request : ", $request);
-    //     $validator = Validator::make($request->all(),[
 
-    //     ]);
-    //     try {
+    public function updateDetail(Request $request, $id)
+    {
+        log::info("Cek Request update: " . json_encode($request, JSON_PRETTY_PRINT));
+        $validator = Validator::make($request->all(), []);
+        $idEmployee = Employee::where('name', $request->employee_name)->first();
+        $getIdEmployee = $idEmployee->id;
+        log::info('cek nama : ', ['cek' => $request->component]);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+        try {
+            $updateDetail = DetailPayroll::findOrFail($id);
+            $newAmount = $request->new_amount ? $request->new_amount : $request->amount;
+            $updateDetail->update([
+                'id_transaksi' => $request->id_transaksi,
+                'id_employee' => $getIdEmployee,
+                'id_component' => $request->component,
+                'amount' => $newAmount,
+            ]);
 
-    //     }catch{
+            return response()->json([
+                'success' => true,
+                'message' => 'Data detailpayroll berhasil disimpan',
+                'data' => $updateDetail,
+            ], 201);
+        } catch (\Exception $e) {
+            Log::error("Error: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menyimpan data detail prapayroll',
+            ], 500);
+        }
+    }
+    public function destroy($id)
+    {
+        try {
+            $deleteDetail = DetailPayroll::findOrFail($id);
+            $deleteDetail->delete();
 
-    //     }
-    // }
+            return response()->json([
+                'success' => true,
+                'message' => 'Data Detail Payroll berhasil dihapus',
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error("Error: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menghapus data Detail Payroll',
+            ], 500);
+        }
+    }
 }

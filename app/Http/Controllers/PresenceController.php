@@ -39,7 +39,7 @@ class PresenceController extends Controller
 
     public function store(Request $request)
     {
-        log::info('Cik Nempo Data:', ['cek' => $request->employed_id]);
+        // log::info('Cik Nempo Data:', ['cek' => $request->employed_id]);
         // Validasi input
         $validator = Validator::make($request->all(), [
             'employed_id' => 'required|integer', // Validasi karyawan
@@ -197,53 +197,9 @@ class PresenceController extends Controller
         return response()->json($presences);
     }
 
-    // public function processImport(Request $request)
-    // {
-    //     $request->validate([
-    //         'file' => 'required|mimes:xls,xlsx,xml',
-    //         'start_date' => 'required|date',
-    //         'end_date' => 'required|date|after_or_equal:start_date',
-    //     ]);
-    //     Log::info('Request All: ', $request->all());
-    //     $file = $request->file('file');
-    //     $data = [];
-
-    //     if ($file->getClientOriginalExtension() === 'xml') {
-    //         $xmlContent = file_get_contents($file);
-    //         $xml = simplexml_load_string($xmlContent);
-    //         foreach ($xml->presence as $row) {
-    //             $data[] = [
-    //                 'tanggal_scan' => (string)$row->tanggal_scan,
-    //                 'tanggal' => (string)$row->tanggal,
-    //                 'jam' => (string)$row->jam,
-    //                 'nip' => (string)$row->nip,
-    //                 'nama' => (string)$row->nama,
-    //                 'sn' => (string)$row->sn,
-    //             ];
-    //         }
-    //         Log::info('Data Presen:' . json_encode($data));
-    //     } else {
-    //         $data = Excel::toArray([], $file)[0];
-    //     }
-
-    //     // Filter data by date range
-    //     $filteredData = array_filter($data, function ($row) use ($request) {
-    //         $date = isset($row['tanggal']) ? $row['tanggal'] : $row['tanggal_scan'];
-    //         return $date >= $request->start_date && $date <= $request->end_date;
-    //     });
-
-    //     // Validasi Data
-    //     $validatedData = $this->validatePresenceData($filteredData);
-
-    //     return response()->json([
-    //         'data' => $validatedData['data'],
-    //         'invalidData' => $validatedData['invalid'],
-    //     ]);
-    // }
-
-
     public function processImport(Request $request)
     {
+
         $validator = Validator::make($request->all(), [
             'file' => 'required|mimes:xls,xlsx,xml',
             'start_date' => 'required|date',
@@ -264,7 +220,9 @@ class PresenceController extends Controller
         $importedCount = 0;
         $validasiData = [];
         try {
-            Log::info('Request All: ', $request->all());
+            // Log::info('Request All: ', $request->all());
+            $startDate = Carbon::parse($request->input('start_date'))->startOfDay();
+            $endDate = Carbon::parse($request->input('end_date'))->endOfDay();
             $file = $request->file('file');
             $data = [];
             $getStatus = [];
@@ -284,58 +242,62 @@ class PresenceController extends Controller
                     $importedCounts = [];
                     foreach ($xml->ROWS->ROW as $row) {
                         $nip = (string) $row['dbg_scanlogpegawai_nip'];
-                        $tanggal = (string) $row['dbg_scanlogtgl'];
+                        $tanggal = Carbon::parse((string) $row['dbg_scanlogtgl']);
                         $exists = [];
-                        // Mengecek apakah NIP ada di database Employee
-                        $isEmployee = Employee::where('nip', $nip)->exists();
+                        if ($tanggal->between($startDate, $endDate)) {
+                            // Mengecek apakah NIP ada di database Employee
+                            $isEmployee = Employee::where('nip', $nip)->exists();
 
-                        if ($isEmployee) {
-                            $employee = Employee::where('nip', $nip)->first();
-                            $employee_id = $employee->id;
+                            if ($isEmployee) {
+                                $employee = Employee::where('nip', $nip)->first();
+                                $employee_id = $employee->id;
 
-                            $exists = Presence::where('employed_id', $employee_id)
-                                ->where('tanggal', $tanggal)
-                                ->exists();
-                            log::info("CEK BROUUU : ", ['ceck data' => $employee]);
-                        } else {
-                            $error[] = "cek";
-                        }
-
-                        // Mengecek apakah NIP dan tanggal sudah pernah diimpor sebelumnya
-
-                        // Array untuk menampung error
-
-
-                        // Jika data sudah ada, tambahkan pesan error
-                        if ($exists) {
-                            // Tambahkan counter untuk NIP terkait
-                            if (!isset($importedCounts[$nip])) {
-                                $importedCounts[$nip] = 0;
+                                $exists = Presence::where('employed_id', $employee_id)
+                                    ->whereBetween('tanggal', [$startDate, $endDate])
+                                    ->exists();
+                                // log::info("CEK BROUUU : ", ['ceck data' => $employee]);
+                            } else {
+                                $error[] = "cek";
                             }
-                            $importedCounts[$nip]++;
-                            $errors[] = "Data dengan NIP {$nip} dan tanggal {$tanggal} sudah pernah diimport.";
-                        }
+                            $tanggalss[] = $tanggal;
+                            $validateDate = array_filter($tanggalss, function ($item) use ($request) {
+                                return $item >= $request->start_date && $item <= $request->end_date;
+                            });
+                            $existss = Presence::where('employed_id', $employee_id)
+                                ->whereBetween('tanggal', [$startDate, $endDate])
+                                ->get();
+                            log::info("CEK REQUEST" . json_encode($existss, JSON_PRETTY_PRINT));
+                            // log::info("CEK REQUEST", $existss);
+                            // Mengecek apakah NIP dan tanggal sudah pernah diimpor sebelumnya
 
-                        // foreach ($importedCounts as $nip => $count) {
-                        //     if ($count > 0) {
-                        //         $validasiData = "Ada {$count} data dengan NIP {$nip} yang sudah diimport sebelumnya.";
-                        //     }
-                        // }
-                        // Menambahkan data ke dalam array $data
-                        $data[] = [
-                            'tanggal_scan' => (string) $row['dbg_scanlogscan_date'] ?? null,
-                            'tanggal' => (string) $row['dbg_scanlogtgl'] ?? null,
-                            'jam' => (string) $row['dbg_scanlogjam'] ?? null,
-                            'nip' => (string) $row['dbg_scanlogpegawai_nip'] ?? null,
-                            'nama' => (string) $row['dbg_scanlogpegawai_nama'] ?? null,
-                            'sn' => (string) $row['dbg_scanlogsn'] ?? null,
-                            'status_karyawan' => $isEmployee ? 'Karyawan' : 'Bukan Karyawan',
-                            'validasi_tanggal' => $errors ? implode(', ', $errors) : null, // Menambahkan pesan error jika ada
-                        ];
-                        // Menambahkan status karyawan ke dalam array $getStatus
-                        $getStatus[] = [
-                            'status_karyawan' => $isEmployee ? 'Karyawan' : 'Bukan Karyawan'
-                        ];
+                            // Array untuk menampung error
+                            log::info("CEK validate : ", $importedCounts);
+                            // Jika data sudah ada, tambahkan pesan error
+                            if ($exists) {
+                                // Tambahkan counter untuk NIP terkait
+                                if (!isset($importedCounts[$nip])) {
+                                    $importedCounts[$nip] = 0;
+                                }
+
+                                $importedCounts[$nip]++;
+                                $errors[] = "Data dengan NIP {$nip} dan tanggal {$tanggal} sudah pernah diimport.";
+                            }
+
+                            $data[] = [
+                                'tanggal_scan' => (string) $row['dbg_scanlogscan_date'] ?? null,
+                                'tanggal' => (string) $row['dbg_scanlogtgl'] ?? null,
+                                'jam' => (string) $row['dbg_scanlogjam'] ?? null,
+                                'nip' => (string) $row['dbg_scanlogpegawai_nip'] ?? null,
+                                'nama' => (string) $row['dbg_scanlogpegawai_nama'] ?? null,
+                                'sn' => (string) $row['dbg_scanlogsn'] ?? null,
+                                'status_karyawan' => $isEmployee ? 'Karyawan' : 'Bukan Karyawan',
+                                'validasi_tanggal' => $errors ? implode(', ', $errors) : null, // Menambahkan pesan error jika ada
+                            ];
+                            // Menambahkan status karyawan ke dalam array $getStatus
+                            $getStatus[] = [
+                                'status_karyawan' => $isEmployee ? 'Karyawan' : 'Bukan Karyawan'
+                            ];
+                        }
                     }
                 } else {
                     Log::warning('Invalid XML structure');
@@ -363,7 +325,7 @@ class PresenceController extends Controller
                 return $item['tanggal'] >= $request->start_date && $item['tanggal'] <= $request->end_date;
             });
 
-            Log::info('Filtered Data: ' . json_encode($filteredData));
+            // Log::info('Filtered Data: ' . json_encode($filteredData));
             $uniqueData = [];
 
             foreach ($filteredData as $itemssss) {
@@ -386,7 +348,7 @@ class PresenceController extends Controller
             $cek_id_employee = $idEmploye->pluck('id')->toArray();
 
             // Output data unik
-            log::info("CEKKKK SOUND : " . json_encode($statuses, JSON_PRETTY_PRINT));
+            // log::info("CEKKKK SOUND : " . json_encode($statuses, JSON_PRETTY_PRINT));
 
             // Grupkan Data Berdasarkan NIP dan Tanggal
             $groupedData = [];
@@ -476,7 +438,7 @@ class PresenceController extends Controller
                 }
             }
             $tanggall = Presence::get();
-            Log::info('Final Data: ' . json_encode($finalData, JSON_PRETTY_PRINT));
+            // Log::info('Final Data: ' . json_encode($finalData, JSON_PRETTY_PRINT));
 
             return response()->json(['data' => $finalData]);
         } catch (\Exception $e) {
@@ -575,7 +537,7 @@ class PresenceController extends Controller
 
     public function storeImport(Request $request)
     {
-        Log::info('Request Data: ' . json_encode($request->all(), JSON_PRETTY_PRINT));
+        // Log::info('Request Data: ' . json_encode($request->all(), JSON_PRETTY_PRINT));
         // $request->validate(['data' => 'required|array']);
 
         $validator = Validator::make($request->all(), [

@@ -1,7 +1,7 @@
 <form id="FormEditDetailPraPayroll">
     @csrf
     <div class="mb-3">
-        <label for="id_transaksi" class="form-label">ID Transaksi</label>
+        <label for="id_transaksii" class="form-label">ID Transaksi</label>
         <input type="text" class="form-control" id="id_transaksi" name="id_transaksi" placeholder="Id Transaksi"
             value="{{ $details->id_transaksi}}"  readonly>
     </div>
@@ -13,17 +13,18 @@
     <div class="mb-3">
         <label for="component" class="form-label">Name Component</label>
         <select name="component" id="component" required>
-            <option value=""  selected  >Selected Component</option>
+            <option value="{{ $details->id_component }}"  selected  >{{  $paramComponents->name }}</option>
         </select>
     </div>
     <div class="mb-3">
-        <label for="Amount" class="form-label">Amount </label>
-        <input type="text" class="form-control" id="Amount" name="Amount" 
-            value="{{ $details->amount  }}" disabled>
+        <label for="amount" class="form-label">Amount </label>
+        <input type="text" class="form-control" id="amount" name="amount" 
+            value="{{ $details->amount  }}" readonly>
     </div>
     <div class="mb-3">
         <label for="new_amount" class="form-label">New Amount</label>
-        <button type="button" class="btn btn-link text-primary mb-0" id="addNewAmountBtn">(Add New Amount)</button>
+        <button type="button" class="btn btn-link text-primary mb-0" id="addNewAmountBtn">+</button>
+        <button type="button" class="btn btn-link text-primary mb-0" id="cancelNewAmountBtn">x</button>
         <input type="text" class="form-control" id="new_amount" name="new_amount" 
             value="{{ $details->new_amount }}" disabled>
     </div>
@@ -31,21 +32,16 @@
         id="btn-submit">Simpan</button>
 </form>
 <script>
-document.getElementById('component').addEventListener('change', function() {
-        console.log('cek amount : ', this.value)
-        const selectedValue = this.value; // Ambil nilai dari dropdown
-        const amountInput = document.getElementById('Amount'); // Ambil elemen input
 
-        if (selectedValue) {
-            amountInput.value = selectedValue; // Ubah nilai input
-        } else {
-            amountInput.value = "{{ $details->amount }}"; // Kembalikan ke nilai awal jika tidak ada yang dipilih
-        }
-    });
 document.getElementById('addNewAmountBtn').addEventListener('click', function(event) {
         event.preventDefault(); // Mencegah halaman refresh
         const inputField = document.getElementById('new_amount');
         inputField.disabled = false; // Mengaktifkan input saat tombol diklik
+    });
+document.getElementById('cancelNewAmountBtn').addEventListener('click', function(event) {
+        event.preventDefault(); // Mencegah halaman refresh
+        const inputField = document.getElementById('new_amount');
+        inputField.disabled = true; // Mengaktifkan input saat tombol diklik
     });
 
 </script>
