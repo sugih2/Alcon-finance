@@ -63,6 +63,10 @@
                                             <td class="align-middle text-end">
                                                 <div class="d-flex px-3 py-1 justify-content-center align-items-center">
                                                     <button type="button" class="btn btn-link text-primary mb-0"
+                                                        onclick="listGroup({{ $g->id }})">
+                                                        Detail
+                                                    </button>
+                                                    <button type="button" class="btn btn-link text-primary mb-0"
                                                         onclick="editGroup({{ $g->id }})">
                                                         Edit
                                                     </button>
@@ -114,7 +118,46 @@
         </div>
     </div>
 
+  <!-- Modal -->
+<div class="modal fade" id="EditGroupList" tabindex="-1" aria-labelledby="EditGroupListLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="EditGroupListLabel">Detail Group</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                <table class="table table-bordered table-striped" id="groupTableDetail">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>No</th>
+                            <th>Nama</th>
+                            <th>NIP</th>
+                            <th>NIK</th>
+                            <th>Address</th>
+                            <th>Phone</th>
+                            <th>Position</th>
+                            <th>Email</th>
+                        </tr>
+                    </thead>
+                    <tbody id="groupMemberList">
+                        <!-- Data karyawan akan dimasukkan di sini -->
+                    </tbody>
+                </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
     <script>
+         $(document).ready(function() {
+        $('#groupTableDetail').DataTable({
+            responsive: true,
+        });
+    });
         $(document).ready(function() {
             $('#groupTable').DataTable({
                 responsive: true,
@@ -231,6 +274,45 @@
                 }
             });
         }
+
+        function listGroup(id) {
+    $.ajax({
+        url: "{{ url('/group/list') }}/" + id,
+        type: 'GET',
+        dataType: 'json',
+        success: function(response) {
+            // Kosongkan daftar sebelumnya
+            $('#groupMemberList').empty();
+
+            // Tambahkan data ke tabel
+            let employees = response.dataEmployes;
+            let positions = response.dataPosition;
+            employees.forEach((employee, index) => {
+                let positionName = positions.find(position => position.id === employee.position_id)?.name || 'Tidak Diketahui';
+
+                $('#groupMemberList').append(`
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${employee.name}</td>
+                        <td>${employee.nip}</td>
+                        <td>${employee.nik}</td>
+                        <td>${employee.address}</td>
+                        <td>${employee.phone}</td>
+                        <td>${positionName}</td>
+                        <td>${employee.email}</td>
+                        
+                    </tr>
+                `);
+            });
+
+            // Tampilkan modal
+            $('#EditGroupList').modal('show');
+        },
+        error: function() {
+            alert('Terjadi kesalahan saat mengambil data.');
+        }
+    });
+}
 
         function editGroup(id) {
             $.ajax({
