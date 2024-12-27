@@ -269,23 +269,29 @@ class RunPayrollController extends Controller
                 $componentName = $tunjanganKaryawan['param_componen']->name;
                 //$idComponent = $tunjangankaryawan['param_componen']->id;
 
-                $attendance = [
-                    'attendance_details' => [],
-                    'total_earnings' => 0,
-                    'total_deductions' => 0,
-                ];
+                $attendanceDetails = [];
+                $totalEarnings = 0;
+                $totalDeductions = 0;
+                $totalOvertimes = 0;
 
-            
-                $attendance = Presence::calculateAttendanceAndDeductions($employeeId, $startDate, $endDate, $nilaiPerHari, $componentType);
-                //Log::info("Attendance: " . json_encode($attendance, JSON_PRETTY_PRINT));
-    
-                $attendanceDetails = $attendance['attendance_details'];
-                $totalEarnings = $attendance['total_earnings'];
-                $totalDeductions = $attendance['total_deductions'];
-                $totalOvertimes = $attendance['total_overtime_earnings'];
+                // Hanya jalankan perhitungan presensi jika komponen bukan Deduction
+                if ($componentType !== 'Deduction') {
+                    $attendance = Presence::calculateAttendanceAndDeductions(
+                        $employeeId,
+                        $startDate,
+                        $endDate,
+                        $nilaiPerHari,
+                        $componentType
+                    );
 
-                // Log::info("attendanceDetails: " . json_encode($attendanceDetails, JSON_PRETTY_PRINT));
-                // Log::info("Total penghasilan: $totalEarnings, Total potongan: $totalDeductions");
+                    $attendanceDetails = $attendance['attendance_details'];
+                    $totalEarnings = $attendance['total_earnings'];
+                    $totalDeductions = $attendance['total_deductions'];
+                    $totalOvertimes = $attendance['total_overtime_earnings'];
+                }
+
+                Log::info("attendanceDetails: " . json_encode($attendanceDetails, JSON_PRETTY_PRINT));
+                Log::info("Total penghasilan: $totalEarnings, Total potongan: $totalDeductions");
 
                 $components = [
                     'salary' => 0,
@@ -309,7 +315,7 @@ class RunPayrollController extends Controller
                         if (!isset($components['deduction'][$componentName])) {
                             $components['deduction'][$componentName] = 0;
                         }
-                        $components['deduction'][$componentName] += $totalDeductions;
+                        $components['deduction'][$componentName] += $nilaiPerHari;
                         break;
 
                     default:
