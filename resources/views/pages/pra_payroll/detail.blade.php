@@ -13,11 +13,12 @@
                         <div class="table-responsive">
                             <!-- Tabel Utama -->
                             <h5>Daftar Karyawan</h5>
+                            <div class="card">
+                                <div class="card-header">
                             <table class="table" id="mainTable">
                                 <thead>
                                     <tr>
                                         <th>No</th>
-                                        <th>Id Transaksi</th>
                                         <th>Nama Employee</th>
                                         <th>Aksi</th>
                                     </tr>
@@ -25,47 +26,50 @@
                                 <tbody>
                                     @php $index = 1; @endphp
                                     @foreach ($detailPayrolls as $id_employee => $payrolls)
-                                        <tr style="cursor: pointer;">
+                                        <tr style="cursor: pointer;" data-row="{{ $id_employee }}">
                                             <td>{{ $index++ }}</td>
-                                            <td>{{ $payrolls->first()->id_transaksi }}</td>
+                                           
                                             <td>{{ $payrolls->first()->employee->name ?? 'N/A' }}</td>
                                             <td>
-                                                <button class="btn btn-sm btn-primary" onclick="showComponents({{ $id_employee }})">Lihat Komponen</button>
+                                                <button class="btn btn-sm btn-primary" onclick="toggleComponents({{ $id_employee }})">Lihat Komponen</button>
                                             </td>
+                                            <tr class="detail-row" id="detail-row-{{ $id_employee }}" style="display: none;">
+                                                <td colspan="4">
+                                                    <div class="card-body">
+                                                    <table class="table table-borderless">
+                                                        <thead>
+                                                            <tr>
+                                                               <th>Id Transaksi</th>
+                                                                <th>Nama Komponen</th>
+                                                                <th>Jumlah</th>
+                                                                <th>Action</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach ($payrolls as $payroll)
+                                                            <tr>
+                                                                <td>{{ $payroll->id_transaksi }}</td>
+                                                                <td>{{ $payroll->component->name ?? 'N/A' }}</td>
+                                                                <td>Rp. {{ number_format($payroll->amount, 0, ',', '.') }}</td>
+                                                                <td>
+                                                                    <button type="button" class="btn btn-link text-primary mb-0"
+                                                                    onclick="editDetail({{ $payroll->id }})">Edit</button>
+                                                                <button type="button" class="btn btn-link text-danger mb-0"
+                                                                    data-bs-toggle="modal" data-bs-target="#deleteDetailModal" onclick="deleteDetail({{ $payroll->id }})"
+                                                                    data-id="{{ $payroll->id }}" >Delete</button>
+                                                                </td>
+                                                            </tr>
+                                                            @endforeach
+                                                        </tbody>
+                                                    </table>
+                                                    </div>
+                                                </td>
+                                            </tr>
                                         </tr>
                                     @endforeach
                                 </tbody>
                             </table>
-                    
-                            <!-- Tabel Kedua -->
-                            <div class="mt-4">
-                                <h5>Detail Komponen</h5>
-                                <table class="table" id="componentTable">
-                                    <thead>
-                                        <tr>
-                                            <th>Nama Komponen</th>
-                                            <th>Jumlah</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="componentTableBody">
-                                        @foreach ($detailPayrolls as $id_employee => $payrolls)
-                                            @foreach ($payrolls as $payroll)
-                                                <tr class="component-row" data-employee-id="{{ $id_employee }}" style="display: none;">
-                                                    <td>{{ $payroll->component->name ?? 'N/A' }}</td>
-                                                    <td>Rp. {{ number_format($payroll->amount, 0, ',', '.') }}</td>
-                                                    <td class="align-middle text-end">
-                                                        <button type="button" class="btn btn-link text-primary mb-0"
-                                                            onclick="editDetail({{ $payroll->id }})">Edit</button>
-                                                        <button type="button" class="btn btn-link text-danger mb-0"
-                                                            data-bs-toggle="modal" data-bs-target="#deleteRoleModal"
-                                                            >Delete</button>
-                                                    </td>
-                                                </tr>
-                                            @endforeach
-                                        @endforeach
-                                    </tbody>
-                                </table>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -92,20 +96,17 @@
 </div>
 
 </div>
+
     <script>
-      function showComponents(employeeId) {
-    // Sembunyikan semua baris komponen
-    document.querySelectorAll('.component-row').forEach((row) => {
-        row.style.display = 'none';
-    });
-
-    // Tampilkan baris komponen yang sesuai dengan employeeId
-    const selectedRows = document.querySelectorAll(`.component-row[data-employee-id="${employeeId}"]`);
-    selectedRows.forEach((row) => {
-        row.style.display = '';
-    });
+        function toggleComponents(employeeId) {
+    const detailRow = document.getElementById(`detail-row-${employeeId}`);
+    if (detailRow.style.display === "none" ) {
+        detailRow.style.display = "table-row";
+    } else {
+        detailRow.style.display = "none";
+    }
+    // detailRow.style.display = detailRow.style.display === "none" ? "table-row" : "none";
 }
-
 
 
 
@@ -154,7 +155,6 @@
                                     },
                                     success: function(data) {
                                         const filteredData = data.filter(item => item.category === response.category);
-                                        console.log("cek data ", response)
                                         callback(filteredData);
                                     },
                                     error: function() {
@@ -163,7 +163,12 @@
                                     }
                                 });
                             },
-                            
+                            onChange: function(value) {
+                                value = response.amount
+                                console.log(value)
+                                $('#amount').val(value);
+                                
+                            }
                         });
                     });
                 },
@@ -178,7 +183,7 @@
             });
         }
 
-        async function StoreEditDetail() {
+        async function StoreEditDetail(id) {
             event.preventDefault();
 
             const form = document.getElementById('FormEditDetailPraPayroll');
@@ -186,38 +191,16 @@
             const submitButton = document.getElementById('btn-submit');
 
             submitButton.disabled = true;
-            Swal.fire({
-                title: 'Menyimpan data...',
-                html: 'Progress: <b>0%</b>',
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
-            });
-
-            console.log('Isi FormData:');
-            for (let [key, value] of formData.entries()) {
-                console.log(`${key}: ${value}`);
-            }
 
             try {
                 const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-                let progress = 0;
-                const progressInterval = setInterval(() => {
-                    progress += 10;
-                    Swal.update({
-                        html: `Progress: <b>${progress}%</b>`
-                    });
-                    if (progress >= 90) clearInterval(progressInterval);
-                }, 200);
-                const response = await fetch('/componen/store', {
+                const response = await fetch('/pra-payroll/update/detail/' + id, {
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': csrfToken
                     },
                     body: formData
                 });
-                clearInterval(progressInterval);
 
                 if (!response.ok) {
                     const errorData = await response.json();
@@ -249,5 +232,58 @@
                 submitButton.disabled = false;
             }
         }
+        async function deleteDetail(id) {
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+    // Menampilkan konfirmasi sebelum menghapus data
+    const result = await Swal.fire({
+        title: 'Apakah Anda yakin?',
+        text: 'Data ini akan dihapus secara permanen!',
+        icon: 'warning',
+        showCancelButton: true,  // Menampilkan tombol batal
+        confirmButtonText: 'Ya, hapus!',
+        cancelButtonText: 'Batal',
+        reverseButtons: true  // Menempatkan tombol Batal di sebelah kiri
+    });
+
+    // Jika pengguna mengklik "Ya, hapus!", lanjutkan proses penghapusan
+    if (result.isConfirmed) {
+        try {
+            const response = await fetch('/pra-payroll/delete/detail/' + id, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                const errorData = await response.text(); // Ambil teks respons
+                throw new Error(errorData || 'Gagal menghapus data.');
+            }
+
+            const data = await response.json();
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: 'Absen berhasil dihapus.',
+                confirmButtonText: 'OK'
+            }).then(() => {
+                // Tindakan setelah sukses (misalnya reload atau perbarui tampilan)
+                location.reload();  // Bisa diganti sesuai kebutuhan
+            });
+
+        } catch (error) {
+            console.error('Error:', error);
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal',
+                text: error.message || 'Terjadi kesalahan saat menghapus absen.',
+                confirmButtonText: 'Coba Lagi'
+            });
+        }
+    }
+}
     </script>
 @endsection

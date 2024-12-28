@@ -29,8 +29,10 @@
                 <th>Tanggal</th>
                 <th>Earnings</th>
                 <th>Deductions</th>
+                <th>Earnings Overtime</th>
+                <th>Overtime Hours</th>
                 <th>Deduction Reason</th>
-                <th>Payroll History ID</th>
+
             </tr>
         </thead>
         <tbody>
@@ -52,8 +54,9 @@
                             @endforeach
                         </ul>
                     </td>
+                    <td>{{ number_format($detail->overtime_earnings, 2) }}</td>
+                    <td>{{ $detail->overtime_hours }}</td>
                     <td>{{ $detail->deduction_reason }}</td>
-                    <td>{{ $detail->payrollHistoryDetail->id_transaksi_payment ?? '-' }}</td>
                 </tr>
             @endforeach
         </tbody>

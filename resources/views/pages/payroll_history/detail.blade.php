@@ -58,6 +58,9 @@
                                             Deduction</th>
                                         <th
                                             class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                            Overtime</th>
+                                        <th
+                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                             Total Incomes</th>
                                         <th
                                             class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
@@ -109,6 +112,7 @@
                                                     -
                                                 @endif
                                             </td>
+                                            <td>Rp. {{ number_format($detail->total_overtime, 0, ',', '.') }}</td>
                                             <td>Rp. {{ number_format($detail->total_pendapatan, 0, ',', '.') }}</td>
                                             <td>Rp. {{ number_format($detail->total_potongan, 0, ',', '.') }}</td>
                                             <td>Rp. {{ number_format($detail->gaji_bruto, 0, ',', '.') }}</td>

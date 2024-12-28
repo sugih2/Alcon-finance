@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Employee;
 use Illuminate\Http\Request;
 use App\Models\Group;
 use App\Models\GroupMember;
+use App\Models\Position;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
@@ -89,7 +91,6 @@ class GroupController extends Controller
                 'message' => 'Data grup dan anggota berhasil disimpan',
                 'data'    => $group
             ], 201);
-
         } catch (\Exception $e) {
             DB::rollBack(); // Batalkan transaksi jika terjadi kesalahan
             Log::error("Error: " . $e->getMessage());
@@ -103,4 +104,20 @@ class GroupController extends Controller
         }
     }
 
+    public function ListGroup($id)
+    {
+        $groupMember = GroupMember::where('group_id', $id)->get();
+        $getMemberId = $groupMember->pluck('member_id');
+        // $cekId = $groupMember->member_id;
+        // log::info("EKhm", ['cek' => $cekId]);
+        $seleectEmployee = Employee::wherein('id', $getMemberId)
+            ->get();
+        $selectPositionId = $seleectEmployee->pluck('position_id');
+        $selectPosition = Position::whereIn('id', $selectPositionId)->get();
+        log::info("CEK" . json_encode($selectPosition, JSON_PRETTY_PRINT));
+        return response()->json([
+            'dataEmployes' => $seleectEmployee,
+            'dataPosition' => $selectPosition
+        ]);
+    }
 }

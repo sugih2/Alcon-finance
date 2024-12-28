@@ -4,7 +4,7 @@
         <i class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none"
             aria-hidden="true" id="iconSidenav"></i>
         <a class="navbar-brand m-0" href="{{ route('home') }}" target="_blank">
-            <img src="{{asset('./img/alcon-logo.png')}}" class="navbar-brand-img h-100" alt="main_logo">
+            <img src="{{ asset('./img/alcon-logo.png') }}" class="navbar-brand-img h-100" alt="main_logo">
             <span class="ms-1 font-weight-bold">ALCON FINANCE APP</span>
         </a>
     </div>
@@ -163,7 +163,8 @@
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="#" onclick="togglePanel(event)">
-                    <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                    <div
+                        class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
                         <i class="ni ni-chart-bar-32 text-dark text-sm opacity-10"></i>
                     </div>
                     <span class="nav-link-text ms-1">Pra Payroll</span>
@@ -174,8 +175,8 @@
                     <a class="nav-link" href="{{ route('prapayroll.index-detail') }}">Detail</a>
                 </div>
             </li>
-            
-            
+
+
             <li class="nav-item">
                 <a class="nav-link {{ Route::currentRouteName() == 'runpayroll.index' ? 'active' : '' }}"
                     href="{{ route('runpayroll.index') }}">
@@ -194,6 +195,16 @@
                         <i class="ni ni-money-coins text-dark text-sm opacity-10"></i>
                     </div>
                     <span class="nav-link-text ms-1">Payroll History</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ Route::currentRouteName() == 'reportpayroll.index' ? 'active' : '' }}"
+                    href="{{ route('reportpayroll.index') }}">
+                    <div
+                        class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                        <i class="ni ni-money-coins text-dark text-sm opacity-10"></i>
+                    </div>
+                    <span class="nav-link-text ms-1">Report Payroll</span>
                 </a>
             </li>
             <li class="nav-item mt-3">
@@ -227,6 +238,16 @@
                         <i class="ni ni-time-alarm text-dark text-sm opacity-10"></i>
                     </div>
                     <span class="nav-link-text ms-1">Setting Shift</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ Route::currentRouteName() == 'setattendance.index' ? 'active' : '' }}"
+                    href="{{ route('setattendance.index') }}">
+                    <div
+                        class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                        <i class="ni ni-time-alarm text-dark text-sm opacity-10"></i>
+                    </div>
+                    <span class="nav-link-text ms-1">Setting Attendance</span>
                 </a>
             </li>
             <li class="nav-item">
