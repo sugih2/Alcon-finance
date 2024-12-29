@@ -60,6 +60,7 @@ Route::group(['prefix' => 'user-management', 'middleware' => 'auth'], function (
 	Route::put('/menus/{menu}', [UserManagementController::class, 'updateMenu'])->middleware('auth')->name('menus.update');
 	Route::delete('/menus/{menu}', [UserManagementController::class, 'destroyMenu'])->name('menus.destroy');
 });
+
 Route::group(['prefix' => 'paramposition', 'middleware' => 'auth'], function () {
 	Route::get('/', [ParamPositionController::class, 'index'])->middleware('auth')->name('paramposition.index');
 	Route::get('/create', [ParamPositionController::class, 'create'])->name('paramposition.create');
@@ -88,6 +89,7 @@ Route::group(['prefix' => 'project', 'middleware' => 'auth'], function () {
 	Route::get('/list', [ProjectController::class, 'list'])->name('project.list');
 	Route::get('/get-project-name', [ProjectController::class, 'getProjectName'])->name('project.name');
 });
+
 Route::group(['prefix' => 'group', 'middleware' => 'auth'], function () {
 	Route::get('/', [GroupController::class, 'index'])->middleware('auth')->name('group.index');
 	Route::post('/store', [GroupController::class, 'store'])->name('group.store');
@@ -95,22 +97,25 @@ Route::group(['prefix' => 'group', 'middleware' => 'auth'], function () {
 	Route::get('/edit/{id}', [GroupController::class, 'edit'])->name('group.edit');
 	Route::get('/list/{id}', [GroupController::class, 'listGroup'])->name('group.list');
 });
+
 Route::group(['prefix' => 'employee', 'middleware' => 'auth'], function () {
 	Route::get('/', [EmployeeController::class, 'index'])->middleware('auth')->name('employee.index');
 	Route::post('/store', [EmployeeController::class, 'store'])->name('employee.store');
 	Route::get('/create', [EmployeeController::class, 'create'])->name('employee.create');
 	Route::get('/edit/{id}', [EmployeeController::class, 'edit'])->name('employee.edit');
-	Route::post('/storeedit/{id}', [EmployeeController::class, 'edit'])->name('employee.storeedit');
+	Route::post('/update/{id}', [EmployeeController::class, 'update'])->name('employee.update');
 	Route::get('/list', [EmployeeController::class, 'list'])->name('employee.list');
 	Route::get('/list/pekerja', [EmployeeController::class, 'list_pekerja'])->name('employee.list-member');
 	Route::get('/list/kepala-pekerja', [EmployeeController::class, 'list_kepala_pekerja'])->name('employee.list-kepala-pekerja');
 	Route::get('/get-employee-name', [EmployeeController::class, 'getEmployeeName'])->name('employee.name');
 	Route::get('/employee-list', [EmployeeController::class, 'getEmployeeList'])->name('employee.getlist');
 });
+
 Route::group(['prefix' => 'regency', 'middleware' => 'auth'], function () {
 	Route::get('/', [RegencyController::class, 'regency'])->name('regency.list');
 	Route::get('/get-regency-name', [RegencyController::class, 'getRegencyName'])->name('regency.name');
 });
+
 Route::group(['prefix' => 'presence', 'middleware' => 'auth'], function () {
 	Route::get('/', [PresenceController::class, 'index'])->middleware('auth')->name('presence.index');
 	Route::post('/store', [PresenceController::class, 'store'])->name('presence.store');
@@ -122,11 +127,13 @@ Route::group(['prefix' => 'presence', 'middleware' => 'auth'], function () {
 	Route::post('/process-import', [PresenceController::class, 'processImport'])->name('presence.processImport');
 	Route::post('/store-import', [PresenceController::class, 'storeImport'])->name('presence.storeImport');
 });
+
 Route::group(['prefix' => 'shift', 'middleware' => 'auth'], function () {
 	Route::get('/', [SettingShiftController::class, 'index'])->middleware('auth')->name('shift.index');
 	Route::get('/edit/{id}', [SettingShiftController::class, 'edit'])->name('shift.edit');
 	Route::post('/update/{id}', [SettingShiftController::class, 'update'])->name('shift.update');
 });
+
 Route::group(['prefix' => 'componen', 'middleware' => 'auth'], function () {
 	Route::get('/', [ParamComponenController::class, 'index'])->middleware('auth')->name('componen.index');
 	Route::post('/store', [ParamComponenController::class, 'store'])->name('componen.store');
@@ -138,6 +145,7 @@ Route::group(['prefix' => 'componen', 'middleware' => 'auth'], function () {
 	Route::get('/componen-list', [ParamComponenController::class, 'getComponentList'])->name('componen.getlist');
 	Route::get('/getform/{componentType}', [ParamComponenController::class, 'getform'])->name('componen.getform');
 });
+
 Route::group(['prefix' => 'pra-payroll', 'middleware' => 'auth'], function () {
 	Route::get('/', [PraPayrollController::class, 'index'])->middleware('auth')->name('prapayroll.index');
 	Route::get('/index/detail', [PraPayrollController::class, 'indexDetail'])->name('prapayroll.index-detail');
@@ -151,6 +159,7 @@ Route::group(['prefix' => 'pra-payroll', 'middleware' => 'auth'], function () {
 	Route::delete('/delete/detail/{id}', [PraPayrollController::class, 'destroy'])->name('prapayroll.deleteDetail');
 	Route::get('/get-componen-name', [PraPayrollController::class, 'getComponenName'])->name('prapayroll.name');
 });
+
 Route::group(['prefix' => 'adjusment', 'middleware' => 'auth'], function () {
 	Route::get('/', [PraPayrollController::class, 'adjusment'])->middleware('auth')->name('adjusment.index');
 	Route::post('/store', [PraPayrollController::class, 'store'])->name('adjusment.store');
@@ -165,6 +174,7 @@ Route::group(['prefix' => 'adjusment', 'middleware' => 'auth'], function () {
 	Route::post('/store-component', [PraPayrollController::class, 'storeselectcom'])->name('adjusment.storeselectcom');
 	Route::post('/store-adjusment', [PraPayrollController::class, 'storeadjusment'])->name('adjusment.storeadjusment');
 });
+
 Route::group(['prefix' => 'run-payroll', 'middleware' => 'auth'], function () {
 	Route::get('/', [RunPayrollController::class, 'index'])->middleware('auth')->name('runpayroll.index');
 	Route::post('/store', [RunPayrollController::class, 'store'])->name('runpayroll.store');
@@ -172,6 +182,7 @@ Route::group(['prefix' => 'run-payroll', 'middleware' => 'auth'], function () {
 	Route::get('/get-selected-employees', [RunPayrollController::class, 'getSelectedEmployees'])->name('runpayroll.employee');
 	Route::post('/store-employee', [RunPayrollController::class, 'storeselectkar'])->name('runpayroll.storeselectkar');
 });
+
 Route::group(['prefix' => 'history-payroll', 'middleware' => 'auth'], function () {
 	Route::get('/', [PayrollHistoryController::class, 'index'])->middleware('auth')->name('historypayroll.index');
 	Route::post('/store', [PayrollHistoryController::class, 'store'])->name('historypayroll.store');
@@ -179,28 +190,21 @@ Route::group(['prefix' => 'history-payroll', 'middleware' => 'auth'], function (
 	Route::get('/detail/{id}', [PayrollHistoryController::class, 'showDetails'])->middleware('auth')->name('historypayroll.detail');
 	Route::post('/locking', [PayrollHistoryController::class, 'locking'])->name('historypayroll.locking');
 });
+
 Route::group(['prefix' => 'history-payroll-detail', 'middleware' => 'auth'], function () {
 	Route::get('/{id}', [PayrollHistoryController::class, 'showDetails'])->middleware('auth')->name('historypayrollDetail.index');
 	Route::get('/detail-attendance/{id}', [PayrollHistoryController::class, 'showAttendanceDetails'])->name('historypayrollDetail.getDetail');
 });
+
 Route::group(['prefix' => 'report-payroll', 'middleware' => 'auth'], function () {
 	Route::get('/', [ReportPayrollController::class, 'index'])->middleware('auth')->name('reportpayroll.index');
 });
+
 Route::group(['prefix' => 'setting-attendance', 'middleware' => 'auth'], function () {
 	Route::get('/', [SettingAttendanceController::class, 'index'])->name('setattendance.index');
 	Route::get('/setattendance/{id}/edit', [SettingAttendanceController::class, 'edit'])->name('setattendance.edit');
 	Route::put('/setattendance/{id}', [SettingAttendanceController::class, 'update'])->name('setattendance.update');
 });
-
-
-
-
-
-
-
-
-
-
 
 Route::get('/', function () {
 	return redirect('/dashboard');

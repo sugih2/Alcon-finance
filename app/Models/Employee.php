@@ -17,10 +17,16 @@ class Employee extends Model
         'email',
         'birth_date',
         'position_id',
+        'status',
     ];
 
     public function position()
     {
         return $this->belongsTo(Position::class);
     }
+
+    // public function ()
+    // {
+    //     return $this->belongsTo(Position::class);
+    // }
 }

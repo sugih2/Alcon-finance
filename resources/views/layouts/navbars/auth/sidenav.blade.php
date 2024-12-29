@@ -21,7 +21,7 @@
                     <span class="nav-link-text ms-1">Dashboard</span>
                 </a>
             </li>
-            <li class="nav-item">
+            {{-- <li class="nav-item">
                 <a class="nav-link {{ Route::currentRouteName() == 'example' ? 'active' : '' }}"
                     href="{{ route('example') }}">
                     <div
@@ -30,7 +30,7 @@
                     </div>
                     <span class="nav-link-text ms-1">Example</span>
                 </a>
-            </li>
+            </li> --}}
             {{-- <li class="nav-item mt-3 d-flex align-items-center">
                 <div class="ps-4">
                     <i class="fab fa-laravel" style="color: #f4645f;"></i>
@@ -113,7 +113,7 @@
                     href="{{ route('user-management.index') }}">
                     <div
                         class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="ni ni-single-02 text-dark text-sm opacity-10"></i>
+                        <i class="ni ni-bullet-list-67 text-dark text-sm opacity-10"></i>
                     </div>
                     <span class="nav-link-text ms-1">User Management</span>
                 </a>

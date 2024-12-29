@@ -15,7 +15,7 @@
                 <div class="card-body px-0 pt-0 pb-2">
                     <div class="container">
                         <div class="table-responsive p-0">
-                            <table class="table align-items-center mb-0" id="employeeTable" style="width:100%"  >
+                            <table class="table align-items-center mb-0" id="employeeTable" style="width:100%">
                                 <thead>
                                     <tr>
                                         <th
@@ -73,9 +73,6 @@
                                             <td class="align-middle text-end">
                                                 <button type="button" class="btn btn-link text-primary mb-0"
                                                     onclick="editEmployee({{ $e->id }})">Edit</button>
-                                                <button type="button" class="btn btn-link text-danger mb-0"
-                                                    data-bs-toggle="modal" data-bs-target="#deleteRoleModal"
-                                                    data-id="{{ $e->id }}">Delete</button>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -134,12 +131,12 @@
                     info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
                     infoEmpty: "Tidak ada entri",
                     zeroRecords: "Tidak ada entri yang cocok",
-                //     paginate: {
-                //         first: "Pertama",
-                //         last: "Terakhir",
-                //         next: "Berikutnya",
-                //         previous: "Sebelumnya"
-                //     }
+                    //     paginate: {
+                    //         first: "Pertama",
+                    //         last: "Terakhir",
+                    //         next: "Berikutnya",
+                    //         previous: "Sebelumnya"
+                    //     }
                 }
             });
         });
@@ -216,6 +213,7 @@
                                         q: query
                                     },
                                     success: function(data) {
+                                        console.log('Response data:', data);
 
                                         callback(data);
                                     },
@@ -338,5 +336,57 @@
                 submitButton.disabled = false;
             }
         }
+
+        async function StoreEditEmployee(id) {
+            event.preventDefault();
+
+            const form = document.getElementById('FromEditEmployee');
+            const formData = new FormData(form);
+            const submitButton = document.getElementById('btn-submit');
+
+            submitButton.disabled = true;
+
+            try {
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                const response = await fetch('/employee/update/' + id, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: formData
+                });
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Gagal Setting Employee.');
+                }
+
+                console.log('CEKK', response)
+
+                const data = await response.json();
+                console.log('Sukses:', data);
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil',
+                    text: 'Setting Employee Berhasil'
+                }).then(() => {
+                    location.reload();
+                });
+
+                form.reset();
+
+            } catch (error) {
+                console.error('Error:', error);
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal',
+                    text: error.message || 'Setting Employee Gagal'
+                });
+            } finally {
+                submitButton.disabled = false;
+            }
+        }
+
     </script>
 @endsection

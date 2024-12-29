@@ -3,12 +3,12 @@
     <div class="mb-3">
         <label for="nip" class="form-label">NIP</label>
         <input type="text" class="form-control" id="nip" value="{{ $employee->nip }}" name="nip"
-            placeholder="NIP" required>
+            placeholder="NIP" maxlength="10" required>
     </div>
     <div class="mb-3">
         <label for="nik" class="form-label">NIK</label>
-        <input type="number" class="form-control" id="nik" value="{{ $employee->nik }}" name="nik"
-            placeholder="NIK" required>
+        <input type="text" class="form-control" id="nik" value="{{ $employee->nik }}" name="nik"
+            placeholder="Masukkan NIK" required maxlength="16" minlength="16" pattern="\d{16}">
     </div>
     <div class="mb-3">
         <label for="name" class="form-label">Name Employee</label>
@@ -38,8 +38,24 @@
     <div class="mb-3">
         <label for="position" class="form-label">Position</label>
         <select name="position" id="position" required>
-            <option value="" selected>Select Position</option>
+            <option value="position" selected>Select Position</option>
         </select>
     </div>
-    <button type="button" id="btn-submit" onclick="StoreEmployee()" class="btn btn-primary">Simpan</button>
+    <div class="form-group">
+        <label for="status">Status</label>
+        <select class="form-control" id="status" name="status">
+            <option value="Aktif" {{ $employee->status == 'Aktif' ? 'selected' : '' }}>Aktif</option>
+            <option value="NonAktif" {{ $employee->status == 'NonAktif' ? 'selected' : '' }}>NonAktif</option>
+        </select>
+    </div>
+    <button type="button" id="btn-submit" onclick="StoreEditEmployee({{ $employee->id }})" class="btn btn-primary">Simpan</button>
 </form>
+
+<script>
+    document.querySelectorAll('#nik, #nip, #phone').forEach((element) => {
+        element.addEventListener('input', function (e) {
+            e.target.value = e.target.value.replace(/[^0-9]/g, '');
+        });
+    });
+</script>
+

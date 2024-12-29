@@ -27,9 +27,74 @@ class EmployeeController extends Controller
 
         return response()->json([
             'html' => $html,
+            'position_id' => $employee->id,
+        ]);
+    }
+
+    public function update(Request $request, $id)
+    {
+        log::info('Cik Nempo Data:', $request->all());
+        $validator = Validator::make($request->all(), [
+            'nip' => "max:10|unique:employees,nip,$id",
+            'nik' => "max:16|unique:employees,nik,$id",
+            'name' => 'string|max:25',
+            'birth_date' => 'date',
+            'address' => 'string',
+            'email' => "email|unique:employees,email,$id",
+            'phone' => 'max:13',
+            'position' => 'integer',
+            'status' => 'in:Aktif,NonAktif',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        try {
+            $employee = Employee::findOrFail($id);
+            log::info('Cik Nempo Data euy:', ['cek' => $employee]);
+            $employee->update([
+                'nip' => $request->nip,
+                'nik' => $request->nik,
+                'name' => $request->name,
+                'birth_date' => $request->birth_date,
+                'address' => $request->address,
+                'email' => $request->email,
+                'phone' => $request->phone,
+                'position_id' => $request->position,
+                'status' => $request->status,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'employee Berhasil',
+                'data' => $employee,
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error("Error: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal Edit Setting Shift',
+            ], 500);
+        }
+    }
+
+
+    public function storeEdit($id)
+    {
+        $employee = Employee::with('position')->find($id);
+        $html = view('pages.employee.edit', compact('employee'))->render();
+
+        return response()->json([
+            'html' => $html,
             'position_id' => $employee->position_id,
         ]);
     }
+
 
     public function store(Request $request)
     {
@@ -45,7 +110,8 @@ class EmployeeController extends Controller
             'address' => 'required|string',
             'email' => 'required|email|unique:employees,email',
             'phone' => 'required|max:13',
-            'position' => 'required|integer'
+            'position' => 'required|integer',
+            'status' => 'in:Aktif,NonAktif'
         ]);
 
         // Jika validasi gagal, kirim response error
@@ -56,7 +122,7 @@ class EmployeeController extends Controller
                 'errors'  => $validator->errors()
             ], 422);
         }
-
+        log::info("data : ", $request->all());
         try {
             // Buat dan simpan data ke model
             $employees = Employee::create([
@@ -67,7 +133,8 @@ class EmployeeController extends Controller
                 'address' => $request->address,
                 'email' => $request->email,
                 'phone' => $request->phone,
-                'position_id' => $request->position,
+                'position_id' => $request->position
+                // 'status' => $request->status
             ]);
 
             // Log data yang berhasil disimpan
@@ -93,7 +160,7 @@ class EmployeeController extends Controller
 
     public function list()
     {
-        $employees = Employee::select('id', 'name', 'nip')->get();
+        $employees = Employee::select('id', 'name', 'nip','status')->get();
         return response()->json($employees);
     }
 
@@ -126,20 +193,22 @@ class EmployeeController extends Controller
         //Log::info("Request: " . json_encode($request->all()));
 
         $employees = Employee::with(['position:id,name'])
-            ->select('id', 'name', 'nip', 'position_id')
+            ->select('id', 'name', 'nip', 'position_id','status')
             ->orderBy('name', 'asc')
             ->distinct()
             ->get();
+
 
         $employees = $employees->map(function ($employee) {
             return [
                 'id' => $employee->id,
                 'nama_lengkap' => $employee->name,
                 'nomor_induk_karyawan' => $employee->nip,
-                'jabatan_nama' => $employee->position->name
+                'jabatan_nama' => $employee->position->name,
+                'statu' => $employee->status
             ];
         });
-
+        log::info("CEK " , $employees);
         return response()->json($employees);
     }
 }
