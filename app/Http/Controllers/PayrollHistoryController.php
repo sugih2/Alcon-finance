@@ -12,7 +12,9 @@ class PayrollHistoryController extends Controller
 {
     public function index()
     {
-        $payrollHistories = PayrollHistory::all();
+        $payrollHistories = PayrollHistory::where('locking', false)
+            ->orderBy('start_periode', 'desc')
+            ->get();
         return view('pages.payroll_history.index', compact('payrollHistories'));
     }
 
