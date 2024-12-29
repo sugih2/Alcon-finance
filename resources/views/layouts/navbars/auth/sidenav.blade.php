@@ -119,47 +119,40 @@
                 </a>
             </li>
             <li class="nav-item mt-3">
-                <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Management</h6>
+                <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Prensensi</h6>
             </li>
             <li class="nav-item">
-                <a class="nav-link {{ Route::currentRouteName() == 'employee.index' ? 'active' : '' }}"
-                    href="{{ route('employee.index') }}">
+                <a class="nav-link {{ Route::currentRouteName() == 'presence.index' ? 'active' : '' }}"
+                    href="{{ route('presence.index') }}">
                     <div
                         class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="ni ni-building text-dark text-sm opacity-10"></i>
+                        <i class="ni ni-time-alarm text-dark text-sm opacity-10"></i>
                     </div>
-                    <span class="nav-link-text ms-1">Employee</span>
+                    <span class="nav-link-text ms-1">Absensi</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link {{ Route::currentRouteName() == 'position.index' ? 'active' : '' }}"
-                    href="{{ route('position.index') }}">
+                <a class="nav-link {{ Route::currentRouteName() == 'shift.index' ? 'active' : '' }}"
+                    href="{{ route('shift.index') }}">
                     <div
                         class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="ni ni-circle-08 text-dark text-sm opacity-10"></i>
+                        <i class="ni ni-settings-gear-65 text-dark text-sm opacity-10"></i>
                     </div>
-                    <span class="nav-link-text ms-1">Position</span>
+                    <span class="nav-link-text ms-1">Setting Shift</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link {{ Route::currentRouteName() == 'project.index' ? 'active' : '' }}"
-                    href="{{ route('project.index') }}">
+                <a class="nav-link {{ Route::currentRouteName() == 'setattendance.index' ? 'active' : '' }}"
+                    href="{{ route('setattendance.index') }}">
                     <div
                         class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="ni ni-books text-dark text-sm opacity-10"></i>
+                        <i class="ni ni-settings-gear-65 text-dark text-sm opacity-10"></i>
                     </div>
-                    <span class="nav-link-text ms-1">Project</span>
+                    <span class="nav-link-text ms-1">Setting Attendance</span>
                 </a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link {{ Route::currentRouteName() == 'group.index' ? 'active' : '' }}"
-                    href="{{ route('group.index') }}">
-                    <div
-                        class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="ni ni-briefcase-24 text-dark text-sm opacity-10"></i>
-                    </div>
-                    <span class="nav-link-text ms-1">Group</span>
-                </a>
+            <li class="nav-item mt-3">
+                <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Payroll</h6>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="#" onclick="togglePanel(event)">
@@ -192,7 +185,7 @@
                     href="{{ route('historypayroll.index') }}">
                     <div
                         class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="ni ni-money-coins text-dark text-sm opacity-10"></i>
+                        <i class="ni ni-book-bookmark text-dark text-sm opacity-10"></i>
                     </div>
                     <span class="nav-link-text ms-1">Payroll History</span>
                 </a>
@@ -207,49 +200,6 @@
                     <span class="nav-link-text ms-1">Report Payroll</span>
                 </a>
             </li>
-            <li class="nav-item mt-3">
-                <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Parameter</h6>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {{ Route::currentRouteName() == 'paramposition.index' ? 'active' : '' }}"
-                    href="{{ route('paramposition.index') }}">
-                    <div
-                        class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="ni ni-ungroup text-dark text-sm opacity-10"></i>
-                    </div>
-                    <span class="nav-link-text ms-1">Position</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {{ Route::currentRouteName() == 'presence.index' ? 'active' : '' }}"
-                    href="{{ route('presence.index') }}">
-                    <div
-                        class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="ni ni-time-alarm text-dark text-sm opacity-10"></i>
-                    </div>
-                    <span class="nav-link-text ms-1">Absensi</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {{ Route::currentRouteName() == 'shift.index' ? 'active' : '' }}"
-                    href="{{ route('shift.index') }}">
-                    <div
-                        class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="ni ni-time-alarm text-dark text-sm opacity-10"></i>
-                    </div>
-                    <span class="nav-link-text ms-1">Setting Shift</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {{ Route::currentRouteName() == 'setattendance.index' ? 'active' : '' }}"
-                    href="{{ route('setattendance.index') }}">
-                    <div
-                        class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="ni ni-time-alarm text-dark text-sm opacity-10"></i>
-                    </div>
-                    <span class="nav-link-text ms-1">Setting Attendance</span>
-                </a>
-            </li>
             <li class="nav-item">
                 <a class="nav-link {{ Route::currentRouteName() == 'componen.index' ? 'active' : '' }}"
                     href="{{ route('componen.index') }}">
@@ -258,6 +208,59 @@
                         <i class="ni ni-tag text-dark text-sm opacity-10"></i>
                     </div>
                     <span class="nav-link-text ms-1">Component</span>
+                </a>
+            </li>
+            <li class="nav-item mt-3">
+                <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Management Employee</h6>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ Route::currentRouteName() == 'employee.index' ? 'active' : '' }}"
+                    href="{{ route('employee.index') }}">
+                    <div
+                        class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                        <i class="ni ni-building text-dark text-sm opacity-10"></i>
+                    </div>
+                    <span class="nav-link-text ms-1">Employee</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ Route::currentRouteName() == 'position.index' ? 'active' : '' }}"
+                    href="{{ route('position.index') }}">
+                    <div
+                        class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                        <i class="ni ni-circle-08 text-dark text-sm opacity-10"></i>
+                    </div>
+                    <span class="nav-link-text ms-1">Position</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ Route::currentRouteName() == 'paramposition.index' ? 'active' : '' }}"
+                    href="{{ route('paramposition.index') }}">
+                    <div
+                        class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                        <i class="ni ni-ungroup text-dark text-sm opacity-10"></i>
+                    </div>
+                    <span class="nav-link-text ms-1">Setting Position</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ Route::currentRouteName() == 'project.index' ? 'active' : '' }}"
+                    href="{{ route('project.index') }}">
+                    <div
+                        class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                        <i class="ni ni-books text-dark text-sm opacity-10"></i>
+                    </div>
+                    <span class="nav-link-text ms-1">Project</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ Route::currentRouteName() == 'group.index' ? 'active' : '' }}"
+                    href="{{ route('group.index') }}">
+                    <div
+                        class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                        <i class="ni ni-briefcase-24 text-dark text-sm opacity-10"></i>
+                    </div>
+                    <span class="nav-link-text ms-1">Group</span>
                 </a>
             </li>
         </ul>
