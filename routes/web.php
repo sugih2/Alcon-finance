@@ -40,6 +40,7 @@ use App\Http\Controllers\RunPayrollController;
 use App\Http\Controllers\PayrollHistoryController;
 use App\Http\Controllers\ReportPayrollController;
 use App\Http\Controllers\SettingAttendanceController;
+use App\Http\Controllers\PaymentController;
 
 Route::get('/data', [ExampleController::class, 'getData'])->middleware('auth')->name('data.index');
 
@@ -204,6 +205,12 @@ Route::group(['prefix' => 'setting-attendance', 'middleware' => 'auth'], functio
 	Route::get('/', [SettingAttendanceController::class, 'index'])->name('setattendance.index');
 	Route::get('/setattendance/{id}/edit', [SettingAttendanceController::class, 'edit'])->name('setattendance.edit');
 	Route::put('/setattendance/{id}', [SettingAttendanceController::class, 'update'])->name('setattendance.update');
+});
+
+Route::group(['prefix' => 'payment', 'middleware' => 'auth'], function () {
+	Route::get('/{id}', [PaymentController::class, 'index'])->name('payment.index');
+	Route::post('/process/{id}', [PaymentController::class, 'process'])->name('payment.process');
+	Route::put('/edit/{id}', [PaymentController::class, 'edit'])->name('payment.edit');
 });
 
 Route::get('/', function () {

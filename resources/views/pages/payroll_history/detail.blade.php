@@ -40,10 +40,10 @@
                                             class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                             No
                                         </th>
-                                        <th
+                                        {{-- <th
                                             class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                             No Transaction
-                                        </th>
+                                        </th> --}}
                                         <th
                                             class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                             Name</th>
@@ -81,7 +81,7 @@
                                     @foreach ($payrollHistoryDetail->detailPayroll as $index => $detail)
                                         <tr>
                                             <td>{{ $index + 1 }}</td>
-                                            <td>{{ $detail->id_transaksi_payment ?? '-' }}</td>
+                                            {{-- <td>{{ $detail->id_transaksi_payment ?? '-' }}</td> --}}
                                             <td>{{ $detail->employee->name ?? '-' }}</td>
                                             <td>Rp. {{ number_format($detail->salary, 0, ',', '.') }}</td>
                                             <td>
