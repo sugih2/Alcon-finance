@@ -160,7 +160,7 @@ class EmployeeController extends Controller
 
     public function list()
     {
-        $employees = Employee::select('id', 'name', 'nip','status')->get();
+        $employees = Employee::select('id', 'name', 'nip', 'status')->get();
         return response()->json($employees);
     }
 
@@ -193,7 +193,7 @@ class EmployeeController extends Controller
         //Log::info("Request: " . json_encode($request->all()));
 
         $employees = Employee::with(['position:id,name'])
-            ->select('id', 'name', 'nip', 'position_id','status')
+            ->select('id', 'name', 'nip', 'position_id', 'status')
             ->orderBy('name', 'asc')
             ->distinct()
             ->get();
@@ -205,10 +205,9 @@ class EmployeeController extends Controller
                 'nama_lengkap' => $employee->name,
                 'nomor_induk_karyawan' => $employee->nip,
                 'jabatan_nama' => $employee->position->name,
-                'statu' => $employee->status
+                'status' => $employee->status
             ];
         });
-        log::info("CEK " , $employees);
         return response()->json($employees);
     }
 }

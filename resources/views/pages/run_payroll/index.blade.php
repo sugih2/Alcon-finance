@@ -60,14 +60,14 @@
 
                                 <div class="form-group">
                                     <label for="floatingTextarea" class="col-form-label">Description</label>
-                                    <textarea class="col-sm-5 form-control" placeholder="Optional" id="floatingTextarea" name="description"></textarea>
+                                    <textarea class="col-sm-5 form-control" placeholder="Description..." id="floatingTextarea" name="description"></textarea>
                                 </div>
-                                <button type="button" class="btn btn-outline-primary" onclick="showEmploySelected()">Add
+                                {{-- <button type="button" class="btn btn-outline-primary" onclick="showEmploySelected()">Add
                                     Employee</button>
                                 <div id="selected-employees" class="mt-3">
                                     <h5>Selected Employees:</h5>
                                     <ul id="employee-list"></ul>
-                                </div>
+                                </div> --}}
                                 <div class="d-flex justify-content-center"><button type="button"
                                         class="btn btn-outline-primary" onclick="runpayroll()">RunPayroll</button></div>
 
@@ -176,7 +176,6 @@
                 start_date: startDate,
                 end_date: endDate,
                 description: description,
-                employee_ids: employeeIds,
             };
             //console.log('Payload:', payload);
             $.ajaxSetup({
@@ -246,41 +245,29 @@
                 }
             });
         }
-        //Week
-        function getPreviousWeeksDates(weeksBack = 2) {
+        function getPreviousWeeksDates() {
             const today = new Date(); // Tanggal hari ini
-            const year = today.getFullYear();
-            const month = today.getMonth() + 1; // Bulan berjalan
-            const firstDay = new Date(year, month - 1, 1); // Hari pertama bulan ini
-            const lastDay = new Date(year, month, 0); // Hari terakhir bulan ini
+            const currentMonth = today.getMonth(); // Bulan berjalan (0-indexed)
+            const currentYear = today.getFullYear();
 
-            // Pastikan minggu dimulai dari hari Senin
-            let currentWeekStart = new Date(today);
-            while (currentWeekStart.getDay() !== 1) {
-                currentWeekStart.setDate(currentWeekStart.getDate() - 1);
+            // Hitung bulan sebelumnya
+            let targetMonth = currentMonth - 1;
+            let targetYear = currentYear;
+            if (targetMonth < 0) {
+                targetMonth = 11; // Bulan Desember tahun sebelumnya
+                targetYear -= 1;
             }
 
-            // Pindahkan ke 2 minggu ke belakang
-            currentWeekStart.setDate(currentWeekStart.getDate() - 7 * weeksBack);
+            // Tentukan tanggal 16 bulan sebelumnya
+            const start = new Date(targetYear, targetMonth, 16);
 
-            // Tanggal akhir untuk periode 2 minggu
-            let currentWeekEnd = new Date(currentWeekStart);
-            currentWeekEnd.setDate(currentWeekEnd.getDate() + (7 * 2 - 1)); // Periode 2 minggu
-
-            // Jika akhir periode melampaui akhir bulan, batasi tanggal akhirnya
-            if (currentWeekEnd > lastDay) {
-                currentWeekEnd = lastDay;
-            }
-
-            // Jika tanggal mulai sebelum awal bulan, batasi tanggal mulai
-            if (currentWeekStart < firstDay) {
-                currentWeekStart = firstDay;
-            }
+            // Tentukan akhir periode: tanggal 29
+            const end = new Date(targetYear, targetMonth, 29);
 
             // Format tanggal sebagai YYYY-MM-DD
             return {
-                start: formatDate(currentWeekStart),
-                end: formatDate(currentWeekEnd),
+                start: formatDate(start),
+                end: formatDate(end),
             };
         }
 
@@ -292,12 +279,13 @@
         }
 
         function setDatesForPreviousWeeks() {
-            const weekDates = getPreviousWeeksDates(2); // Ambil 2 minggu ke belakang
+            const weekDates = getPreviousWeeksDates();
 
             // Set tanggal ke input field
             document.getElementById("start_date").value = weekDates.start;
             document.getElementById("end_date").value = weekDates.end;
-        }
+        } 
+
     </script>
 
     <meta name="csrf-token" content="{{ csrf_token() }}" />

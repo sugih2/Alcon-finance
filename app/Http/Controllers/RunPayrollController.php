@@ -10,6 +10,7 @@ use App\Models\Presence;
 use App\Models\PayrollHistory;
 use App\Models\PayrollHistoryDetail;
 use App\Models\AttendanceDetail;
+use App\Models\DetailPayroll;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -35,8 +36,8 @@ class RunPayrollController extends Controller
             'employees.*.nama_lengkap' => 'required|string',
             'employees.*.nomor_induk_karyawan' => 'required|string',
         ]);
-
         $employeeIds = collect($validatedData['employees'])->pluck('id')->toArray();
+
 
         session(['selected_employee_ids' => $employeeIds]);
 
@@ -49,8 +50,15 @@ class RunPayrollController extends Controller
 
     public function getSelectedEmployees()
     {
+        // $detailPayrolls = DetailPayroll::whereHas('employee', function ($query) {
+        //     $query->where('status', 'Aktif');
+        // })->get();
+        // log::info('cek data 1: ' . json_encode($detailPayrolls, JSON_PRETTY_PRINT));
         $selectedEmployeeIds = session('selected_employee_ids', []);
-        $employees = Employee::whereIn('id', $selectedEmployeeIds)->get();
+        $tesContoh = Employee::where('status', 'Aktif')->get();
+        $ambildata = $tesContoh->pluck('id_employee')->toArray();
+        // log::info('cek data 2: ' . json_encode($selectedEmployeeIds, JSON_PRETTY_PRINT));
+        $employees = Employee::whereIn('id', $ambildata)->get();
 
         return response()->json([
             'success' => true,
@@ -67,7 +75,6 @@ class RunPayrollController extends Controller
             'description' => 'required|string',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after:start_date',
-            'employee_ids' => 'required|array|min:1',
         ]);
 
         if ($validator->fails()) {
@@ -77,14 +84,16 @@ class RunPayrollController extends Controller
                 'errors'  => $validator->errors()
             ], 422);
         }
-
+        $tesContoh = Employee::where('status', 'Aktif')->get();
+        $ambildata = $tesContoh->pluck('id')->toArray();;
+        log::info('cek data 1: ' . json_encode($ambildata, JSON_PRETTY_PRINT));
         try {
             $user = Auth::user();
             $description = $request->input('description');
             $startDate = $request->input('start_date');
             $endDate = $request->input('end_date');
-            $employeeIds = $request->input('employee_ids');
-            
+            $employeeIds = $ambildata;
+
             $lockedPayrolls = PayrollHistory::where('start_periode', '<=', $endDate)
                 ->where('end_periode', '>=', $startDate)
                 ->where('locking', true)
@@ -101,16 +110,16 @@ class RunPayrollController extends Controller
 
             //Log::info("Description: $description, Start Date: $startDate, End Date: $endDate, Employee IDs: " . json_encode($employeeIds));
             $activeTransactions = MasterPayroll::where('efektif_date', '<=', $endDate)
-            ->where(function ($query) use ($startDate, $endDate) {
-                $query->whereNull('end_date')
-                    ->orWhereBetween('end_date', [$startDate, $endDate])
-                    ->orWhere('end_date', '>', $startDate);
-            })
-            ->with(['detailPayroll' => function ($query) use ($employeeIds) {
-                $query->whereIn('id_employee', $employeeIds)
-                    ->with(['employee', 'component']);
-            }])
-            ->get();
+                ->where(function ($query) use ($startDate, $endDate) {
+                    $query->whereNull('end_date')
+                        ->orWhereBetween('end_date', [$startDate, $endDate])
+                        ->orWhere('end_date', '>', $startDate);
+                })
+                ->with(['detailPayroll' => function ($query) use ($employeeIds) {
+                    $query->whereIn('id_employee', $employeeIds)
+                        ->with(['employee', 'component']);
+                }])
+                ->get();
 
             //Log::info("Active Transactions: " . json_encode($activeTransactions, JSON_PRETTY_PRINT));
 
@@ -133,34 +142,34 @@ class RunPayrollController extends Controller
                 $groupedData = $this->calculatePresensiAndSalaries($groupedData, $startDate, $endDate);
                 //Log::info("Grouped Data FINAL: " . json_encode($groupedData, JSON_PRETTY_PRINT));
 
-               foreach ($groupedData->first()['karyawan'] as $employeeData) {
-                $employeeId = $employeeData['karyawan']->id;
-            
-                if (!$combinedData->has($employeeId)) {
-                    $combinedData->put($employeeId, [
-                        'karyawan' => $employeeData['karyawan'],
-                        'components' => [
-                            'salary' => 0,
-                            'allowance' => [],
-                            'benefit' => [],
-                            'deduction' => [],
-                        ],
-                        'presensi' => [],
-                        'total_overtime' => 0,
-                        'total_pendapatan' => 0,
-                        'total_potongan' => 0,
-                        'gaji_bruto' => 0,
-                        'gaji_bersih' => 0,
-                    ]);
-                }
-            
-                $existingData = $combinedData->get($employeeId);
-            
-                // Update komponen salary
-                $existingData['components']['salary'] += $employeeData['components']['salary'];
-            
-                // Update allowance dan deduction
-                foreach (['allowance', 'deduction'] as $type) {
+                foreach ($groupedData->first()['karyawan'] as $employeeData) {
+                    $employeeId = $employeeData['karyawan']->id;
+
+                    if (!$combinedData->has($employeeId)) {
+                        $combinedData->put($employeeId, [
+                            'karyawan' => $employeeData['karyawan'],
+                            'components' => [
+                                'salary' => 0,
+                                'allowance' => [],
+                                'benefit' => [],
+                                'deduction' => [],
+                            ],
+                            'presensi' => [],
+                            'total_overtime' => 0,
+                            'total_pendapatan' => 0,
+                            'total_potongan' => 0,
+                            'gaji_bruto' => 0,
+                            'gaji_bersih' => 0,
+                        ]);
+                    }
+
+                    $existingData = $combinedData->get($employeeId);
+
+                    // Update komponen salary
+                    $existingData['components']['salary'] += $employeeData['components']['salary'];
+
+                    // Update allowance dan deduction
+                    foreach (['allowance', 'deduction'] as $type) {
                         foreach ($employeeData['components'][$type] as $key => $value) {
                             if (!isset($existingData['components'][$type][$key])) {
                                 $existingData['components'][$type][$key] = 0;
@@ -168,84 +177,83 @@ class RunPayrollController extends Controller
                             $existingData['components'][$type][$key] += $value;
                         }
                     }
-                
+
                     // Update total pendapatan dan potongan
                     $existingData['total_overtime'] += $employeeData['total_overtime'] ?? 0;
                     $existingData['total_pendapatan'] += $employeeData['total_pendapatan'] ?? 0;
                     $existingData['total_potongan'] += $employeeData['total_potongan'] ?? 0;
                     $existingData['gaji_bruto'] += $employeeData['gaji_bruto'] ?? 0;
                     $existingData['gaji_bersih'] += $employeeData['gaji_bersih'] ?? 0;
-                
+
                     // Group and merge presensi data by tanggal
                     $presensiGroupedByTanggal = collect($existingData['presensi'])
-                    ->mergeRecursive(collect($employeeData['presensi']))
-                    ->groupBy('tanggal')
-                    ->map(function ($items, $tanggal) {
-                        // Gabungkan semua presensi untuk tanggal yang sama
-                        $mergedPresence = [
-                            'tanggal' => $tanggal,
-                            'earnings' => [],
-                            'deductions' => [],
-                            'overtime' => [
-                                'overtime_hours' => "00:00:00",
-                                'overtime_earnings' => 0,
-                            ],
-                            'deduction_reason' => null,
-                        ];
+                        ->mergeRecursive(collect($employeeData['presensi']))
+                        ->groupBy('tanggal')
+                        ->map(function ($items, $tanggal) {
+                            // Gabungkan semua presensi untuk tanggal yang sama
+                            $mergedPresence = [
+                                'tanggal' => $tanggal,
+                                'earnings' => [],
+                                'deductions' => [],
+                                'overtime' => [
+                                    'overtime_hours' => "00:00:00",
+                                    'overtime_earnings' => 0,
+                                ],
+                                'deduction_reason' => null,
+                            ];
 
-                        // Variabel untuk total overtime dalam detik
-                        $totalOvertimeInSeconds = 0;
+                            // Variabel untuk total overtime dalam detik
+                            $totalOvertimeInSeconds = 0;
 
-                        foreach ($items as $item) {
-                            // Gabungkan earnings
-                            foreach ($item['earnings'] ?? [] as $key => $value) {
-                                if (!isset($mergedPresence['earnings'][$key])) {
-                                    $mergedPresence['earnings'][$key] = 0;
+                            foreach ($items as $item) {
+                                // Gabungkan earnings
+                                foreach ($item['earnings'] ?? [] as $key => $value) {
+                                    if (!isset($mergedPresence['earnings'][$key])) {
+                                        $mergedPresence['earnings'][$key] = 0;
+                                    }
+                                    $mergedPresence['earnings'][$key] += $value;
                                 }
-                                $mergedPresence['earnings'][$key] += $value;
-                            }
 
-                            // Gabungkan deductions
-                            foreach ($item['deductions'] ?? [] as $key => $value) {
-                                if (!isset($mergedPresence['deductions'][$key])) {
-                                    $mergedPresence['deductions'][$key] = 0;
+                                // Gabungkan deductions
+                                foreach ($item['deductions'] ?? [] as $key => $value) {
+                                    if (!isset($mergedPresence['deductions'][$key])) {
+                                        $mergedPresence['deductions'][$key] = 0;
+                                    }
+                                    $mergedPresence['deductions'][$key] += $value;
                                 }
-                                $mergedPresence['deductions'][$key] += $value;
+
+                                // Gabungkan overtime
+                                if (!empty($item['overtime']['overtime_hours'])) {
+                                    [$hours, $minutes, $seconds] = array_map('intval', explode(':', $item['overtime']['overtime_hours']));
+                                    $totalOvertimeInSeconds += ($hours * 3600) + ($minutes * 60) + $seconds;
+                                }
+                                $mergedPresence['overtime']['overtime_earnings'] += $item['overtime']['overtime_earnings'] ?? 0;
+
+                                // Ambil alasan deduksi jika ada
+                                if (!empty($item['deduction_reason']) && empty($mergedPresence['deduction_reason'])) {
+                                    $mergedPresence['deduction_reason'] = $item['deduction_reason'];
+                                }
                             }
 
-                            // Gabungkan overtime
-                            if (!empty($item['overtime']['overtime_hours'])) {
-                                [$hours, $minutes, $seconds] = array_map('intval', explode(':', $item['overtime']['overtime_hours']));
-                                $totalOvertimeInSeconds += ($hours * 3600) + ($minutes * 60) + $seconds;
-                            }
-                            $mergedPresence['overtime']['overtime_earnings'] += $item['overtime']['overtime_earnings'] ?? 0;
+                            // Konversi total overtime menjadi format HH:mm:ss
+                            $hours = floor($totalOvertimeInSeconds / 3600);
+                            $minutes = floor(($totalOvertimeInSeconds % 3600) / 60);
+                            $seconds = $totalOvertimeInSeconds % 60;
+                            $mergedPresence['overtime']['overtime_hours'] = sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
 
-                            // Ambil alasan deduksi jika ada
-                            if (!empty($item['deduction_reason']) && empty($mergedPresence['deduction_reason'])) {
-                                $mergedPresence['deduction_reason'] = $item['deduction_reason'];
-                            }
-                        }
+                            return $mergedPresence;
+                        })
+                        ->values()
+                        ->all();
 
-                        // Konversi total overtime menjadi format HH:mm:ss
-                        $hours = floor($totalOvertimeInSeconds / 3600);
-                        $minutes = floor(($totalOvertimeInSeconds % 3600) / 60);
-                        $seconds = $totalOvertimeInSeconds % 60;
-                        $mergedPresence['overtime']['overtime_hours'] = sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
-
-                        return $mergedPresence;
-                    })
-                    ->values()
-                    ->all();
-
-                $existingData['presensi'] = $presensiGroupedByTanggal;
+                    $existingData['presensi'] = $presensiGroupedByTanggal;
 
                     $combinedData->put($employeeId, $existingData);
                 }
-            
             }
 
             //Log::info("Combined Data First: " . json_encode($combinedData, JSON_PRETTY_PRINT));
-            $this->insertCombinedPayrollData($combinedData, $startDate, $endDate , $description, $user);
+            $this->insertCombinedPayrollData($combinedData, $startDate, $endDate, $description, $user);
 
             return response()->json(['success' => true, 'message' => 'Payroll process completed successfully.']);
         } catch (\Exception $e) {

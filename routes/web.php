@@ -182,6 +182,7 @@ Route::group(['prefix' => 'run-payroll', 'middleware' => 'auth'], function () {
 	Route::get('/employee', [RunPayrollController::class, 'employee'])->name('runpayroll.employee');
 	Route::get('/get-selected-employees', [RunPayrollController::class, 'getSelectedEmployees'])->name('runpayroll.employee');
 	Route::post('/store-employee', [RunPayrollController::class, 'storeselectkar'])->name('runpayroll.storeselectkar');
+	Route::get('/employee-list', [RunPayrollController::class, 'getEmployeeList'])->name('runpayroll.getlist');
 });
 
 Route::group(['prefix' => 'history-payroll', 'middleware' => 'auth'], function () {
