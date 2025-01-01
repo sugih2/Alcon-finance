@@ -41,13 +41,13 @@
             <option value="position" selected>Select Position</option>
         </select>
     </div>
-    <div class="form-group">
+    {{-- <div class="form-group">
         <label for="status">Status</label>
         <select class="form-control" id="status" name="status">
             <option value="Aktif" {{ $employee->status == 'Aktif' ? 'selected' : '' }}>Aktif</option>
             <option value="NonAktif" {{ $employee->status == 'NonAktif' ? 'selected' : '' }}>NonAktif</option>
         </select>
-    </div>
+    </div> --}}
     <button type="button" id="btn-submit" onclick="StoreEditEmployee({{ $employee->id }})" class="btn btn-primary">Simpan</button>
 </form>
 

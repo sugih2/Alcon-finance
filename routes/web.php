@@ -105,6 +105,7 @@ Route::group(['prefix' => 'employee', 'middleware' => 'auth'], function () {
 	Route::get('/create', [EmployeeController::class, 'create'])->name('employee.create');
 	Route::get('/edit/{id}', [EmployeeController::class, 'edit'])->name('employee.edit');
 	Route::post('/update/{id}', [EmployeeController::class, 'update'])->name('employee.update');
+    Route::post('/update-status/{id}', [EmployeeController::class, 'updateStatus'])->name('employee.update-status');
 	Route::get('/list', [EmployeeController::class, 'list'])->name('employee.list');
 	Route::get('/list/pekerja', [EmployeeController::class, 'list_pekerja'])->name('employee.list-member');
 	Route::get('/list/kepala-pekerja', [EmployeeController::class, 'list_kepala_pekerja'])->name('employee.list-kepala-pekerja');

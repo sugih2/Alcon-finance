@@ -26015,6 +26015,16 @@ pre[class*="language-"] {
     width: 11px;
 }
 
+/* .form-switch .form-check-input {
+    width: 3em;
+    cursor: pointer;
+}
+
+.form-switch .form-check-input:checked {
+    background-color: #198754;
+    border-color: #198754;
+} */
+
 /* MS supports */
 @supports (-ms-overflow-style: none) {
     .ps {
