@@ -43,7 +43,7 @@ class EmployeeController extends Controller
             'email' => "email|unique:employees,email,$id",
             'phone' => 'max:13',
             'position' => 'integer',
-            'status' => 'in:Aktif,NonAktif',
+            // 'status' => 'in:Aktif,NonAktif',
         ]);
 
         if ($validator->fails()) {
@@ -66,7 +66,7 @@ class EmployeeController extends Controller
                 'email' => $request->email,
                 'phone' => $request->phone,
                 'position_id' => $request->position,
-                'status' => $request->status,
+                // 'status' => $request->status,
             ]);
 
             return response()->json([
@@ -82,6 +82,40 @@ class EmployeeController extends Controller
             ], 500);
         }
     }
+
+    public function updateStatus(Request $request, $id)
+{
+    try {
+        $validator = Validator::make($request->all(), [
+            'status' => 'required|in:Aktif,NonAktif',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $employee = Employee::findOrFail($id);
+        $employee->status = $request->status;
+        $employee->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Status berhasil diubah',
+            'data' => $employee
+        ]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Terjadi kesalahan',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
 
 
     public function storeEdit($id)
