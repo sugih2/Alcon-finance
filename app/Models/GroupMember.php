@@ -17,4 +17,9 @@ class GroupMember extends Model
     {
         return $this->belongsTo(Group::class);
     }
+
+    public function member()
+    {
+        return $this->belongsTo(Employee::class, 'member_id');
+    }
 }

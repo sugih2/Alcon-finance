@@ -92,10 +92,66 @@ class PayrollHistoryController extends Controller
                 'groups' => $groups,
             ]);
         } catch (\Exception $e) {
-            Log::error("Error fetching payroll history detail: " . $e->getMessage());
+            Log::error("Error fetching group totals: " . $e->getMessage(), ['exception' => $e]);
+
             return redirect()->back()->with('error', 'Data tidak ditemukan.');
         }
     }
+
+    public function showGroupDetails($payrollHistoryId, $groupId)
+    {
+        try {
+            // Fetching group with payroll history details
+            $group = Group::with([
+                'leader',
+                'members.member',
+                'members.member.payrollHistoryDetails' => function ($query) use ($payrollHistoryId) {
+                    // Filter payroll details by the provided payroll history ID
+                    $query->where('id_payroll_history', $payrollHistoryId);
+                }
+            ])->findOrFail($groupId);
+
+            // Prepare result to pass to the view
+            $result = [
+                'group_name' => $group->name,
+                'group_code' => $group->code,
+                'leader' => $group->leader ? $group->leader->name : null,
+                'members' => $group->members->map(function ($member) {
+                    return [
+                        'employee_name' => $member->member->name,
+                        'employee_nip' => $member->member->nip,
+                        'payroll_details' => $member->member->payrollHistoryDetails->map(function ($payroll) {
+                            return [
+                                'salary' => $payroll->salary,
+                                'allowance' => json_decode($payroll->allowance, true) ?? [],
+                                'deduction' => json_decode($payroll->deduction, true) ?? [],
+                                'total_pendapatan' => $payroll->total_pendapatan,
+                                'total_overtime' => $payroll->total_overtime,
+                                'total_potongan' => $payroll->total_potongan,
+                                'gaji_bruto' => $payroll->gaji_bruto,
+                                'gaji_bersih' => $payroll->gaji_bersih,
+                            ];
+                        }),
+                    ];
+                }),
+            ];
+
+            Log::info("Group Details", ['Details Group' => json_encode($result, JSON_PRETTY_PRINT)]);
+            // Return the result to the view
+            return view('pages.payroll_history.detail', compact('result'));
+        } catch (\Exception $e) {
+            // Log any errors that occur and redirect back with an error message
+            Log::error("Error fetching group details: " . $e->getMessage());
+            return redirect()->back()->with('error', 'Data tidak ditemukan.');
+        }
+    }
+
+
+
+
+
+
+
 
 
     public function showAttendanceDetails($idPayrollHistoryDetail)

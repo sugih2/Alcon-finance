@@ -1,13 +1,13 @@
 @extends('../layouts.app')
 
 @section('content')
-    @include('../layouts.navbars.auth.topnav', ['title' => 'Payroll History Detail'])
+    @include('../layouts.navbars.auth.topnav', ['title' => 'Payroll History Employee'])
     @include('sweetalert::alert')
     <div class="row mt-4 mx-4">
         <div class="col-md-12">
             <div class="card mb-4">
                 <div class="card-header pb-0 d-flex justify-content-between align-items-center">
-                    <h6>Payroll History Detail</h6>
+                    <h6>Payroll History Employee</h6>
                 </div>
                 <div class="card-body px-0 pt-0 pb-2">
                     <div class="container">
@@ -15,116 +15,96 @@
 
                             <table class="table">
                                 <tr>
-                                    <th>ID Transaksi</th>
-                                    <td>{{ $payrollHistoryDetail->id_transaksi_payment }}</td>
+                                    <th>Group Name</th>
+                                    <td>{{ $result['group_name'] }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Periode</th>
-                                    <td>{{ $payrollHistoryDetail->start_periode }} -
-                                        {{ $payrollHistoryDetail->end_periode }}</td>
+                                    <th>Group Code</th>
+                                    <td>{{ $result['group_code'] }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Total Karyawan</th>
-                                    <td>{{ $payrollHistoryDetail->total_karyawan }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Jumlah Transaksi</th>
-                                    <td>Rp. {{ number_format($payrollHistoryDetail->amount_transaksi, 0, ',', '.') }}
-                                    </td>
+                                    <th>Leader</th>
+                                    <td>{{ $result['leader'] ?? '-' }}</td>
                                 </tr>
                             </table>
-                            <table class="table align-items-center mb-0" id="PayrollHistoryDetailTable">
+
+                            <table class="table align-items-center mb-0">
                                 <thead>
                                     <tr>
-                                        <th
-                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                            No
-                                        </th>
-                                        {{-- <th
-                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                            No Transaction
-                                        </th> --}}
-                                        <th
-                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                            Name</th>
-                                        <th
-                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                            Salary</th>
-                                        <th
-                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                            Allowance</th>
-                                        <th
-                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                            Deduction</th>
-                                        <th
-                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                            Overtime</th>
-                                        <th
-                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                            Total Incomes</th>
-                                        <th
-                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                            Total Deductions</th>
-                                        <th
-                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                            Gross Salary</th>
-                                        <th
-                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                            Net Salary</th>
-                                        <th
-                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                            Action</th>
+                                        <th>No</th>
+                                        <th>Member Name</th>
+                                        <th>Member NIP</th>
+                                        <th>Salary</th>
+                                        <th>Allowance</th>
+                                        <th>Deduction</th>
+                                        <th>Total Incomes</th>
+                                        <th>Total Overtime</th>
+                                        <th>Total Deductions</th>
+                                        <th>Gross Salary</th>
+                                        <th>Net Salary</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @php $index = 1; @endphp
-                                    @foreach ($payrollHistoryDetail->detailPayroll as $index => $detail)
+                                    @foreach ($result['members'] as $member)
+                                        @php
+                                            $payrollDetails = $member['payroll_details'];
+                                            $rowSpan = count($payrollDetails) > 0 ? count($payrollDetails) : 1;
+                                        @endphp
                                         <tr>
-                                            <td>{{ $index + 1 }}</td>
-                                            {{-- <td>{{ $detail->id_transaksi_payment ?? '-' }}</td> --}}
-                                            <td>{{ $detail->employee->name ?? '-' }}</td>
-                                            <td>Rp. {{ number_format($detail->salary, 0, ',', '.') }}</td>
-                                            <td>
-                                                @if (!empty($detail->allowance))
-                                                    <ul>
-                                                        @foreach ($detail->allowance as $allowance)
-                                                            <li>
-                                                                {{ $allowance['nama'] }}:
-                                                                {{ number_format($allowance['nilai'], 0, ',', '.') }}
-                                                            </li>
-                                                        @endforeach
-                                                    </ul>
-                                                @else
-                                                    -
-                                                @endif
-                                            </td>
-                                            <td>
-                                                @if (!empty($detail->deduction))
-                                                    <ul>
-                                                        @foreach ($detail->deduction as $deduction)
-                                                            <li>{{ $deduction['nama'] }}:
-                                                                Rp.
-                                                                {{ number_format($deduction['nilai'], 0, ',', '.') }}
-                                                            </li>
-                                                        @endforeach
-                                                    </ul>
-                                                @else
-                                                    -
-                                                @endif
-                                            </td>
-                                            <td>Rp. {{ number_format($detail->total_overtime, 0, ',', '.') }}</td>
-                                            <td>Rp. {{ number_format($detail->total_pendapatan, 0, ',', '.') }}</td>
-                                            <td>Rp. {{ number_format($detail->total_potongan, 0, ',', '.') }}</td>
-                                            <td>Rp. {{ number_format($detail->gaji_bruto, 0, ',', '.') }}</td>
-                                            <td>Rp. {{ number_format($detail->gaji_bersih, 0, ',', '.') }}</td>
-                                            <td>
-                                                <button type="button" class="btn btn-primary btn-sm mb-0"
-                                                    onclick="detailAttendance({{ $detail->id }})">Detail</button>
-                                            </td>
+                                            <td rowspan="{{ $rowSpan }}">{{ $index++ }}</td>
+                                            <td rowspan="{{ $rowSpan }}">{{ $member['employee_name'] }}</td>
+                                            <td rowspan="{{ $rowSpan }}">{{ $member['employee_nip'] }}</td>
+
+                                            @if (!empty($payrollDetails))
+                                                @foreach ($payrollDetails as $key => $payroll)
+                                                    @if ($key > 0)
+                                        <tr>
+                                    @endif
+                                    <td>Rp. {{ number_format($payroll['salary'], 0, ',', '.') }}</td>
+                                    <td>
+                                        @if (!empty($payroll['allowance']))
+                                            <ul>
+                                                @foreach ($payroll['allowance'] as $allowance)
+                                                    <li>{{ $allowance['nama'] }}: Rp.
+                                                        {{ number_format($allowance['nilai'], 0, ',', '.') }}</li>
+                                                @endforeach
+                                            </ul>
+                                        @else
+                                            -
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if (!empty($payroll['deduction']))
+                                            <ul>
+                                                @foreach ($payroll['deduction'] as $deduction)
+                                                    <li>{{ $deduction['nama'] }}: Rp.
+                                                        {{ number_format($deduction['nilai'], 0, ',', '.') }}</li>
+                                                @endforeach
+                                            </ul>
+                                        @else
+                                            -
+                                        @endif
+                                    </td>
+                                    <td>Rp. {{ number_format($payroll['total_pendapatan'], 0, ',', '.') }}</td>
+                                    <td>Rp. {{ number_format($payroll['total_overtime'], 0, ',', '.') }}</td>
+                                    <td>Rp. {{ number_format($payroll['total_potongan'], 0, ',', '.') }}</td>
+                                    <td>Rp. {{ number_format($payroll['gaji_bruto'], 0, ',', '.') }}</td>
+                                    <td>Rp. {{ number_format($payroll['gaji_bersih'], 0, ',', '.') }}</td>
+                                    @if ($key > 0)
                                         </tr>
+                                    @endif
+                                    @endforeach
+                                @else
+                                    <td colspan="8" class="text-center">No Payroll Details</td>
+                                    @endif
+                                    </tr>
                                     @endforeach
                                 </tbody>
                             </table>
+
+
+
                         </div>
                     </div>
                 </div>
