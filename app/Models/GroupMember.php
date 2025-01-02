@@ -12,4 +12,9 @@ class GroupMember extends Model
         'group_id',
         'member_id'
     ];
+
+    public function member()
+    {
+        return $this->belongsTo(Employee::class, 'member_id');
+    }
 }
