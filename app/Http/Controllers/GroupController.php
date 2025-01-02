@@ -64,6 +64,16 @@ class GroupController extends Controller
         DB::beginTransaction(); // Mulai transaksi
 
         try {
+            // Cek apakah leader_id sudah ada di grup lain
+            $groupExist = Group::where('leader_id', $request->leader)->exists();
+
+            if ($groupExist) {
+                // Jika leader_id sudah ada, kembalikan response error
+                return response()->json([
+                    'error' => 'Leader Grup Sudah ada.'
+                ], 400);
+            }
+
             // Buat dan simpan data grup
             $group = Group::create([
                 'name' => $request->name,
@@ -74,6 +84,24 @@ class GroupController extends Controller
 
             // Log data grup yang berhasil disimpan
             Log::info("Berhasil Menyimpan Group: " . json_encode($group));
+
+            // Cek apakah anggota sudah ada di grup lain
+            foreach ($request->members as $member_id) {
+                // Periksa apakah anggota sudah terdaftar di grup lain
+                $memberInOtherGroup = GroupMember::where('member_id', $member_id)
+                    ->whereHas('group', function ($query) use ($request) {
+                        // Memastikan grup yang memiliki member_id bukan grup yang baru saja dibuat
+                        $query->where('leader_id', '!=', $request->leader);
+                    })
+                    ->exists();
+
+                if ($memberInOtherGroup) {
+                    // Jika anggota sudah ada di grup lain
+                    return response()->json([
+                        'error' => 'Anggota sudah terdaftar di grup lain.'
+                    ], 400);
+                }
+            }
 
             // Simpan anggota ke dalam tabel GroupMember
             foreach ($request->members as $member_id) {
@@ -103,6 +131,7 @@ class GroupController extends Controller
             ], 500);
         }
     }
+
 
     public function ListGroup($id)
     {

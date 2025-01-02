@@ -56,6 +56,10 @@
                                             <td>{{ $e->description }}</td>
 
                                             <td class="align-middle text-end">
+                                                {{-- <button type="button" class="btn btn-link text-info mb-0"
+                                                    onclick="window.location.href='{{ route('historypayroll.listGroup' )}}'">
+                                                    Detail
+                                                </button> --}}
                                                 <button type="button" class="btn btn-link text-info mb-0"
                                                     onclick="window.location.href='{{ route('historypayrollDetail.index', ['id' => $e->id]) }}'">
                                                     Detail

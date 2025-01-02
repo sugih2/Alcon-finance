@@ -20,11 +20,11 @@
                                         </th>
                                         <th
                                             class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                            No Transaction
+                                            Nama Group
                                         </th>
                                         <th
                                             class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                            Periode</th>
+                                            Nama Leader</th>
                                         <th
                                             class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                             Amount</th>
@@ -33,27 +33,18 @@
                                             Total Karyawan</th>
                                         <th
                                             class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                            Status</th>
-                                        <th
-                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                            Description</th>
-                                        <th
-                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                             Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @php $index = 1; @endphp
-                                    @foreach ($payrollHistories as $e)
+                                    @foreach ($listGroup as $e)
                                         <tr>
                                             <td class="align-middle text-center">{{ $index++ }}</td>
-                                            <td>{{ $e->id_transaksi_payment }}</td>
-                                            <td>{{ \Carbon\Carbon::parse($e->start_periode)->format('d F') }} -
-                                                {{ \Carbon\Carbon::parse($e->end_periode)->format('d F Y') }}</td>
-                                            <td>Rp {{ number_format($e->amount_transaksi, 0, ',', '.') }}</td>
-                                            <td>{{ $e->total_karyawan }}</td>
-                                            <td>{{ $e->status_payroll }}</td>
-                                            <td>{{ $e->description }}</td>
+                                            <td>{{ $e->name }}</td>
+                                            <td>{{ $e->leader->name }}</td>
+                                            <td>RP</td>
+                                            <td>0</td>
 
                                             <td class="align-middle text-end">
                                                 <button type="button" class="btn btn-link text-info mb-0"

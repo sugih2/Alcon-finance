@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\DB;
+
 use Illuminate\Http\Request;
 use App\Models\PayrollHistory;
 use App\Models\PayrollHistoryDetail;
 use App\Models\AttendanceDetail;
+use App\Models\Group;
 use Illuminate\Support\Facades\Log;
 
 class PayrollHistoryController extends Controller
@@ -18,39 +21,37 @@ class PayrollHistoryController extends Controller
         return view('pages.payroll_history.index', compact('payrollHistories'));
     }
 
-    public function showMasterDetails($id)
+    public function showListGroup()
     {
-        $detailMaster = PayrollHistoryDetail::find($id);
+        $listGroup = Group::get();
+
+        return view('pages.payroll_history.MasterDetail', compact('listGroup'));
     }
 
     public function showDetails($id)
     {
-        $detailMaster = PayrollHistoryDetail::where('id_payroll_history', $id)->get();
-
-        log::info('cek history' . json_encode($detailMaster, JSON_PRETTY_PRINT));
         try {
             // Ambil data payroll history dengan relasi
             $payrollHistoryDetail = PayrollHistory::with(['detailPayroll.employee'])
                 ->findOrFail($id);
 
+            Log::info('cek history' . json_encode($payrollHistoryDetail, JSON_PRETTY_PRINT));
+
             // Ubah allowance dan deduction menjadi array jika berbentuk JSON
             foreach ($payrollHistoryDetail->detailPayroll as $detail) {
-                // Pastikan allowance dalam bentuk array
+                // Allowance
                 $allowanceData = is_string($detail->allowance)
                     ? json_decode($detail->allowance, true)
                     : $detail->allowance;
 
-                // Bersihkan nilai allowance jika ada
                 if (is_array($allowanceData)) {
                     foreach ($allowanceData as $key => $allowance) {
                         $allowanceData[$key]['nilai'] = (float) str_replace('.', '', $allowance['nilai']);
                     }
                 }
-
-                // Tetapkan allowance yang sudah diperbarui kembali ke properti
                 $detail->allowance = $allowanceData;
 
-                // Lakukan hal yang sama untuk deduction jika diperlukan
+                // Deduction
                 $deductionData = is_string($detail->deduction)
                     ? json_decode($detail->deduction, true)
                     : $detail->deduction;
@@ -60,22 +61,42 @@ class PayrollHistoryController extends Controller
                         $deductionData[$key]['nilai'] = (float) str_replace('.', '', $deduction['nilai']);
                     }
                 }
-
                 $detail->deduction = $deductionData;
             }
 
+            // Ambil semua employee_id dari detail payroll
+            $employeeIds = $payrollHistoryDetail->detailPayroll->pluck('employee_id');
 
+            // Ambil data grup berdasarkan employee_id
+            $groups = DB::table('groups')
+                ->join('group_members', 'groups.id', '=', 'group_members.group_id')
+                ->whereIn('group_members.member_id', $employeeIds)
+                ->select('groups.id as group_id', 'groups.name as group_name', 'group_members.member_id as employee_id')
+                ->get()
+                ->groupBy('group_id');
 
-            // Log detail data untuk debugging
-            Log::info("Payroll History Detail: ", ['data' => $payrollHistoryDetail]);
+            // Tambahkan karyawan yang tidak memiliki grup ke dalam "no_group"
+            $noGroup = $payrollHistoryDetail->detailPayroll
+                ->filter(function ($detail) use ($groups) {
+                    return !$groups->pluck('employee_id')->flatten()->contains($detail->employee_id);
+                });
+
+            $groups['no_group'] = $noGroup;
+
+            // Log untuk debugging
+            Log::info("Grouped Payroll Details" . json_encode($groups, JSON_PRETTY_PRINT));
 
             // Kirim data ke view
-            return view('pages.payroll_history.detail', compact('payrollHistoryDetail'));
+            return view('pages.payroll_history.detail', [
+                'payrollHistoryDetail' => $payrollHistoryDetail,
+                'groups' => $groups,
+            ]);
         } catch (\Exception $e) {
             Log::error("Error fetching payroll history detail: " . $e->getMessage());
             return redirect()->back()->with('error', 'Data tidak ditemukan.');
         }
     }
+
 
     public function showAttendanceDetails($idPayrollHistoryDetail)
     {

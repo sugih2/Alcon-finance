@@ -84,38 +84,37 @@ class EmployeeController extends Controller
     }
 
     public function updateStatus(Request $request, $id)
-{
-    try {
-        $validator = Validator::make($request->all(), [
-            'status' => 'required|in:Aktif,NonAktif',
-        ]);
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'status' => 'required|in:Aktif,NonAktif',
+            ]);
 
-        if ($validator->fails()) {
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validasi gagal',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $employee = Employee::findOrFail($id);
+            $employee->status = $request->status;
+            $employee->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Status berhasil diubah',
+                'data' => $employee
+            ]);
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validasi gagal',
-                'errors' => $validator->errors()
-            ], 422);
+                'message' => 'Terjadi kesalahan',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        $employee = Employee::findOrFail($id);
-        $employee->status = $request->status;
-        $employee->save();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Status berhasil diubah',
-            'data' => $employee
-        ]);
-
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Terjadi kesalahan',
-            'error' => $e->getMessage()
-        ], 500);
     }
-}
 
 
     public function storeEdit($id)
@@ -202,10 +201,13 @@ class EmployeeController extends Controller
     {
         $employees = Employee::whereHas('position.paramPosition', function ($query) {
             $query->where('name', 'PEKERJA');
-        })->get();
+        })
+            ->orderBy('name', 'asc')  // Mengurutkan berdasarkan nama karyawan dari A-Z
+            ->get();
 
         return response()->json($employees);
     }
+
 
     public function list_kepala_pekerja()
     {
