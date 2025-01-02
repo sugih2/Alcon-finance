@@ -24,4 +24,9 @@ class Group extends Model
     {
         return $this->belongsTo(Employee::class, 'leader_id');
     }
+
+    public function members()
+    {
+        return $this->hasMany(GroupMember::class, 'group_id');
+    }
 }

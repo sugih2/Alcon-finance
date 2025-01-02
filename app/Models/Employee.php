@@ -24,9 +24,9 @@ class Employee extends Model
     {
         return $this->belongsTo(Position::class);
     }
-
-    // public function ()
-    // {
-    //     return $this->belongsTo(Position::class);
-    // }
+    
+    public function payrollHistoryDetails()
+    {
+        return $this->hasMany(PayrollHistoryDetail::class, 'employee_id');
+    }
 }

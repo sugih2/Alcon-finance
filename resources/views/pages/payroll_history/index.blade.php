@@ -57,19 +57,19 @@
 
                                             <td class="align-middle text-end">
                                                 <button type="button" class="btn btn-link text-info mb-0"
-                                                    onclick="window.location.href='{{ route('historypayrollDetail.index', ['id' => $e->id]) }}'">
-                                                    Detail
+                                                    onclick="window.location.href='{{ route('historypayrollGroup.index', ['id' => $e->id]) }}'">
+                                                    Detail Group
                                                 </button>
                                                 <button class="btn btn-sm"
                                                     onclick="locking({{ $e->id }}, {{ $e->locking }}, '{{ $e->start_periode }}', '{{ $e->end_periode }}')">
                                                     <i>
                                                         {!! $e->locking
                                                             ? '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-lock-fill" viewBox="0 0 16 16">
-                                                                                                                                                                                           <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2m3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2"/>
-                                                                                                                                                                                       </svg>'
+                                                                                                                                                                                                                                                                                                                                                                   <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2m3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2"/>
+                                                                                                                                                                                                                                                                                                                                                               </svg>'
                                                             : '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-unlock-fill" viewBox="0 0 16 16">
-                                                                                                                                                                                           <path d="M11 1a2 2 0 0 0-2 2v4a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h5V3a3 3 0 0 1 6 0v4a.5.5 0 0 1-1 0V3a2 2 0 0 0-2-2"/>
-                                                                                                                                                                                       </svg>' !!}
+                                                                                                                                                                                                                                                                                                                                                                   <path d="M11 1a2 2 0 0 0-2 2v4a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h5V3a3 3 0 0 1 6 0v4a.5.5 0 0 1-1 0V3a2 2 0 0 0-2-2"/>
+                                                                                                                                                                                                                                                                                                                                                               </svg>' !!}
                                                     </i>
                                                 </button>
                                             </td>
@@ -165,6 +165,27 @@
                 }
             });
         }
+
+        // function DetailPayroll(id) {
+        //     console.log('Detail Payroll');
+        //     $.ajax({
+        //         url: "{{ url('/history-payroll/detail') }}/" + id,
+        //         type: 'GET',
+        //         dataType: 'html',
+        //         success: function(data) {
+        //             $("#detailPayroll").html(data);
+        //             $('#DetailPayrollModal').modal('show');
+        //         },
+        //         error: function() {
+        //             Swal.fire({
+        //                 icon: 'error',
+        //                 title: 'Error',
+        //                 text: 'Failed to open Detail form. Please try again later.',
+        //                 confirmButtonText: 'OK'
+        //             });
+        //         }
+        //     });
+        // }
 
         function createEmployee() {
             $.ajax({
