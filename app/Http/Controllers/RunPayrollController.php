@@ -55,9 +55,9 @@ class RunPayrollController extends Controller
         // })->get();
         // log::info('cek data 1: ' . json_encode($detailPayrolls, JSON_PRETTY_PRINT));
         $selectedEmployeeIds = session('selected_employee_ids', []);
-        $tesContoh = Employee::where('status', 'Aktif')->get();
+        $tesContoh = Employee::get();
         $ambildata = $tesContoh->pluck('id_employee')->toArray();
-        // log::info('cek data 2: ' . json_encode($selectedEmployeeIds, JSON_PRETTY_PRINT));
+        log::info('cek data 2: ' . json_encode($ambildata, JSON_PRETTY_PRINT));
         $employees = Employee::whereIn('id', $ambildata)->get();
 
         return response()->json([
@@ -84,10 +84,10 @@ class RunPayrollController extends Controller
                 'errors'  => $validator->errors()
             ], 422);
         }
-        $tesContoh = Employee::where('status', 'Aktif')->get();
-        $ambildata = $tesContoh->pluck('id')->toArray();;
-        log::info('cek data 1: ' . json_encode($ambildata, JSON_PRETTY_PRINT));
         try {
+            $tesContoh = Employee::where('status', 'Aktif')->get();
+            $ambildata = $tesContoh->pluck('id')->toArray();;
+            log::info('cek data 1: ' . json_encode($ambildata, JSON_PRETTY_PRINT));
             $user = Auth::user();
             $description = $request->input('description');
             $startDate = $request->input('start_date');
@@ -359,7 +359,7 @@ class RunPayrollController extends Controller
 
     private function insertCombinedPayrollData($combinedData, $startDate, $endDate, $description, $user)
     {
-        //Log::info("Combined Dataaaaa: " . json_encode($combinedData, JSON_PRETTY_PRINT));
+        Log::info("Combined Dataaaaa: " . json_encode($combinedData, JSON_PRETTY_PRINT));
 
         DB::beginTransaction();
 
