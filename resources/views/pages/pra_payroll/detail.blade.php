@@ -33,13 +33,15 @@
                                             <td>
                                                 <button class="btn btn-sm btn-primary" onclick="toggleComponents({{ $id_employee }})">Lihat Komponen</button>
                                             </td>
-                                            <tr class="detail-row" id="detail-row-{{ $id_employee }}" style="display: none;">
-                                                <td colspan="4">
+                                        </tr>
+
+                                            <tr class="detail-row1" id="detail-row-{{ $id_employee }}" style="display: none;">
+                                                <td colspan="3">
                                                     <div class="card-body">
-                                                    <table class="table table-borderless">
+                                                    <table class="table table-borderlesssss">
                                                         <thead>
                                                             <tr>
-                                                               <th>Id Transaksi</th>
+                                                               <td>Id Transaksi</td>
                                                                 <th>Nama Komponen</th>
                                                                 <th>Jumlah</th>
                                                                 <th>Action</th>
@@ -65,7 +67,6 @@
                                                     </div>
                                                 </td>
                                             </tr>
-                                        </tr>
                                     @endforeach
                                 </tbody>
                             </table>

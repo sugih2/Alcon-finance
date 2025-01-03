@@ -90,7 +90,13 @@ body {
     -webkit-text-size-adjust: 100%;
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
-
+.detail-row {
+    display: none;
+    transition: all 0.3s ease;
+}
+.detail-row.d-none {
+    display: table-row;
+}
 hr {
     margin: 1rem 0;
     color: inherit;
@@ -2471,7 +2477,17 @@ progress {
 .table-borderless > :not(:first-child) {
     border-top-width: 0;
 }
+.table-borderlesssss, .table-borderlesssss thead, .table-borderlesssss tbody, .table-borderlesssss th, .table-borderlesssss td {
+    border: none !important;
+}
 
+/* Mengatur border-collapse untuk tabel */
+.table-borderlesssss {
+    border-collapse: collapse;
+}
+/* .table-borderlesss {
+    border: none;
+} */
 .table-striped > tbody > tr:nth-of-type(odd) > * {
     --bs-table-accent-bg: var(--bs-table-striped-bg);
     color: var(--bs-table-striped-color);
@@ -8177,13 +8193,7 @@ fieldset:disabled .btn {
 .h-auto {
     height: auto !important;
 }
-.table-borderless tbody tr td {
-    border: none;
-}
-.table-borderlesss {
-    border: none;
-    width: "100000px";
-}
+
 .mh-100 {
     max-height: 100% !important;
 }
