@@ -43,7 +43,7 @@ class EmployeeController extends Controller
             'email' => "email|unique:employees,email,$id",
             'phone' => 'max:13',
             'position' => 'integer',
-            'status' => 'in:Aktif,NonAktif',
+            // 'status' => 'in:Aktif,NonAktif',
         ]);
 
         if ($validator->fails()) {
@@ -66,7 +66,7 @@ class EmployeeController extends Controller
                 'email' => $request->email,
                 'phone' => $request->phone,
                 'position_id' => $request->position,
-                'status' => $request->status,
+                // 'status' => $request->status,
             ]);
 
             return response()->json([
@@ -79,6 +79,39 @@ class EmployeeController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Gagal Edit Setting Shift',
+            ], 500);
+        }
+    }
+
+    public function updateStatus(Request $request, $id)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'status' => 'required|in:Aktif,NonAktif',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validasi gagal',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $employee = Employee::findOrFail($id);
+            $employee->status = $request->status;
+            $employee->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Status berhasil diubah',
+                'data' => $employee
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan',
+                'error' => $e->getMessage()
             ], 500);
         }
     }
@@ -160,7 +193,7 @@ class EmployeeController extends Controller
 
     public function list()
     {
-        $employees = Employee::select('id', 'name', 'nip','status')->get();
+        $employees = Employee::select('id', 'name', 'nip', 'status')->get();
         return response()->json($employees);
     }
 
@@ -168,10 +201,13 @@ class EmployeeController extends Controller
     {
         $employees = Employee::whereHas('position.paramPosition', function ($query) {
             $query->where('name', 'PEKERJA');
-        })->get();
+        })
+            ->orderBy('name', 'asc')  // Mengurutkan berdasarkan nama karyawan dari A-Z
+            ->get();
 
         return response()->json($employees);
     }
+
 
     public function list_kepala_pekerja()
     {
@@ -193,7 +229,7 @@ class EmployeeController extends Controller
         //Log::info("Request: " . json_encode($request->all()));
 
         $employees = Employee::with(['position:id,name'])
-            ->select('id', 'name', 'nip', 'position_id','status')
+            ->select('id', 'name', 'nip', 'position_id', 'status')
             ->orderBy('name', 'asc')
             ->distinct()
             ->get();
@@ -205,10 +241,9 @@ class EmployeeController extends Controller
                 'nama_lengkap' => $employee->name,
                 'nomor_induk_karyawan' => $employee->nip,
                 'jabatan_nama' => $employee->position->name,
-                'statu' => $employee->status
+                'status' => $employee->status
             ];
         });
-        log::info("CEK " , $employees);
         return response()->json($employees);
     }
 }

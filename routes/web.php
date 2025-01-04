@@ -127,6 +127,7 @@ Route::group(['prefix' => 'employee', 'middleware' => 'auth'], function () {
 	Route::get('/create', [EmployeeController::class, 'create'])->name('employee.create');
 	Route::get('/edit/{id}', [EmployeeController::class, 'edit'])->name('employee.edit');
 	Route::post('/update/{id}', [EmployeeController::class, 'update'])->name('employee.update');
+	Route::post('/update-status/{id}', [EmployeeController::class, 'updateStatus'])->name('employee.update-status');
 	Route::get('/list', [EmployeeController::class, 'list'])->name('employee.list');
 	Route::get('/list/pekerja', [EmployeeController::class, 'list_pekerja'])->name('employee.list-member');
 	Route::get('/list/kepala-pekerja', [EmployeeController::class, 'list_kepala_pekerja'])->name('employee.list-kepala-pekerja');
@@ -204,18 +205,24 @@ Route::group(['prefix' => 'run-payroll', 'middleware' => 'auth'], function () {
 	Route::get('/employee', [RunPayrollController::class, 'employee'])->name('runpayroll.employee');
 	Route::get('/get-selected-employees', [RunPayrollController::class, 'getSelectedEmployees'])->name('runpayroll.employee');
 	Route::post('/store-employee', [RunPayrollController::class, 'storeselectkar'])->name('runpayroll.storeselectkar');
+	Route::get('/employee-list', [RunPayrollController::class, 'getEmployeeList'])->name('runpayroll.getlist');
 });
 
 Route::group(['prefix' => 'history-payroll', 'middleware' => 'auth'], function () {
 	Route::get('/', [PayrollHistoryController::class, 'index'])->middleware('auth')->name('historypayroll.index');
 	Route::post('/store', [PayrollHistoryController::class, 'store'])->name('historypayroll.store');
 	Route::get('/employee', [PayrollHistoryController::class, 'employee'])->name('historypayroll.');
+	Route::get('/ListGroup', [PayrollHistoryController::class, 'showListGroup'])->name('historypayroll.listGroup');
 	Route::get('/detail/{id}', [PayrollHistoryController::class, 'showDetails'])->middleware('auth')->name('historypayroll.detail');
 	Route::post('/locking', [PayrollHistoryController::class, 'locking'])->name('historypayroll.locking');
 });
 
+Route::group(['prefix' => 'history-payroll-group', 'middleware' => 'auth'], function () {
+	Route::get('/{id}', [PayrollHistoryController::class, 'showGroupTotals'])->middleware('auth')->name('historypayrollGroup.index');
+});
+
 Route::group(['prefix' => 'history-payroll-detail', 'middleware' => 'auth'], function () {
-	Route::get('/{id}', [PayrollHistoryController::class, 'showDetails'])->middleware('auth')->name('historypayrollDetail.index');
+	Route::get('/{payrollHistoryId}/{groupId}', [PayrollHistoryController::class, 'showGroupDetails'])->middleware('auth')->name('historypayrollDetail.index');
 	Route::get('/detail-attendance/{id}', [PayrollHistoryController::class, 'showAttendanceDetails'])->name('historypayrollDetail.getDetail');
 });
 

@@ -435,6 +435,7 @@
                                         q: query
                                     },
                                     success: function(data) {
+                                        console.log('cek : ')
                                         callback(data);
                                     },
                                     error: function() {
@@ -480,96 +481,100 @@
         }
 
         async function StoreGroup() {
-            event.preventDefault();
+    event.preventDefault();
 
-            const submitButton = document.getElementById('btn-submit');
-            submitButton.disabled = true;
+    const submitButton = document.getElementById('btn-submit');
+    submitButton.disabled = true;
 
-            // Ambil nilai manual dari elemen form
-            const name = document.getElementById('name').value;
-            const code = document.getElementById('code').value;
-            const project = document.getElementById('project').value;
-            const leader = document.getElementById('leader').value;
+    // Ambil nilai manual dari elemen form
+    const name = document.getElementById('name').value;
+    const code = document.getElementById('code').value;
+    const project = document.getElementById('project').value;
+    const leader = document.getElementById('leader').value;
 
-            // Ambil nilai dari Selectize
-            const membersSelect = $('#members')[0].selectize;
-            const members = membersSelect.getValue(); // Array dari anggota yang dipilih
+    // Ambil nilai dari Selectize
+    const membersSelect = $('#members')[0].selectize;
+    const members = membersSelect.getValue(); // Array dari anggota yang dipilih
 
-            // Validasi jika tidak ada anggota yang dipilih
-            if (members.length === 0) {
-                Swal.fire('Error', 'Harap pilih minimal satu anggota.', 'error');
-                submitButton.disabled = false;
-                return;
-            }
+    // Validasi jika tidak ada anggota yang dipilih
+    if (members.length === 0) {
+        Swal.fire('Error', 'Harap pilih minimal satu anggota.', 'error');
+        submitButton.disabled = false;
+        return;
+    }
 
-            Swal.fire({
-                title: 'Menyimpan data...',
-                html: 'Progress: <b>0%</b>',
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
-            });
-
-            // Susun data secara manual
-            const formData = {
-                name: name,
-                code: code,
-                project: project,
-                leader: leader,
-                members: members, // Array anggota
-            };
-
-            console.log('Data yang dikirim:', formData);
-
-            try {
-                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-                let progress = 0;
-                const progressInterval = setInterval(() => {
-                    progress += 10;
-                    Swal.update({
-                        html: `Progress: <b>${progress}%</b>`
-                    });
-                    if (progress >= 90) clearInterval(progressInterval); // Stop updating near completion
-                }, 200); // Update every 200ms
-                const response = await fetch('/group/store', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': csrfToken,
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(formData),
-                });
-                clearInterval(progressInterval);
-
-                const responseData = await response.json();
-                console.log('Response Data:', responseData);
-
-                if (!response.ok || !responseData.success) {
-                    throw new Error(responseData.message || 'Gagal menyimpan data.');
-                }
-
-                console.log('Sukses:', responseData);
-
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Berhasil',
-                    text: responseData.message || 'Data berhasil disimpan'
-                }).then(() => {
-                    location.reload();
-                });
-
-            } catch (error) {
-                console.error('Error:', error);
-
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Gagal',
-                    text: error.message || 'Data gagal disimpan'
-                });
-            } finally {
-                submitButton.disabled = false;
-            }
+    Swal.fire({
+        title: 'Menyimpan data...',
+        html: 'Progress: <b>0%</b>',
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
         }
+    });
+
+    // Susun data secara manual
+    const formData = {
+        name: name,
+        code: code,
+        project: project,
+        leader: leader,
+        members: members, // Array anggota
+    };
+
+    console.log('Data yang dikirim:', formData);
+
+    try {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        let progress = 0;
+        const progressInterval = setInterval(() => {
+            progress += 10;
+            Swal.update({
+                html: `Progress: <b>${progress}%</b>`
+            });
+            if (progress >= 90) clearInterval(progressInterval); // Stop updating near completion
+        }, 200); // Update every 200ms
+
+        const response = await fetch('/group/store', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': csrfToken,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData),
+        });
+
+        clearInterval(progressInterval);
+
+        const responseData = await response.json();
+        console.log('Response Data:', responseData); // Cek respons dari server
+
+        // Pastikan responsData memiliki key success atau error
+        if (!response.ok || !responseData.success) {
+            // Jika tidak ada response.ok atau success, ambil pesan error
+            const errorMessage = responseData.error || responseData.message || 'Terjadi kesalahan';
+            throw new Error(errorMessage); 
+        }
+
+        // Jika sukses
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil',
+            text: responseData.message || 'Data berhasil disimpan'
+        }).then(() => {
+            location.reload();
+        });
+
+    } catch (error) {
+        console.log('Caught error:', error); // Log error yang ditangkap
+        Swal.fire({
+            icon: 'error',
+            title: 'Gagal',
+            text: error.message || 'Gagal Menyimpan Data'
+        });
+    } finally {
+        submitButton.disabled = false;
+    }
+}
+
     </script>
 @endsection

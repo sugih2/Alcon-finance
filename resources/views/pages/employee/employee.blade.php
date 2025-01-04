@@ -53,6 +53,9 @@
                                             Group</th>
                                         <th
                                             class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                            Status</th>
+                                        <th
+                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                             Action</th>
                                     </tr>
                                 </thead>
@@ -70,6 +73,16 @@
                                             <td>{{ $e->phone }}</td>
                                             <td>{{ $e->position->name }}</td>
                                             <td>Ujang</td>
+                                            <td>
+                                                <div class="form-check form-switch">
+                                                    <input class="form-check-input" type="checkbox" role="switch"
+                                                        id="statusSwitch{{ $e->id }}" data-id="{{ $e->id }}"
+                                                        {{ $e->status == 'Aktif' ? 'checked' : '' }}>
+                                                    <label class="form-check-label" for="statusSwitch{{ $e->id }}">
+                                                        {{ $e->status }}
+                                                    </label>
+                                                </div>
+                                            </td>
                                             <td class="align-middle text-end">
                                                 <button type="button" class="btn btn-link text-primary mb-0"
                                                     onclick="editEmployee({{ $e->id }})">Edit</button>
@@ -123,7 +136,7 @@
             $('#employeeTable').DataTable({
                 responsive: true,
                 scrollX: true,
-                pageLength: 5,
+                pageLength: 10,
                 pagingType: 'simple_numbers',
                 language: {
                     search: "Cari:",
@@ -189,6 +202,9 @@
         }
 
         function editEmployee(id) {
+            if ($.fn.DataTable.isDataTable('#employeeTable')) {
+                $('#employeeTable').DataTable().destroy();
+            }
             $.ajax({
                 url: "{{ url('/employee/edit') }}/" + id,
                 type: 'GET',
@@ -264,6 +280,55 @@
             });
         }
 
+        // Tambahkan event listener untuk switch button
+        document.querySelectorAll('.form-check-input[role="switch"]').forEach(function(switchInput) {
+            switchInput.addEventListener('change', function() {
+                const employeeId = this.dataset.id;
+                const newStatus = this.checked ? 'Aktif' : 'NonAktif';
+
+                // Update label text
+                this.nextElementSibling.textContent = newStatus;
+
+                updateEmployeeStatus(employeeId, newStatus);
+            });
+        });
+        // Fungsi untuk update status
+        async function updateEmployeeStatus(id, status) {
+            try {
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                const response = await fetch('/employee/update-status/' + id, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json' // Tambahkan ini
+                    },
+                    body: JSON.stringify({ // Gunakan JSON.stringify
+                        status: status
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'Gagal mengubah status.');
+                }
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil',
+                    text: data.message || 'Status berhasil diubah'
+                });
+
+            } catch (error) {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal',
+                    text: error.message || 'Gagal mengubah status'
+                });
+            }
+        }
         async function StoreEmployee() {
             event.preventDefault();
 
@@ -295,7 +360,8 @@
                     Swal.update({
                         html: `Progress: <b>${progress}%</b>`
                     });
-                    if (progress >= 90) clearInterval(progressInterval); // Stop updating near completion
+                    if (progress >= 90) clearInterval(
+                        progressInterval); // Stop updating near completion
                 }, 200); // Update every 200ms
                 const response = await fetch('/employee/store', {
                     method: 'POST',
@@ -387,6 +453,5 @@
                 submitButton.disabled = false;
             }
         }
-
     </script>
 @endsection
