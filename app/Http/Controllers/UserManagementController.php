@@ -4,24 +4,73 @@ namespace App\Http\Controllers;
 
 use Alert;
 use App\Models\User;
-use App\Models\Role;
+//use App\Models\Role;
 use App\Models\Menu;
 use App\Models\RolePermission;
 use App\Models\MenuPermission;
 use Yajra\DataTables\DataTables;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 
 class UserManagementController extends Controller
 {
+    // public function index()
+    // {
+
+    //     // $users = User::with('roles.permissions')->get()->map(function ($user) {
+    //     //     return [
+    //     //         'id' => $user->id,
+    //     //         'name' => $user->name,
+    //     //         'email' => $user->email,
+    //     //         'role' => $user->roles->map(function ($role) {
+    //     //             return [
+    //     //                 'role_name' => $role->name,
+    //     //                 'permissions' => $role->permissions->pluck('name')->toArray(),  // Mendapatkan semua permissions dari role
+    //     //             ];
+    //     //         }),
+    //     //     ];
+    //     // });
+
+    //     // dd($users);
+
+
+    //     $users = User::with('role')->get();
+    //     $roles = Role::all();
+    //     $menus = Menu::all();
+
+    //     return view('pages.admin.user-management', compact('users', 'roles', 'menus'));
+    // }
     public function index()
     {
-        $users = User::with('role')->get();
+
+        $users = User::with('roles.permissions')->get()->map(function ($user) {
+
+            return [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'roles' => $user->roles->map(function ($role) {
+                    return [
+                        'role_name' => $role->name,
+                        'permissions' => $role->permissions->pluck('name')->toArray(),
+                    ];
+                }),
+            ];
+        });
+        //dd($users);
+
         $roles = Role::all();
+        //dd($roles);
+
+
         $menus = Menu::all();
+
         return view('pages.admin.user-management', compact('users', 'roles', 'menus'));
     }
+
 
     public function roles_index()
     {
@@ -109,9 +158,10 @@ class UserManagementController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
         ]);
-
+        $guard_name = 'web';
         Role::create([
             'name' => $request->name,
+            'guard_name' => $guard_name,
         ]);
 
         Alert::success('Success', 'Role berhasil ditambahkan!');
@@ -124,9 +174,10 @@ class UserManagementController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
         ]);
-
+        $guard_name = 'web';
         $role->update([
             'name' => $request->name,
+            'guard_name' => $guard_name,
         ]);
 
         Alert::success('Success', 'Role berhasil diperbarui!');
@@ -222,7 +273,7 @@ class UserManagementController extends Controller
                 'updated_at' => now(),
             ];
 
-            // Cek apakah menu_permission sudah ada
+
             $menuPermission = MenuPermission::where('menu_id', $menu->id)->first();
 
             if ($menuPermission) {
@@ -235,10 +286,10 @@ class UserManagementController extends Controller
             }
         }
 
-        // Buat atau perbarui menu_permissions
+
         MenuPermission::upsert($menuPermissionsData, ['menu_id'], ['updated_at']);
 
-        // Ambil semua menu_permissions terbaru
+
         $menuPermissions = MenuPermission::whereIn('menu_id', $menus->pluck('id'))->get();
 
         foreach ($menuPermissions as $menuPermission) {

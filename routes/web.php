@@ -41,11 +41,33 @@ use App\Http\Controllers\PayrollHistoryController;
 use App\Http\Controllers\ReportPayrollController;
 use App\Http\Controllers\SettingAttendanceController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\Admin\PermissionsController;
+
 
 Route::get('/data', [ExampleController::class, 'getData'])->middleware('auth')->name('data.index');
 
-Route::group(['prefix' => 'user-management', 'middleware' => 'auth'], function () {
-	Route::get('/', [UserManagementController::class, 'index'])->middleware('auth')->name('user-management.index');
+// Route::group(['prefix' => 'user-management', 'middleware' => 'auth'], function () {
+// 	Route::get('/', [UserManagementController::class, 'index'])->middleware('auth')->name('user-management.index');
+// 	Route::get('/users', [UserManagementController::class, 'getDataUser'])->name('users.data');
+// 	Route::post('/users', [UserManagementController::class, 'storeUser'])->name('users.store');
+// 	Route::put('/users/{user}', [UserManagementController::class, 'updateUser'])->name('users.update');
+// 	Route::delete('/users/{user}', [UserManagementController::class, 'destroyUser'])->name('users.destroy');
+// 	Route::post('/roles', [UserManagementController::class, 'storeRole'])->name('roles.store');
+// 	Route::put('/roles/{role}', [UserManagementController::class, 'updateRole'])->name('roles.update');
+// 	Route::delete('/roles/{role}', [UserManagementController::class, 'destroyRole'])->name('roles.destroy');
+// 	Route::get('/roles/{role}/permissions', [UserManagementController::class, 'getPermissions'])->name('roles.permissions');
+// 	Route::post('/roles/{role}/permissions/save', [UserManagementController::class, 'savePermissions'])->name('roles.permissions.save');
+// 	Route::get('/menus', [UserManagementController::class, 'getDataMenu'])->name('menus.data');
+// 	Route::post('/menus', [UserManagementController::class, 'storeDataMenu'])->name('menus.store');
+// 	Route::get('/menus/{menu}', [UserManagementController::class, 'showDataMenu'])->name('menus.show');
+// 	Route::put('/menus/{menu}', [UserManagementController::class, 'updateMenu'])->middleware('auth')->name('menus.update');
+// 	Route::delete('/menus/{menu}', [UserManagementController::class, 'destroyMenu'])->name('menus.destroy');
+// });
+Route::group([
+	'prefix' => 'user-management',
+	'middleware' => ['auth', 'permission:users.index']
+], function () {
+	Route::get('/', [UserManagementController::class, 'index'])->name('user-management.index');
 	Route::get('/users', [UserManagementController::class, 'getDataUser'])->name('users.data');
 	Route::post('/users', [UserManagementController::class, 'storeUser'])->name('users.store');
 	Route::put('/users/{user}', [UserManagementController::class, 'updateUser'])->name('users.update');
@@ -58,7 +80,7 @@ Route::group(['prefix' => 'user-management', 'middleware' => 'auth'], function (
 	Route::get('/menus', [UserManagementController::class, 'getDataMenu'])->name('menus.data');
 	Route::post('/menus', [UserManagementController::class, 'storeDataMenu'])->name('menus.store');
 	Route::get('/menus/{menu}', [UserManagementController::class, 'showDataMenu'])->name('menus.show');
-	Route::put('/menus/{menu}', [UserManagementController::class, 'updateMenu'])->middleware('auth')->name('menus.update');
+	Route::put('/menus/{menu}', [UserManagementController::class, 'updateMenu'])->name('menus.update');
 	Route::delete('/menus/{menu}', [UserManagementController::class, 'destroyMenu'])->name('menus.destroy');
 });
 

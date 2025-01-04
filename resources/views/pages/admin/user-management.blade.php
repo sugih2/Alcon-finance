@@ -18,8 +18,11 @@
                             <thead>
                                 <tr>
                                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">No</th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Role Name</th>
-                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Action</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                        Role Name</th>
+                                    <th
+                                        class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                        Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -32,10 +35,14 @@
                                             <div class="d-flex flex-column flex-md-row gap-1 justify-content-center">
                                                 {{-- <button type="button" class="btn btn-link text-info" data-bs-toggle="modal" data-bs-target="#editRolePermission"
                                                     data-name="{{ $role->name }}" data-id="{{ $role->id }}">Permission</button> --}}
-                                                <button type="button" class="btn btn-link text-info" onclick="showPermissions({{ $role->id }})">Permissions</button>
-                                                <button type="button" class="btn btn-link text-primary" data-bs-toggle="modal" data-bs-target="#editRoleModal"
-                                                    data-name="{{ $role->name }}" data-id="{{ $role->id }}">Edit</button>
-                                                <button type="button" class="btn btn-link text-danger" data-bs-toggle="modal" data-bs-target="#deleteRoleModal"
+                                                <button type="button" class="btn btn-link text-info"
+                                                    onclick="showPermissions({{ $role->id }})">Permissions</button>
+                                                <button type="button" class="btn btn-link text-primary"
+                                                    data-bs-toggle="modal" data-bs-target="#editRoleModal"
+                                                    data-name="{{ $role->name }}"
+                                                    data-id="{{ $role->id }}">Edit</button>
+                                                <button type="button" class="btn btn-link text-danger"
+                                                    data-bs-toggle="modal" data-bs-target="#deleteRoleModal"
                                                     data-id="{{ $role->id }}">Delete</button>
                                             </div>
                                         </td>
@@ -72,9 +79,13 @@
                             <thead>
                                 <tr>
                                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">No</th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Nama Menu</th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Url</th>
-                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Action</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                        Nama Menu</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Url
+                                    </th>
+                                    <th
+                                        class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                        Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -85,8 +96,12 @@
                                         <td>{{ $menu->name }}</td>
                                         <td>{{ $menu->url }}</td>
                                         <td class="align-middle text-end">
-                                            <button type="button" class="btn btn-link text-primary mb-0" data-bs-toggle="modal" data-bs-target="#editMenuModal" data-name="{{ $menu->name }}" data-id="{{ $menu->id }}">Edit</button>
-                                            <button type="button" class="btn btn-link text-danger mb-0" data-bs-toggle="modal" data-bs-target="#deleteMenuModal" data-id="{{ $menu->id }}">Delete</button>
+                                            <button type="button" class="btn btn-link text-primary mb-0"
+                                                data-bs-toggle="modal" data-bs-target="#editMenuModal"
+                                                data-name="{{ $menu->name }}" data-id="{{ $menu->id }}">Edit</button>
+                                            <button type="button" class="btn btn-link text-danger mb-0"
+                                                data-bs-toggle="modal" data-bs-target="#deleteMenuModal"
+                                                data-id="{{ $menu->id }}">Delete</button>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -123,10 +138,16 @@
                         <table id="usersTable" class="table align-items-center mb-0">
                             <thead>
                                 <tr>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Name</th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Role</th>
-                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Create Date</th>
-                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Action</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Name
+                                    </th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                        Role</th>
+                                    <th
+                                        class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                        Create Date</th>
+                                    <th
+                                        class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                        Action</th>
                                 </tr>
                             </thead>
                         </table>
@@ -137,18 +158,17 @@
 
         <script>
             $(document).ready(function() {
-            $('#usersTable').DataTable({
-                processing: true,
-                serverSide: true,
-                pageLength: 5,
-                pagingType: 'simple_numbers',
-                searching: false,
-                ajax: '{{ route('users.data') }}',
-                columns: [
-                    {
-                        data: 'name',
-                        render: function(data, type, row) {
-                            return `
+                $('#usersTable').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    pageLength: 5,
+                    pagingType: 'simple_numbers',
+                    searching: false,
+                    ajax: '{{ route('users.data') }}',
+                    columns: [{
+                            data: 'name',
+                            render: function(data, type, row) {
+                                return `
                                 <div class="d-flex px-3 py-1">
                                     <div>
                                         <img src="./img/team-${row.id}.jpg" class="avatar me-3" alt="image">
@@ -158,20 +178,24 @@
                                     </div>
                                 </div>
                             `;
-                        }
-                    },
-                    { data: 'role.name', name: 'role.name' },
-                    {
-                        data: 'created_at',
-                        name: 'created_at',
-                        render: function(data) {
-                            return moment(data).format('DD/MM/YYYY'); // Pastikan moment.js sudah diimpor
-                        }
-                    },
-                    {
-                        data: null,
-                        render: function(data, type, row) {
-                            return `
+                            }
+                        },
+                        {
+                            data: 'role.name',
+                            name: 'role.name'
+                        },
+                        {
+                            data: 'created_at',
+                            name: 'created_at',
+                            render: function(data) {
+                                return moment(data).format(
+                                    'DD/MM/YYYY'); // Pastikan moment.js sudah diimpor
+                            }
+                        },
+                        {
+                            data: null,
+                            render: function(data, type, row) {
+                                return `
                                 <div class="d-flex px-3 py-1 justify-content-center align-items-center">
                                     <button class="btn btn-link text-primary mb-0" data-bs-toggle="modal"
                                         data-bs-target="#editUserModal"
@@ -183,12 +207,12 @@
                                     </button>
                                 </div>
                             `;
+                            }
                         }
-                    }
-                ],
+                    ],
 
+                });
             });
-        });
         </script>
     </div>
 
@@ -229,9 +253,13 @@
                         </div>
                         <div class="mb-3">
                             <label for="role_id" class="form-label">Role</label>
-                            <select class="form-select" id="role_id" name="role_id" required>
-                                @foreach ($roles as $role)
-                                    <option value="{{ $role->id }}">{{ $role->name }}</option>
+                            <select class="form-select" id="role_id" name="role_id">
+                                @foreach ($users as $user)
+                                    @foreach ($user['roles'] as $role)
+                                        <option value="{{ $role['role_name'] }}">
+                                            {{ $role['role_name'] }}
+                                        </option>
+                                    @endforeach
                                 @endforeach
                             </select>
                         </div>
@@ -274,11 +302,14 @@
                         </div>
                         <div class="mb-3">
                             <label for="edit_role_id" class="form-label">Role</label>
-                            <select class="form-select" id="edit_role_id" name="role_id" required>
-                                @foreach ($roles as $role)
-                                    <option value="{{ $role->id }}">{{ $role->name }}</option>
-                                @endforeach
-                            </select>
+                            <div class="mb-3">
+                                <label for="edit_role_id" class="form-label">Role</label>
+                                <select class="form-select" id="edit_role_id" name="role_id" required>
+                                    @foreach ($roles as $role)
+                                        <option value="{{ $role->id }}">{{ $role->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
                         </div>
                         <button type="submit" class="btn btn-primary">Update</button>
                     </form>
@@ -457,7 +488,8 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" id="deleteMenuModal" tabindex="-1" aria-labelledby="deleteMenuModalLabel" aria-hidden="true">
+    <div class="modal fade" id="deleteMenuModal" tabindex="-1" aria-labelledby="deleteMenuModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -754,25 +786,28 @@
             var form = deleteMenuModal.querySelector('#deleteMenuForm'); // Pastikan id form benar
             form.action = '{{ url('menu-management/menus') }}/' + menuId;
         });
+
         function showPermissions(roleId) {
             // Panggil AJAX untuk mengambil data permissions
             $.ajax({
                 url: `/user-management/roles/${roleId}/permissions`, // Route untuk fetch data
                 type: 'GET',
-                success: function (response) {
+                success: function(response) {
                     // Ganti isi modal dengan data yang diterima
                     $('#permissionsModal .modal-body').html(response);
                     $('#permissionsModal').modal('show');
                 },
-                error: function (xhr) {
+                error: function(xhr) {
                     alert('Failed to load permissions.');
                 }
             });
         };
-        document.getElementById('savePermissions').addEventListener('click', function () {
-            const roleId = document.getElementById('permissionsModal').getAttribute('data-role-id'); // Ambil roleId dari atribut modal
+        document.getElementById('savePermissions').addEventListener('click', function() {
+            const roleId = document.getElementById('permissionsModal').getAttribute(
+                'data-role-id'); // Ambil roleId dari atribut modal
             savePermissions(roleId);
         });
+
         function savePermissions(roleId) {
             // Ambil data checkbox dari form
             const formData = $('#permissionsForm').serialize();
@@ -784,10 +819,10 @@
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // CSRF Token
                 },
-                success: function (response) {
+                success: function(response) {
                     alert(response.message);
                 },
-                error: function (xhr) {
+                error: function(xhr) {
                     alert('Failed to save permissions.');
                 }
             });
