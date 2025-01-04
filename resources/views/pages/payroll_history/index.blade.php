@@ -56,6 +56,10 @@
                                             <td>{{ $e->description }}</td>
 
                                             <td class="align-middle text-end">
+                                                {{-- <button type="button" class="btn btn-link text-info mb-0"
+                                                    onclick="window.location.href='{{ route('historypayroll.listGroup' )}}'">
+                                                    Detail
+                                                </button> --}}
                                                 <button type="button" class="btn btn-link text-info mb-0"
                                                     onclick="window.location.href='{{ route('historypayrollGroup.index', ['id' => $e->id]) }}'">
                                                     Detail Group
@@ -146,12 +150,12 @@
         }
 
         function DetailPayroll(id) {
-            console.log('Detail Payroll');
             $.ajax({
                 url: "{{ url('/history-payroll/detail') }}/" + id,
                 type: 'GET',
                 dataType: 'html',
                 success: function(data) {
+                    console.log('Detail Payroll', data);
                     $("#detailPayroll").html(data);
                     $('#DetailPayrollModal').modal('show');
                 },

@@ -60,14 +60,14 @@
 
                                 <div class="form-group">
                                     <label for="floatingTextarea" class="col-form-label">Description</label>
-                                    <textarea class="col-sm-5 form-control" placeholder="Optional" id="floatingTextarea" name="description"></textarea>
+                                    <textarea class="col-sm-5 form-control" placeholder="Description..." id="floatingTextarea" name="description"></textarea>
                                 </div>
-                                <button type="button" class="btn btn-outline-primary" onclick="showEmploySelected()">Add
+                                {{-- <button type="button" class="btn btn-outline-primary" onclick="showEmploySelected()">Add
                                     Employee</button>
                                 <div id="selected-employees" class="mt-3">
                                     <h5>Selected Employees:</h5>
                                     <ul id="employee-list"></ul>
-                                </div>
+                                </div> --}}
                                 <div class="d-flex justify-content-center"><button type="button"
                                         class="btn btn-outline-primary" onclick="runpayroll()">RunPayroll</button></div>
 
@@ -176,7 +176,6 @@
                 start_date: startDate,
                 end_date: endDate,
                 description: description,
-                employee_ids: employeeIds,
             };
             //console.log('Payload:', payload);
             $.ajaxSetup({
@@ -246,7 +245,6 @@
                 }
             });
         }
-        //Week
         function getPreviousWeeksDates() {
             const today = new Date(); // Tanggal hari ini
             const currentMonth = today.getMonth(); // Bulan berjalan (0-indexed)
@@ -286,7 +284,8 @@
             // Set tanggal ke input field
             document.getElementById("start_date").value = weekDates.start;
             document.getElementById("end_date").value = weekDates.end;
-        }
+        } 
+
     </script>
 
     <meta name="csrf-token" content="{{ csrf_token() }}" />

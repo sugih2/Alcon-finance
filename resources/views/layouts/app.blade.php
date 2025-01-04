@@ -19,6 +19,7 @@
     <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
     <link href="{{asset('assets/css/nucleo-svg.css')}}" rel="stylesheet" />
     <!-- CSS Files -->
+    
     <link href="{{ asset('assets/css/argon-dashboard.css') }}" rel="stylesheet" />
 
     {{-- <link rel="stylesheet" href="assets/datatables/jquery.dataTables.min.css">
@@ -38,6 +39,7 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <link href="https://cdn.datatables.net/v/dt/dt-2.1.8/datatables.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.datatables.net/2.1.2/css/dataTables.foundation.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.1.0/css/buttons.foundation.css">
     <script src="https://cdn.datatables.net/v/dt/dt-2.1.8/datatables.min.js"></script>

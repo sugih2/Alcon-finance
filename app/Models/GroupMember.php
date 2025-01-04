@@ -13,6 +13,11 @@ class GroupMember extends Model
         'member_id'
     ];
 
+    public function group()
+    {
+        return $this->belongsTo(Group::class);
+    }
+
     public function member()
     {
         return $this->belongsTo(Employee::class, 'member_id');

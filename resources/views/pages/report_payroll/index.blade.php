@@ -57,12 +57,18 @@
 
                                             <td class="align-middle text-end">
                                                 <button type="button" class="btn btn-link text-info mb-0"
-                                                    onclick="window.location.href='{{ route('historypayrollDetail.index', ['id' => $e->id]) }}'">
-                                                    Detail
-                                                </button>
+                                                onclick="window.location.href='{{ route('historypayrollGroup.index', ['id' => $e->id]) }}'">
+                                                Detail Group
+                                            </button>
                                                 <button type="button" class="btn btn-primary"
                                                     onclick="payment({{ $e->id }})"> Proces Payment
                                                 </button>
+                                                {{-- @if($e->status_payroll === 'pending')
+                                                <button type="button" class="btn btn-primary"
+                                                    onclick="payment({{ $e->id }})">Process Payment</button>
+                                                @else
+                                                <button type="button" class="btn btn-secondary" disabled>Sudah Payment</button>
+                                                @endif --}}
                                             </td>
 
                                         </tr>
