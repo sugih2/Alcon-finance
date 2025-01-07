@@ -15,18 +15,21 @@ use Illuminate\Support\Facades\DB;
 
 class UserManagementController extends Controller
 {
-    public function index()
+    public function index_user()
     {
         $users = User::with('role')->get();
         $roles = Role::all();
-        $menus = Menu::all();
-        return view('pages.admin.user-management', compact('users', 'roles', 'menus'));
+        return view('pages.admin.index-user', compact('users', 'roles'));
     }
 
-    public function roles_index()
+    public function index_role()
     {
-        $roles = Role::all();
-        return view('pages.admin.roles-management', compact('roles'));
+        return view('pages.admin.roles', compact('roles'));
+    }
+
+    public function index_permission()
+    {
+        return view('pages.admin.permission', compact('roles'));
     }
 
     public function getDataUser()
