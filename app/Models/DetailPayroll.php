@@ -15,6 +15,11 @@ class DetailPayroll extends Model
         return $this->belongsTo(Employee::class, 'id_employee');
     }
 
+    public function group()
+    {
+        return $this->belongsTo(GroupMember::class, 'member_id');
+    }
+
     public function component()
     {
         return $this->belongsTo(ParamComponen::class, 'id_component');

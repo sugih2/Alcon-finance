@@ -21,8 +21,10 @@ class PraPayrollController extends Controller
     }
     public function indexDetail()
     {
-        $detailPayrolls = DetailPayroll::select()->get()->groupBy('id_employee');
-        // log::info('CEKK epribadedhh comeon ' . json_encode($detailPayrolls, JSON_PRETTY_PRINT));
+        $detailPayrolls = DetailPayroll::with(['employee', 'component'])
+            ->get()
+            ->groupBy('id_employee');
+
         return view('pages.pra_payroll.detail', compact('detailPayrolls'));
     }
     public function adjusment()
@@ -34,7 +36,6 @@ class PraPayrollController extends Controller
     {
         return view('pages.adjusment.employee');
     }
-
     public function component()
     {
         return view('pages.adjusment.component');
@@ -58,7 +59,7 @@ class PraPayrollController extends Controller
                 'id' => $karyawan->id,
                 'nama_lengkap' => $karyawan->name,
                 'nomor_induk_karyawan' => $karyawan->nip,
-                'jabatan' => $karyawan->position->name
+                'jabatan' => $karyawan->position->name,
             ];
         }
         session()->put('selectedEmployees', $finalEmployeeData);
@@ -72,18 +73,20 @@ class PraPayrollController extends Controller
         $employeeData = session()->get('selectedEmployees');
 
         if (!$employeeData) {
-            return response()->json([
-                'success' => false,
-                'message' => 'No employees selected.'
-            ], 400);
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => 'No employees selected.',
+                ],
+                400,
+            );
         }
 
         foreach ($components as $componentReq) {
             if (isset($componentReq['id_com'])) {
                 $componentId = $componentReq['id_com'];
 
-                $componentData = ParamComponen::select('name', 'type', 'amount', 'componen')
-                    ->findOrFail($componentId);
+                $componentData = ParamComponen::select('name', 'type', 'amount', 'componen')->findOrFail($componentId);
 
                 foreach ($employeeData as &$employee) {
                     $employee['componentData'][] = [
@@ -94,11 +97,14 @@ class PraPayrollController extends Controller
                     ];
                 }
             } else {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Missing id_com in request data',
-                    'errorData' => $componentReq
-                ], 400);
+                return response()->json(
+                    [
+                        'success' => false,
+                        'message' => 'Missing id_com in request data',
+                        'errorData' => $componentReq,
+                    ],
+                    400,
+                );
             }
         }
 
@@ -144,7 +150,7 @@ class PraPayrollController extends Controller
             foreach ($request->employeedata as $employee) {
                 $employeeModel = Employee::find($employee['id']);
                 $validationErrors = [];
-            
+
                 if (!$employeeModel) {
                     $validationErrors[] = "Data karyawan dengan ID {$employee['id']} tidak ditemukan.";
                 } else {
@@ -154,43 +160,43 @@ class PraPayrollController extends Controller
                             $validationErrors[] = "Komponen dengan ID {$component['id_com']} tidak ditemukan.";
                             continue;
                         }
-            
+
                         // Validasi kecocokan posisi untuk Salary
                         if ($componentModel->componen === 'Salary' && $employeeModel->position_id !== $componentModel->id_position) {
                             $validationErrors[] = "Komponen Salary dengan ID {$component['component_name']} tidak sesuai dengan posisi karyawan {$employee['nama_lengkap']}.";
                         }
-            
+
                         // Validasi apakah Salary sudah ada
                         $existingSalary = DetailPayroll::where('id_employee', $employee['id'])
                             ->whereHas('component', function ($query) {
                                 $query->where('componen', 'Salary');
-                            })->exists();
-            
+                            })
+                            ->exists();
+
                         if ($existingSalary && $componentModel->componen === 'Salary') {
                             $validationErrors[] = "Komponen Salary sudah ada untuk karyawan ID {$employee['nama_lengkap']}.";
                         }
-            
+
                         // Validasi kategori Allowance
                         if ($componentModel->type === 'Allowance') {
                             $existingAllowance = DetailPayroll::where('id_employee', $employee['id'])
                                 ->whereHas('component', function ($query) use ($componentModel) {
-                                    $query->where('type', 'Allowance')
-                                          ->where('category', $componentModel->category);
-                                })->exists();
-            
+                                    $query->where('type', 'Allowance')->where('category', $componentModel->category);
+                                })
+                                ->exists();
+
                             if ($existingAllowance) {
                                 $validationErrors[] = "Allowance dengan kategori {$componentModel->category} sudah ada untuk karyawan ID {$employee['id']}.";
                             }
                         }
                     }
                 }
-            
+
                 // Jika ada error validasi, kembalikan respons error 400
                 if (!empty($validationErrors)) {
                     return response()->json(['error' => $validationErrors], 400);
                 }
             }
-            
 
             $prefix = 'PP';
             $id_transaksi = MasterPayroll::generateIdTransaksi($prefix);
@@ -205,9 +211,7 @@ class PraPayrollController extends Controller
 
             foreach ($request->employeedata as $employee) {
                 foreach ($employee['components'] as $component) {
-                    $amount = isset($component['new_amount']) && !empty($component['new_amount'])
-                        ? $component['new_amount']
-                        : $component['last_amount'];
+                    $amount = isset($component['new_amount']) && !empty($component['new_amount']) ? $component['new_amount'] : $component['last_amount'];
 
                     DetailPayroll::create([
                         'id_employee' => $employee['id'],
@@ -230,8 +234,7 @@ class PraPayrollController extends Controller
     public function editDetail($id)
     {
         $details = DetailPayroll::find($id);
-        $paramComponent = ParamComponen::where('category', $details->component->category)
-            ->first();
+        $paramComponent = ParamComponen::where('category', $details->component->category)->first();
         $paramComponents = ParamComponen::where('id', $details->id_component)->first();
         // log::info("CEK AMOUNT : ", ['CEk' => $paramComponents]);
         $html = view('pages.pra_payroll.editDetail', compact('details', 'paramComponents'))->render();
@@ -241,23 +244,26 @@ class PraPayrollController extends Controller
             'detail_id' => $details->id,
             'param_name' => $paramComponent->name,
             'category' => $paramComponent->category,
-            'amount' => $paramComponent->amount
+            'amount' => $paramComponent->amount,
         ]);
     }
 
     public function updateDetail(Request $request, $id)
     {
-        log::info("Cek Request update: " . json_encode($request, JSON_PRETTY_PRINT));
+        log::info('Cek Request update: ' . json_encode($request, JSON_PRETTY_PRINT));
         $validator = Validator::make($request->all(), []);
         $idEmployee = Employee::where('name', $request->employee_name)->first();
         $getIdEmployee = $idEmployee->id;
         log::info('cek nama : ', ['cek' => $request->component]);
         if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validasi gagal',
-                'errors' => $validator->errors(),
-            ], 422);
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => 'Validasi gagal',
+                    'errors' => $validator->errors(),
+                ],
+                422,
+            );
         }
         try {
             $updateDetail = DetailPayroll::findOrFail($id);
@@ -269,17 +275,23 @@ class PraPayrollController extends Controller
                 'amount' => $newAmount,
             ]);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Data detailpayroll berhasil disimpan',
-                'data' => $updateDetail,
-            ], 201);
+            return response()->json(
+                [
+                    'success' => true,
+                    'message' => 'Data detailpayroll berhasil disimpan',
+                    'data' => $updateDetail,
+                ],
+                201,
+            );
         } catch (\Exception $e) {
-            Log::error("Error: " . $e->getMessage());
-            return response()->json([
-                'success' => false,
-                'message' => 'Gagal menyimpan data detail prapayroll',
-            ], 500);
+            Log::error('Error: ' . $e->getMessage());
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => 'Gagal menyimpan data detail prapayroll',
+                ],
+                500,
+            );
         }
     }
     public function destroy($id)
@@ -288,16 +300,22 @@ class PraPayrollController extends Controller
             $deleteDetail = DetailPayroll::findOrFail($id);
             $deleteDetail->delete();
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Data Detail Payroll berhasil dihapus',
-            ], 200);
+            return response()->json(
+                [
+                    'success' => true,
+                    'message' => 'Data Detail Payroll berhasil dihapus',
+                ],
+                200,
+            );
         } catch (\Exception $e) {
-            Log::error("Error: " . $e->getMessage());
-            return response()->json([
-                'success' => false,
-                'message' => 'Gagal menghapus data Detail Payroll',
-            ], 500);
+            Log::error('Error: ' . $e->getMessage());
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => 'Gagal menghapus data Detail Payroll',
+                ],
+                500,
+            );
         }
     }
 }
