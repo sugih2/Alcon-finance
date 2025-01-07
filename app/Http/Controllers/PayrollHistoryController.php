@@ -76,6 +76,8 @@ class PayrollHistoryController extends Controller
 
     public function showGroupTotals($id)
     {
+        session(['id_payroll_histories' => $id]);
+        log::info('cek id cik bro : ' . json_encode($id, JSON_PRETTY_PRINT));
         try {
             //::info("Fetching group totals for payroll history ID: {$id}");
 
@@ -149,6 +151,7 @@ class PayrollHistoryController extends Controller
 
     public function showGroupDetails($payrollHistoryId, $groupId)
     {
+        Log::info("showGroupDetails called", ['payrollHistoryId' => $payrollHistoryId, 'groupId' => $groupId]);
         try {
             // Fetching group with payroll history details
             $group = Group::with([
@@ -159,17 +162,20 @@ class PayrollHistoryController extends Controller
                     $query->where('id_payroll_history', $payrollHistoryId);
                 }
             ])->findOrFail($groupId);
-
-            // Prepare result to pass to the view
+            Log::info("Attendance Details Data AHUY : " . json_encode($group, JSON_PRETTY_PRINT));
+            // Prepare result to pass to the viewf
             $result = [
                 'group_name' => $group->name,
                 'group_code' => $group->code,
                 'leader' => $group->leader ? $group->leader->name : null,
                 'members' => $group->members->map(function ($member) {
                     return [
+                        'id' => $member->member->id,
                         'employee_name' => $member->member->name,
                         'employee_nip' => $member->member->nip,
+                        'id_transaksi_payment' => $member->member->payrollHistoryDetails->first()?->id_transaksi_payment,
                         'payroll_details' => $member->member->payrollHistoryDetails->map(function ($payroll) {
+                            log::info("cek data payroll" . json_encode($payroll, JSON_PRETTY_PRINT));
                             return [
                                 'salary' => $payroll->salary,
                                 'allowance' => json_decode($payroll->allowance, true) ?? [],
@@ -187,6 +193,8 @@ class PayrollHistoryController extends Controller
 
             Log::info("Group Details", ['Details Group' => json_encode($result, JSON_PRETTY_PRINT)]);
             // Return the result to the view
+            Log::info("Fetching group details", ['groupId' => $groupId, 'payrollHistoryId' => $payrollHistoryId]);
+
             return view('pages.payroll_history.detail', compact('result'));
         } catch (\Exception $e) {
             // Log any errors that occur and redirect back with an error message
@@ -195,24 +203,21 @@ class PayrollHistoryController extends Controller
         }
     }
 
-
-
-
-
-
-
-
-
     public function showAttendanceDetails($idPayrollHistoryDetail)
     {
+        $id = session('id_payroll_histories');
+        Log::info("Payroll History ID from session: " . $id);
+        Log::info("Attendance Details Data: ", ['data' => $idPayrollHistoryDetail]);
         try {
             // Ambil semua AttendanceDetail berdasarkan id_payroll_history_detail
             $payrollHistoryDetail = PayrollHistoryDetail::with('employee', 'payrollHistory')
-                ->findOrFail($idPayrollHistoryDetail);
-
+                ->where('id_payroll_history', $id)
+                ->where('employee_id', $idPayrollHistoryDetail)
+                ->first();
+            $getId = $payrollHistoryDetail->id;
             // Ambil semua AttendanceDetail terkait
             $attendanceDetails = AttendanceDetail::with('payrollHistoryDetail')
-                ->where('id_payroll_history_detail', $idPayrollHistoryDetail)
+                ->where('id_payroll_history_detail', $getId)
                 ->get();
 
             // Log data untuk debugging

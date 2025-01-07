@@ -8,22 +8,26 @@ use Illuminate\Database\Eloquent\Model;
 class PayrollHistoryDetail extends Model
 {
     use HasFactory;
-    protected $fillable = 
+    protected $fillable =
     [
-        'id_payroll_history', 
-        'id_transaksi_payment', 
-        'employee_id', 'salary', 
-        'allowance', 'deduction', 
-        'total_pendapatan', 'total_overtime',
-        'total_potongan', 'gaji_bruto', 
+        'id_payroll_history',
+        'id_transaksi_payment',
+        'employee_id',
+        'salary',
+        'allowance',
+        'deduction',
+        'total_pendapatan',
+        'total_overtime',
+        'total_potongan',
+        'gaji_bruto',
         'gaji_bersih'
     ];
-    
+
     protected $casts = [
         'allowance' => 'array',
         'deduction' => 'array',
     ];
-    
+
     public function getAllowanceAttribute($value)
     {
         return json_decode($value, true) ?? [];

@@ -55,52 +55,60 @@
                                             <td rowspan="{{ $rowSpan }}">{{ $index++ }}</td>
                                             <td rowspan="{{ $rowSpan }}">{{ $member['employee_name'] }}</td>
                                             <td rowspan="{{ $rowSpan }}">{{ $member['employee_nip'] }}</td>
-
+                                
                                             @if (!empty($payrollDetails))
                                                 @foreach ($payrollDetails as $key => $payroll)
                                                     @if ($key > 0)
-                                        <tr>
-                                    @endif
-                                    <td>Rp. {{ number_format($payroll['salary'], 0, ',', '.') }}</td>
-                                    <td>
-                                        @if (!empty($payroll['allowance']))
-                                            <ul>
-                                                @foreach ($payroll['allowance'] as $allowance)
-                                                    <li>{{ $allowance['nama'] }}: Rp.
-                                                        {{ number_format($allowance['nilai'], 0, ',', '.') }}</li>
+                                                        <tr>
+                                                    @endif
+                                                    <td>Rp. {{ number_format($payroll['salary'], 0, ',', '.') }}</td>
+                                                    <td>
+                                                        @if (!empty($payroll['allowance']))
+                                                            <ul>
+                                                                @foreach ($payroll['allowance'] as $allowance)
+                                                                    <li>{{ $allowance['nama'] }}: Rp.
+                                                                        {{ number_format($allowance['nilai'], 0, ',', '.') }}</li>
+                                                                @endforeach
+                                                            </ul>
+                                                        @else
+                                                            -
+                                                        @endif
+                                                    </td>
+                                                    <td>
+                                                        @if (!empty($payroll['deduction']))
+                                                            <ul>
+                                                                @foreach ($payroll['deduction'] as $deduction)
+                                                                    <li>{{ $deduction['nama'] }}: Rp.
+                                                                        {{ number_format($deduction['nilai'], 0, ',', '.') }}</li>
+                                                                @endforeach
+                                                            </ul>
+                                                        @else
+                                                            -
+                                                        @endif
+                                                    </td>
+                                                    <td>Rp. {{ number_format($payroll['total_pendapatan'], 0, ',', '.') }}</td>
+                                                    <td>Rp. {{ number_format($payroll['total_overtime'], 0, ',', '.') }}</td>
+                                                    <td>Rp. {{ number_format($payroll['total_potongan'], 0, ',', '.') }}</td>
+                                                    <td>Rp. {{ number_format($payroll['gaji_bruto'], 0, ',', '.') }}</td>
+                                                    <td>Rp. {{ number_format($payroll['gaji_bersih'], 0, ',', '.') }}</td>
+                                                    <td>
+                                                        <button type="button" class="btn btn-link text-primary mb-0"
+                                                                data-bs-toggle="modal" data-bs-target="#editModal"
+                                                                onclick="detailAttendance({{ $member['id'] }})">
+                                                            Show Attendance
+                                                        </button>
+                                                    </td>
+                                                    @if ($key > 0)
+                                                        </tr>
+                                                    @endif
                                                 @endforeach
-                                            </ul>
-                                        @else
-                                            -
-                                        @endif
-                                    </td>
-                                    <td>
-                                        @if (!empty($payroll['deduction']))
-                                            <ul>
-                                                @foreach ($payroll['deduction'] as $deduction)
-                                                    <li>{{ $deduction['nama'] }}: Rp.
-                                                        {{ number_format($deduction['nilai'], 0, ',', '.') }}</li>
-                                                @endforeach
-                                            </ul>
-                                        @else
-                                            -
-                                        @endif
-                                    </td>
-                                    <td>Rp. {{ number_format($payroll['total_pendapatan'], 0, ',', '.') }}</td>
-                                    <td>Rp. {{ number_format($payroll['total_overtime'], 0, ',', '.') }}</td>
-                                    <td>Rp. {{ number_format($payroll['total_potongan'], 0, ',', '.') }}</td>
-                                    <td>Rp. {{ number_format($payroll['gaji_bruto'], 0, ',', '.') }}</td>
-                                    <td>Rp. {{ number_format($payroll['gaji_bersih'], 0, ',', '.') }}</td>
-                                    @if ($key > 0)
+                                            @else
+                                                <td colspan="8" class="text-center">No Payroll Details</td>
+                                            @endif
                                         </tr>
-                                    @endif
-                                    @endforeach
-                                @else
-                                    <td colspan="8" class="text-center">No Payroll Details</td>
-                                    @endif
-                                    </tr>
                                     @endforeach
                                 </tbody>
+                                
                             </table>
 
 
