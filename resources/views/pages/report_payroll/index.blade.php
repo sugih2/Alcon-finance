@@ -36,6 +36,9 @@
                                             Status</th>
                                         <th
                                             class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                            Payment Date</th>
+                                        <th
+                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                             Description</th>
                                         <th
                                             class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
@@ -53,6 +56,9 @@
                                             <td>Rp {{ number_format($e->amount_transaksi, 0, ',', '.') }}</td>
                                             <td>{{ $e->total_karyawan }}</td>
                                             <td>{{ $e->status_payroll }}</td>
+                                            @foreach($getDate as $d)
+                                                <td>{{ $d->payment_date }}
+                                            @endforeach
                                             <td>{{ $e->description }}</td>
 
                                             <td class="align-middle text-end">

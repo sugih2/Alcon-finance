@@ -33,19 +33,19 @@
                                 </tr>
                             </table>
 
-                            <table class="table table-striped table-hover align-items-center mb-0">
-                                <thead class="thead-light">
+                            <table class="table align-items-center mb-0" id="PayrollHistoryDetailTable">
+                                <thead >
                                     <tr>
-                                        <th class="text-center">No</th>
-                                        <th>Group Name</th>
-                                        <th>Group Code</th>
-                                        <th class="text-center">Leader</th>
-                                        <th class="text-right">Total Salary</th>
-                                        <th class="text-right">Total Allowance</th>
-                                        <th class="text-right">Total Deduction</th>
-                                        <th class="text-right">Gross Salary</th>
-                                        <th class="text-right">Net Salary</th>
-                                        <th class="text-center">Action</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">No</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Group Name</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Group Code</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Leader</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Total Salary</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Total Allowance</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Total Deduction</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Gross Salary</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Net Salary</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>

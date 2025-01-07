@@ -15,7 +15,7 @@ class PayrollHistoryController extends Controller
 {
     public function index()
     {
-        $payrollHistories = PayrollHistory::where('locking', false)->orWhere('status_payroll', 'payment')
+        $payrollHistories = PayrollHistory::where('locking', false)
             ->orderBy('start_periode', 'desc')
             ->get();
 
