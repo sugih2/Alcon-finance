@@ -160,6 +160,7 @@ Route::group(['prefix' => 'pra-payroll', 'middleware' => 'auth'], function () {
 	Route::get('/list', [PraPayrollController::class, 'list'])->name('prapayroll.list');
 	Route::delete('/delete/detail/{id}', [PraPayrollController::class, 'destroy'])->name('prapayroll.deleteDetail');
 	Route::get('/get-componen-name', [PraPayrollController::class, 'getComponenName'])->name('prapayroll.name');
+	Route::get('/getDataRow', [PraPayrollController::class, 'indexDetail'])->name('prapayroll.getDataRow');
 });
 
 Route::group(['prefix' => 'adjusment', 'middleware' => 'auth'], function () {
@@ -200,8 +201,8 @@ Route::group(['prefix' => 'history-payroll-group', 'middleware' => 'auth'], func
 });
 
 Route::group(['prefix' => 'history-payroll-detail', 'middleware' => 'auth'], function () {
-	Route::get('/{payrollHistoryId}/{groupId}', [PayrollHistoryController::class, 'showGroupDetails'])->middleware('auth')->name('historypayrollDetail.index');
 	Route::get('/detail-attendance/{id}', [PayrollHistoryController::class, 'showAttendanceDetails'])->name('historypayrollDetail.getDetail');
+	Route::get('/{payrollHistoryId}/{groupId}', [PayrollHistoryController::class, 'showGroupDetails'])->middleware('auth')->name('historypayrollDetail.index');
 });
 
 Route::group(['prefix' => 'report-payroll', 'middleware' => 'auth'], function () {

@@ -41,7 +41,7 @@
                                                     <table class="table table-borderlesssss">
                                                         <thead>
                                                             <tr>
-                                                               <td>Id Transaksi</td>
+                                                               <th>Id Transaksi</th>
                                                                 <th>Nama Komponen</th>
                                                                 <th>Jumlah</th>
                                                                 <th>Action</th>
