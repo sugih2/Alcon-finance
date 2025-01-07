@@ -1,3 +1,106 @@
+{{-- @extends('../layouts.app')
+
+@section('content')
+    @include('../layouts.navbars.auth.topnav', ['title' => 'User Management'])
+    @include('sweetalert::alert')
+
+    <div class="row mt-4 mx-4">
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <!-- Add content here if needed -->
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card mb-3">
+                <div class="card-header pb-0 d-flex justify-content-between align-items-center">
+                    <h6>Users</h6>
+                </div>
+                <div class="card-body px-0 pt-0 pb-2">
+                    <div class="table-responsive p-0">
+                        <table id="usersTable" class="table align-items-center mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Name
+                                    </th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                        Role</th>
+                                    <th
+                                        class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                        Create Date</th>
+                                    <th
+                                        class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                        Action</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $('#usersTable').DataTable({
+                processing: true,
+                serverSide: true,
+                pageLength: 5,
+                pagingType: 'simple_numbers',
+                searching: false,
+                ajax: '{{ route('users.data') }}',
+                columns: [{
+                        data: 'name', // Pastikan 'name' ada dalam response
+                        render: function(data, type, row) {
+                            return `
+                                <div class="d-flex px-3 py-1">
+                                    <div>
+                                        <img src="./img/team-${row.id}.jpg" class="avatar me-3" alt="image">
+                                    </div>
+                                    <div class="d-flex flex-column justify-content-center">
+                                        <h6 class="mb-0 text-sm">${row.name}</h6>
+                                        <p class="text-xs text-secondary mb-0">${row.email}</p>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    },
+                    {
+                        data: 'roles', // Sesuaikan dengan array roles
+                        render: function(data, type, row) {
+                            // Map role names menjadi string terpisah koma
+                            let roleNames = data.map(role => role.name).join(', ');
+                            return `<span class="badge bg-primary">${roleNames}</span>`;
+                        }
+                    },
+                    {
+                        data: 'created_at', // Format sudah dalam dd/mm/yyyy
+                        render: function(data) {
+                            return data; // Tidak perlu format ulang karena sudah di-backend
+                        }
+                    },
+                    {
+                        data: null,
+                        render: function(data, type, row) {
+                            return `
+                                <div class="d-flex px-3 py-1 justify-content-center align-items-center">
+                                    <button class="btn btn-link text-primary mb-0" data-bs-toggle="modal"
+                                        data-bs-target="#editUserModal"
+                                        onclick="fillEditUserModal(${JSON.stringify(row)})">Edit</button>
+                                    <button class="btn btn-link text-danger mb-0" data-bs-toggle="modal"
+                                        data-bs-target="#deleteUserModal"
+                                        onclick="setDeleteFormAction('${row.delete_url}')">
+                                        Delete
+                                    </button>
+                                </div>
+                            `;
+                        }
+                    }
+                ],
+            });
+        });
+    </script>
+@endsection --}}
 @extends('../layouts.app')
 
 @section('content')
@@ -181,8 +284,11 @@
                             }
                         },
                         {
-                            data: 'role.name',
-                            name: 'role.name'
+                            data: 'role_name',
+                            name: 'role_name',
+                            render: function(data) {
+                                return data ? data : 'No Role Assigned';
+                            }
                         },
                         {
                             data: 'created_at',
@@ -216,7 +322,7 @@
         </script>
     </div>
 
-    <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+    {{-- <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -253,13 +359,58 @@
                         </div>
                         <div class="mb-3">
                             <label for="role_id" class="form-label">Role</label>
-                            <select class="form-select" id="role_id" name="role_id">
-                                @foreach ($users as $user)
-                                    @foreach ($user['roles'] as $role)
-                                        <option value="{{ $role['role_name'] }}">
-                                            {{ $role['role_name'] }}
-                                        </option>
-                                    @endforeach
+                            <select class="form-select" id="role_id" name="role_id" required>
+                                @foreach ($roles as $role)
+                                    <option value="{{ $role->id }}">{{ $role->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Simpan</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div> --}}
+    <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addUserModalLabel">Tambah Pengguna</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ route('users.store') }}" method="POST">
+                        @csrf
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" name="username" placeholder="Username"
+                                required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="firstname" class="form-label">Firstname</label>
+                            <input type="text" class="form-control" id="firstname" name="firstname"
+                                placeholder="Firstname" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="lastname" class="form-label">Lastname</label>
+                            <input type="text" class="form-control" id="lastname" name="lastname"
+                                placeholder="Lastname" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email"
+                                placeholder="example@email.com" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" name="password"
+                                placeholder="Password" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="role" class="form-label">Role</label>
+                            <select class="form-select" id="role" name="role" required>
+                                @foreach ($roles as $role)
+                                    <option value="{{ $role->name }}">{{ $role->name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -269,6 +420,7 @@
             </div>
         </div>
     </div>
+
     <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -277,7 +429,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="editUserForm" action="#" method="POST">
+                    <form id="editUserForm" action="{{ route('users.update', ['user' => $user->id]) }}" method="POST">
                         @csrf
                         @method('PUT')
                         <div class="mb-3">
@@ -302,14 +454,11 @@
                         </div>
                         <div class="mb-3">
                             <label for="edit_role_id" class="form-label">Role</label>
-                            <div class="mb-3">
-                                <label for="edit_role_id" class="form-label">Role</label>
-                                <select class="form-select" id="edit_role_id" name="role_id" required>
-                                    @foreach ($roles as $role)
-                                        <option value="{{ $role->id }}">{{ $role->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
+                            <select class="form-select" id="edit_role_id" name="role_id" required>
+                                @foreach ($roles as $role)
+                                    <option value="{{ $role->id }}">{{ $role->name }}</option>
+                                @endforeach
+                            </select>
                         </div>
                         <button type="submit" class="btn btn-primary">Update</button>
                     </form>
@@ -723,8 +872,9 @@
     <script>
         function fillEditUserModal(user) {
             console.modal('user = ', user)
-            document.getElementById('editUserForm').action =
-                `/user-management/users/${user.id}`; // Ubah URL sesuai rute Anda
+            // document.getElementById('editUserForm').action =
+            //     `/user-management/users/${user.id}`; // Ubah URL sesuai rute Anda
+
             document.getElementById('edit_username').value = user.username;
             document.getElementById('edit_firstname').value = user.firstname;
             document.getElementById('edit_lastname').value = user.lastname;

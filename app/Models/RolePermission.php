@@ -19,14 +19,14 @@ class RolePermission extends Model
     ];
 
     // Relasi ke model MenuPermission
-    public function menuPermission()
-    {
-        return $this->belongsTo(MenuPermission::class);
-    }
+    // public function menuPermission()
+    // {
+    //     return $this->belongsTo(MenuPermission::class);
+    // }
 
-    // Relasi ke model Role
-    public function role()
-    {
-        return $this->belongsTo(Role::class);
-    }
+    // // Relasi ke model Role
+    // public function role()
+    // {
+    //     return $this->belongsTo(Role::class);
+    // }
 }

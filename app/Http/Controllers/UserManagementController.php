@@ -13,6 +13,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Carbon\Carbon;
+
 
 
 class UserManagementController extends Controller
@@ -43,33 +45,47 @@ class UserManagementController extends Controller
 
     //     return view('pages.admin.user-management', compact('users', 'roles', 'menus'));
     // }
-    public function index()
+    public function index(Request $request)
     {
+        // $users = User::with('roles.permissions')->get();
+        //  dd($users);
+        // $users = User::with('roles.permissions')->get()->map(function ($user) {
+        //     return [
+        //         'id' => $user->id,
+        //         'name' => $user->username,
+        //         'email' => $user->email,
+        //         'created_at' => Carbon::parse($user->created_at)->format('d/m/Y'), // Format dd/mm/yyyy
+        //         'roles' => $user->roles->map(function ($role) {
+        //             return [
+        //                 'name' => $role->name, // Ambil nama role langsung
+        //             ];
+        //         })->toArray(), // Konversi roles menjadi array
+        //     ];
+        // });
+        $role = auth()->user()->getRoleNames();
 
-        $users = User::with('roles.permissions')->get()->map(function ($user) {
+        if ($role[0] == 'super_admin') {
 
-            return [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'roles' => $user->roles->map(function ($role) {
-                    return [
-                        'role_name' => $role->name,
-                        'permissions' => $role->permissions->pluck('name')->toArray(),
-                    ];
-                }),
-            ];
-        });
-        //dd($users);
+            $users = User::when(request()->q, function ($query) {
+                $query->where('name', 'like', '%' . request()->q . '%');
+            })->with('roles')->latest()->get();
+        } else {
 
+            $users = User::when(request()->q, function ($query) {
+                $query->where('name', 'like', '%' . request()->q . '%');
+            })->where('id', auth()->user()->id)->with('roles')->latest()->get();
+        }
+        dd($users);
+
+
+        // Jika bukan request ajax, ambil data untuk view
         $roles = Role::all();
-        //dd($roles);
-
-
         $menus = Menu::all();
 
         return view('pages.admin.user-management', compact('users', 'roles', 'menus'));
     }
+
+
 
 
     public function roles_index()
@@ -80,11 +96,16 @@ class UserManagementController extends Controller
 
     public function getDataUser()
     {
-        $users = User::with('role')->select('users.*');
+        // Muat data user beserta relasi roles
+        $users = User::with('roles')->select('users.*');
 
         return DataTables::of($users)
             ->addColumn('name', function ($user) {
                 return $user->firstname . ' ' . $user->lastname;
+            })
+            ->addColumn('role_name', function ($user) {
+                // Ambil nama role pertama atau default jika tidak ada role
+                return $user->roles->pluck('name')->first() ?? 'No Role Assigned';
             })
             ->addColumn('delete_url', function ($user) {
                 return route('users.destroy', $user->id);
@@ -94,27 +115,34 @@ class UserManagementController extends Controller
 
     public function storeUser(Request $request)
     {
+        // Validasi input
         $request->validate([
             'username' => 'required|string|max:255',
             'firstname' => 'required|string|max:255',
             'lastname' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8',
-            'role_id' => 'required|exists:roles,id',
+            'role' => 'required|exists:roles,name', // Validasi peran (harus ada di tabel roles)
         ]);
-
-        User::create([
+        $role_n = 0;
+        // Membuat user baru
+        $user = User::create([
             'username' => $request->username,
             'firstname' => $request->firstname,
             'lastname' => $request->lastname,
             'email' => $request->email,
-            'password' => $request->password,
-            'role_id' => $request->role_id,
+            'role_id' => $role_n,
+            'password' => bcrypt($request->password), // Enkripsi password
             'status' => 'active',
         ]);
 
-        Alert::success('Success', 'User berhasil ditambahkan!');
+        // Menambahkan role ke user
+        $user->assignRole($request->role);
 
+        // Notifikasi berhasil
+        Alert::success('Success', 'User berhasil ditambahkan dengan role!');
+
+        // Redirect kembali ke halaman sebelumnya
         return redirect()->back();
     }
 
@@ -124,27 +152,91 @@ class UserManagementController extends Controller
             'firstname' => 'required|string|max:255',
             'lastname' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
-            'role_id' => 'required|exists:roles,id',
             'password' => 'nullable|string|min:8',
+            'role' => 'required|exists:roles,name', // Validasi role
         ]);
 
+        // Data untuk diperbarui
+        $role_n = 0;
         $data = [
             'firstname' => $request->firstname,
             'lastname' => $request->lastname,
             'email' => $request->email,
-            'role_id' => $request->role_id,
+            'role_id' => $role_n,
         ];
 
         if ($request->filled('password')) {
-            $data['password'] = $request->password;
+            $data['password'] = bcrypt($request->password);
         }
 
+        // Update data pengguna
         $user->update($data);
+
+        // Update role pengguna
+        $user->syncRoles($request->role); // Hapus role lama dan tetapkan role baru
 
         Alert::success('Success', 'User berhasil diperbarui!');
 
         return redirect()->back();
     }
+
+
+
+
+    // public function storeUser(Request $request)
+    // {
+    //     $request->validate([
+    //         'username' => 'required|string|max:255',
+    //         'firstname' => 'required|string|max:255',
+    //         'lastname' => 'required|string|max:255',
+    //         'email' => 'required|email|unique:users,email',
+    //         'password' => 'required|string|min:8',
+    //         //'role_id' => 'required|exists:roles,id',
+    //     ]);
+    //     $role_n = 0;
+    //     User::create([
+    //         'username' => $request->username,
+    //         'firstname' => $request->firstname,
+    //         'lastname' => $request->lastname,
+    //         'email' => $request->email,
+    //         'password' => $request->password,
+    //         'role_id' => $role_n,
+    //         'status' => 'active',
+    //     ]);
+    //     $user->assignRole($request->role);
+    //     Alert::success('Success', 'User berhasil ditambahkan!');
+
+    //     return redirect()->back();
+    // }
+
+    // public function updateUser(Request $request, User $user)
+    // {
+    //     $request->validate([
+    //         'firstname' => 'required|string|max:255',
+    //         'lastname' => 'required|string|max:255',
+    //         'email' => 'required|email|unique:users,email,' . $user->id,
+    //         'role_id' => 'required|exists:roles,id',
+    //         'password' => 'nullable|string|min:8',
+    //     ]);
+
+    //     $data = [
+    //         'firstname' => $request->firstname,
+    //         'lastname' => $request->lastname,
+    //         'email' => $request->email,
+    //         'role_id' => $request->role_id,
+    //     ];
+
+    //     if ($request->filled('password')) {
+    //         $data['password'] = $request->password;
+    //     }
+
+    //     $user->update($data);
+
+    //     Alert::success('Success', 'User berhasil diperbarui!');
+
+    //     return redirect()->back();
+    // }
+
 
     public function destroyUser(User $user)
     {
