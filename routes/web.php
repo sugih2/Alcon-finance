@@ -45,7 +45,9 @@ use App\Http\Controllers\PaymentController;
 Route::get('/data', [ExampleController::class, 'getData'])->middleware('auth')->name('data.index');
 
 Route::group(['prefix' => 'user-management', 'middleware' => 'auth'], function () {
-	Route::get('/', [UserManagementController::class, 'index'])->middleware('auth')->name('user-management.index');
+	Route::get('/role/index', [UserManagementController::class, 'index_role'])->middleware('auth')->name('role.index');
+	Route::get('/permission/index', [UserManagementController::class, 'index_permission'])->middleware('auth')->name('permission.index');
+	Route::get('/user/index', [UserManagementController::class, 'index_user'])->middleware('auth')->name('user.index');
 	Route::get('/users', [UserManagementController::class, 'getDataUser'])->name('users.data');
 	Route::post('/users', [UserManagementController::class, 'storeUser'])->name('users.store');
 	Route::put('/users/{user}', [UserManagementController::class, 'updateUser'])->name('users.update');
