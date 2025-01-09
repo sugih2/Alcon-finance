@@ -19582,6 +19582,18 @@ fieldset:disabled .btn {
 .btn-group-sm > .btn i {
     font-size: 0.7rem;
 }
+#addNewAmountBtn{
+    width: 25px; 
+    height: 25px; 
+    padding: 0;
+    margin : 5px 0 0 20px;
+}
+#cancelNewAmountBtn{
+    width: 25px; 
+    height: 25px; 
+    padding: 0;
+    margin : 5px 0 0 20px;
+}
 .btn.btn-lg.btn-icon-only,
 .btn-group-lg > .btn.btn-icon-only {
     width: 3.25rem;

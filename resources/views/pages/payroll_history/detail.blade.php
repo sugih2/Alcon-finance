@@ -28,20 +28,21 @@
                                 </tr>
                             </table>
 
-                            <table class="table align-items-center mb-0">
+                            <table class="table align-items-center mb-0" id="PayrollHistoryDetailTablee">
                                 <thead>
                                     <tr>
-                                        <th>No</th>
-                                        <th>Member Name</th>
-                                        <th>Member NIP</th>
-                                        <th>Salary</th>
-                                        <th>Allowance</th>
-                                        <th>Deduction</th>
-                                        <th>Total Incomes</th>
-                                        <th>Total Overtime</th>
-                                        <th>Total Deductions</th>
-                                        <th>Gross Salary</th>
-                                        <th>Net Salary</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">No</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Member Name</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Member NIP</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Salary</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Allowance</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Deduction</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Total Incomes</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Total Overtime</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Total Deductions</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Gross Salary</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Net Salary</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -138,7 +139,7 @@
 
     <script>
         $(document).ready(function() {
-            $('#PayrollHistoryDetailTable').DataTable({
+            $('#PayrollHistoryDetailTablee').DataTable({
                 responsive: true,
             });
         });
