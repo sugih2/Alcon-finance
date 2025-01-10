@@ -102,16 +102,7 @@ class RoleController extends Controller
         return view('pages.roles.show', compact('role', 'rolePermissions'));
     }
 
-    // public function edit($id)
-    // {
-    //     $role = Role::with('permissions')->findOrFail($id);
-    //     $permissions = Permission::all();
 
-    //     return response()->json([
-    //         'role' => $role,
-    //         'permissions' => $permissions
-    //     ]);
-    // }
     public function edit($id)
     {
         $role = Role::with('permissions')->findOrFail($id);
@@ -133,14 +124,14 @@ class RoleController extends Controller
 
         $role = Role::findOrFail($id);
 
-        // Menetapkan nama role yang diperbarui
-        $role->name = $validated['name'];
-        $role->save(); // Simpan perubahan nama role
 
-        // Mendapatkan permission berdasarkan ID yang diberikan dan memastikan menggunakan nama
+        $role->name = $validated['name'];
+        $role->save();
+
+
         $permissions = Permission::whereIn('id', $validated['permissions'])->pluck('name')->toArray();
 
-        // Sinkronisasi permission dengan nama yang sesuai
+
         $role->syncPermissions($permissions);
 
         return response()->json(['message' => 'Role updated successfully.']);
@@ -149,7 +140,7 @@ class RoleController extends Controller
 
     public function destroy($id)
     {
-        // Menggunakan findOrFail dan destroy untuk menangani role yang tidak ditemukan
+
         $role = Role::findOrFail($id);
         $role->delete();
 
