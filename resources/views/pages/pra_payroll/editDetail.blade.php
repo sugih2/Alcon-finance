@@ -23,8 +23,8 @@
     </div>
     <div class="mb-3">
         <label for="new_amount" class="form-label">New Amount</label>
-        <button type="button" class="btn btn-link text-primary mb-0" id="addNewAmountBtn">+</button>
-        <button type="button" class="btn btn-link text-primary mb-0" id="cancelNewAmountBtn">x</button>
+        <button type="button"  class="btn btn-primary"  id="addNewAmountBtn">+</button>
+        <button type="button"  class="btn btn-primary" id="cancelNewAmountBtn">x</button>
         <input type="text" class="form-control" id="new_amount" name="new_amount" 
             value="{{ $details->new_amount }}" disabled>
     </div>
