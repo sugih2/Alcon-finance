@@ -35,22 +35,28 @@
                 </a>
                 <ul class="dropdown-menu ps-4 mt-0" aria-labelledby="navbarDropdown">
                     <li>
-                        <a class="dropdown-item {{ Route::currentRouteName() == 'permissions.index' ? 'active' : '' }}"
-                            href="{{ route('permissions.index') }}">
-                            Permission
-                        </a>
+                        @can('permissions.index')
+                            <a class="dropdown-item {{ Route::currentRouteName() == 'permissions.index' ? 'active' : '' }}"
+                                href="{{ route('permissions.index') }}">
+                                Permission
+                            </a>
+                        @endcan
                     </li>
                     <li>
-                        <a class="dropdown-item {{ Route::currentRouteName() == 'role.index' ? 'active' : '' }}"
-                            href="{{ route('roles.index') }}">
-                            Role
-                        </a>
+                        @can('roles.index')
+                            <a class="dropdown-item {{ Route::currentRouteName() == 'role.index' ? 'active' : '' }}"
+                                href="{{ route('roles.index') }}">
+                                Role
+                            </a>
+                        @endcan
                     </li>
                     <li>
-                        <a class="dropdown-item {{ Route::currentRouteName() == 'user.index' ? 'active' : '' }}"
-                            href="{{ route('user.index') }}">
-                            Users
-                        </a>
+                        @can('users.index')
+                            <a class="dropdown-item {{ Route::currentRouteName() == 'user.index' ? 'active' : '' }}"
+                                href="{{ route('user.index') }}">
+                                Users
+                            </a>
+                        @endcan
                     </li>
                 </ul>
             </li>

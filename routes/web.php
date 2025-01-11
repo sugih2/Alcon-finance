@@ -52,8 +52,10 @@ Route::group(['prefix' => 'user-management', 'middleware' => 'auth'], function (
 	Route::get('/user/index', [UserManagementController::class, 'index_user'])->middleware('auth')->name('user.index');
 	Route::get('/users', [UserManagementController::class, 'getDataUser'])->name('users.data');
 	Route::post('/users', [UserManagementController::class, 'storeUser'])->name('users.store');
+	Route::get('/users/{user}', [UserManagementController::class, 'showUser'])->name('users.show');
 	Route::put('/users/{user}', [UserManagementController::class, 'updateUser'])->name('users.update');
 	Route::delete('/users/{user}', [UserManagementController::class, 'destroyUser'])->name('users.destroy');
+
 
 	Route::get('/roles', [RoleController::class, 'index'])->name('roles.index');
 	Route::get('/roles/create', [RoleController::class, 'create'])->name('roles.create');

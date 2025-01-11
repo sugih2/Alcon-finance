@@ -13,132 +13,26 @@ use Spatie\Permission\Models\Role;
 
 class UserManagementController extends Controller
 {
-    //     public function index_user()
-    //     {
 
-    //         $role = auth()->user()->getRoleNames()->first();
-    //         $isSuperAdmin = $role === 'super_admin';
+    function __construct()
+    {
+        $this->middleware('permission:users.index', ['only' => ['index_user', 'getDataUser']]);
+        $this->middleware('permission:users.create', ['only' => ['storeUser', 'getDataUser']]);
+        $this->middleware('permission:users.edit', ['only' => ['edit', 'updateUser']]);
+        $this->middleware('permission:users.delete', ['only' => ['destroyUser']]);
+    }
 
-    //         $users = User::when(request()->q, function ($query) {
-    //             $query->where('name', 'like', '%' . request()->q . '%');
-    //         })
-    //             ->when(!$isSuperAdmin, function ($query) {
-    //                 $query->where('id', auth()->user()->id);
-    //             })
-    //             ->with('roles')
-    //             ->latest()
-    //             ->get();
-    //         //  dd($users->toArray());
-    //         $roles = Role::all();
-    //         return view('pages.admin.index-user', compact('users', 'roles'));
-    //     }
-
-
-
-    //     public function getDataUser()
-    //     {
-    //         // Muat data user beserta relasi roles
-    //         $users = User::with('roles')->select('users.*');
-
-    //         return DataTables::of($users)
-    //             ->addColumn('name', function ($user) {
-    //                 return $user->firstname . ' ' . $user->lastname;
-    //             })
-    //             ->addColumn('role_name', function ($user) {
-    //                 // Ambil nama role pertama atau default jika tidak ada role
-    //                 return $user->roles->pluck('name')->first() ?? 'No Role Assigned';
-    //             })
-    //             ->addColumn('delete_url', function ($user) {
-    //                 return route('users.destroy', $user->id);
-    //             })
-    //             ->make(true);
-    //     }
-
-    //     public function storeUser(Request $request)
-    //     {
-    //         // Validasi input
-    //         $request->validate([
-    //             'username' => 'required|string|max:255',
-    //             'firstname' => 'required|string|max:255',
-    //             'lastname' => 'required|string|max:255',
-    //             'email' => 'required|email|unique:users,email',
-    //             'password' => 'required|string|min:8',
-    //             'role' => 'required|exists:roles,name', // Validasi peran (harus ada di tabel roles)
-    //         ]);
-    //         $role_n = 0;
-    //         // Membuat user baru
-    //         $user = User::create([
-    //             'username' => $request->username,
-    //             'firstname' => $request->firstname,
-    //             'lastname' => $request->lastname,
-    //             'email' => $request->email,
-    //             'password' => $request->password,
-    //             'status' => 'active',
-    //         ]);
-
-    //         // Menambahkan role ke user
-    //         $user->assignRole($request->role);
-
-    //         // Notifikasi berhasil
-    //         Alert::success('Success', 'User berhasil ditambahkan dengan role!');
-
-    //         // Redirect kembali ke halaman sebelumnya
-    //         return redirect()->back();
-    //     }
-
-    //     public function updateUser(Request $request, User $user)
-    //     {
-    //         $request->validate([
-    //             'firstname' => 'required|string|max:255',
-    //             'lastname' => 'required|string|max:255',
-    //             'email' => 'required|email|unique:users,email,' . $user->id,
-    //             'password' => 'nullable|string|min:8',
-    //             'role' => 'required|exists:roles,name', // Validasi role
-    //         ]);
-
-    //         // Data untuk diperbarui
-    //         $role_n = 0;
-    //         $data = [
-    //             'firstname' => $request->firstname,
-    //             'lastname' => $request->lastname,
-    //             'email' => $request->email,
-
-    //         ];
-
-    //         if ($request->filled('password')) {
-    //             $data['password'] = bcrypt($request->password);
-    //         }
-
-    //         // Update data pengguna
-    //         $user->update($data);
-
-    //         // Update role pengguna
-    //         $user->syncRoles($request->role); // Hapus role lama dan tetapkan role baru
-
-    //         Alert::success('Success', 'User berhasil diperbarui!');
-
-    //         return redirect()->back();
-    //     }
-
-
-
-    //     public function destroyUser(User $user)
-    //     {
-    //         $user->delete();
-    //         Alert::success('Success', 'User berhasil dihapus!');
-    //         return redirect()->back();
-    //     }
     public function index_user()
     {
-        // Memeriksa apakah pengguna memiliki role 'super_admin'
-        $isSuperAdmin = auth()->user()->hasRole('super_admin');  // Pemeriksaan role yang lebih mudah dibaca
 
-        // Mengambil data pengguna dengan filter pencarian dan role
+        $isSuperAdmin = auth()->user()->hasRole('super_admin');
+
+
         $users = User::when(request()->q, function ($query) {
             $query->where('name', 'like', '%' . request()->q . '%');
         })
             ->when(!$isSuperAdmin, function ($query) {
-                $query->where('id', auth()->user()->id); // Jika bukan super admin, hanya tampilkan data diri sendiri
+                $query->where('id', auth()->user()->id);
             })
             ->with('roles')
             ->latest()
@@ -150,7 +44,7 @@ class UserManagementController extends Controller
 
     public function getDataUser()
     {
-        // Muat data pengguna beserta relasi roles
+
         $users = User::with('roles')->select('users.*');
 
         return DataTables::of($users)
@@ -166,9 +60,15 @@ class UserManagementController extends Controller
             ->make(true);
     }
 
+    public function showUser(User $user)
+    {
+        return response()->json($user);
+    }
+
+
     public function storeUser(Request $request)
     {
-        // Validasi input pengguna
+
         $request->validate([
             'username' => 'required|string|max:255',
             'firstname' => 'required|string|max:255',
@@ -178,17 +78,17 @@ class UserManagementController extends Controller
             'role' => 'required|exists:roles,name',
         ]);
 
-        // Membuat pengguna baru dengan password yang di-hash
+
         $user = User::create([
             'username' => $request->username,
             'firstname' => $request->firstname,
             'lastname' => $request->lastname,
             'email' => $request->email,
-            'password' => $request->password,  // Pastikan password di-hash
+            'password' => $request->password,
             'status' => 'active',
         ]);
 
-        // Menambahkan role ke pengguna
+
         $user->assignRole($request->role);
 
         Alert::success('Success', 'User berhasil ditambahkan dengan role!');
@@ -198,7 +98,7 @@ class UserManagementController extends Controller
 
     public function updateUser(Request $request, User $user)
     {
-        // Validasi input untuk pembaruan
+
         $request->validate([
             'firstname' => 'required|string|max:255',
             'lastname' => 'required|string|max:255',
@@ -207,7 +107,7 @@ class UserManagementController extends Controller
             'role' => 'required|exists:roles,name',
         ]);
 
-        // Data yang akan diperbarui
+
         $data = [
             'firstname' => $request->firstname,
             'lastname' => $request->lastname,
@@ -215,14 +115,14 @@ class UserManagementController extends Controller
         ];
 
         if ($request->filled('password')) {
-            $data['password'] = bcrypt($request->password); // Pastikan password di-hash
+            $data['password'] = $request->password;
         }
 
-        // Memperbarui data pengguna
+
         $user->update($data);
 
-        // Memperbarui role pengguna
-        $user->syncRoles($request->role); // Menghapus role lama dan menambahkan role baru
+
+        $user->syncRoles($request->role);
 
         Alert::success('Success', 'User berhasil diperbarui!');
 

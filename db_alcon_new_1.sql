@@ -534,7 +534,7 @@ CREATE TABLE `model_has_roles` (
 
 LOCK TABLES `model_has_roles` WRITE;
 /*!40000 ALTER TABLE `model_has_roles` DISABLE KEYS */;
-INSERT INTO `model_has_roles` VALUES (5,'App\\Models\\User',9),(21,'App\\Models\\User',19);
+INSERT INTO `model_has_roles` VALUES (21,'App\\Models\\User',1),(5,'App\\Models\\User',21),(21,'App\\Models\\User',22);
 /*!40000 ALTER TABLE `model_has_roles` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -751,7 +751,7 @@ CREATE TABLE `permissions` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `permissions_name_guard_name_unique` (`name`,`guard_name`)
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -760,7 +760,7 @@ CREATE TABLE `permissions` (
 
 LOCK TABLES `permissions` WRITE;
 /*!40000 ALTER TABLE `permissions` DISABLE KEYS */;
-INSERT INTO `permissions` VALUES (1,'dashboard.index','web','2024-12-30 07:22:03','2024-12-30 07:22:03'),(2,'dashboard.statistics','web','2024-12-30 07:22:03','2024-12-30 07:22:03'),(3,'dashboard.chart','web','2024-12-30 07:22:03','2024-12-30 07:22:03'),(4,'users.index','web','2024-12-30 07:22:03','2024-12-30 07:22:03'),(5,'users.create','web','2024-12-30 07:22:03','2024-12-30 07:22:03'),(6,'users.edit','web','2024-12-30 07:22:03','2024-12-30 07:22:03'),(7,'users.delete','web','2024-12-30 07:22:03','2024-12-30 07:22:03'),(8,'roles.index','web','2024-12-30 07:22:03','2024-12-30 07:22:03'),(9,'roles.create','web','2024-12-30 07:22:03','2024-12-30 07:22:03'),(10,'roles.edit','web','2024-12-30 07:22:03','2024-12-30 07:22:03'),(12,'permissions.index','web','2024-12-30 07:22:03','2024-12-30 07:22:03'),(13,'role.list','web','2025-01-08 10:07:47','2025-01-08 10:07:47'),(14,'role.create','web','2025-01-08 10:07:47','2025-01-08 10:07:47'),(15,'role.edit','web','2025-01-08 10:07:47','2025-01-08 10:07:47');
+INSERT INTO `permissions` VALUES (4,'users.index','web','2024-12-30 07:22:03','2024-12-30 07:22:03'),(5,'users.create','web','2024-12-30 07:22:03','2024-12-30 07:22:03'),(6,'users.edit','web','2024-12-30 07:22:03','2024-12-30 07:22:03'),(7,'users.delete','web','2024-12-30 07:22:03','2024-12-30 07:22:03'),(8,'roles.index','web','2024-12-30 07:22:03','2024-12-30 07:22:03'),(9,'roles.create','web','2024-12-30 07:22:03','2024-12-30 07:22:03'),(10,'roles.edit','web','2024-12-30 07:22:03','2024-12-30 07:22:03'),(19,'roles.delete','web','2025-01-10 09:35:36','2025-01-10 09:35:36'),(20,'permissions.index','web','2025-01-10 09:44:06','2025-01-10 09:44:06'),(21,'permissions.create','web','2025-01-10 09:44:27','2025-01-10 09:44:27'),(22,'permissions.edit','web','2025-01-10 09:44:39','2025-01-10 09:44:39'),(23,'permissions.delete','web','2025-01-10 09:44:52','2025-01-10 09:44:52');
 /*!40000 ALTER TABLE `permissions` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -973,7 +973,7 @@ CREATE TABLE `role_has_permissions` (
 
 LOCK TABLES `role_has_permissions` WRITE;
 /*!40000 ALTER TABLE `role_has_permissions` DISABLE KEYS */;
-INSERT INTO `role_has_permissions` VALUES (1,1),(2,1),(3,1),(4,1),(5,1),(6,1),(7,1),(8,1),(9,1),(10,1),(12,1),(4,5),(5,5),(6,5),(7,5),(1,21),(2,21),(3,21),(4,21),(5,21),(6,21),(7,21),(8,21),(9,21),(10,21),(12,21),(13,21),(14,21),(15,21),(1,26);
+INSERT INTO `role_has_permissions` VALUES (4,5),(5,5),(6,5),(7,5),(8,5),(9,5),(10,5),(19,5),(20,5),(21,5),(22,5),(23,5),(4,21);
 /*!40000 ALTER TABLE `role_has_permissions` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -992,7 +992,7 @@ CREATE TABLE `roles` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `roles_name_guard_name_unique` (`name`,`guard_name`)
-) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1001,7 +1001,7 @@ CREATE TABLE `roles` (
 
 LOCK TABLES `roles` WRITE;
 /*!40000 ALTER TABLE `roles` DISABLE KEYS */;
-INSERT INTO `roles` VALUES (1,'admina','web','2024-12-30 07:22:03','2025-01-02 21:14:55'),(5,'super_admin','web','2025-01-02 20:01:46','2025-01-02 20:01:46'),(21,'Admin','web','2025-01-08 10:12:14','2025-01-08 10:12:14'),(26,'test','web','2025-01-09 02:40:36','2025-01-09 02:40:36');
+INSERT INTO `roles` VALUES (5,'super_admin','web','2025-01-02 20:01:46','2025-01-02 20:01:46'),(21,'admin','web','2025-01-08 10:12:14','2025-01-10 09:45:33');
 /*!40000 ALTER TABLE `roles` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1081,7 +1081,6 @@ CREATE TABLE `users` (
   `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `email_verified_at` timestamp NULL DEFAULT NULL,
   `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `role_id` bigint unsigned NOT NULL,
   `status` enum('active','inactive') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'active',
   `address` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `city` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -1092,9 +1091,8 @@ CREATE TABLE `users` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `users_email_unique` (`email`),
-  KEY `users_role_id_foreign` (`role_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  UNIQUE KEY `users_email_unique` (`email`)
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1103,7 +1101,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'admin','Admin','Admin','admin@alfabanguncipta.com','2024-10-23 09:36:35','$2y$12$QBAIE2i3KybEERpcaGdejOmlGWeoswsxVQT48deIl25o.9.0Cm9Fa',0,'active','Jl. Contoh No. 1','Kota Bandung','Indonesia','12345','Administrator of the system',NULL,'2024-10-23 09:36:35','2024-10-23 09:36:35'),(9,'Administrators','Administrators','Administrators','admins@gmail.com',NULL,'$2y$12$QBAIE2i3KybEERpcaGdejOmlGWeoswsxVQT48deIl25o.9.0Cm9Fa',0,'active',NULL,NULL,NULL,NULL,NULL,NULL,'2024-12-30 07:40:18','2024-12-30 07:40:18'),(17,'test','test','test','test@gmail.com',NULL,'$2y$12$ie2.85IEXFJmu7IDkILPDeipmFEt0cOMu/eW4js6al.FyEA.D5Zjm',0,'active',NULL,NULL,NULL,NULL,NULL,NULL,'2025-01-06 18:31:43','2025-01-06 18:31:43'),(18,'test2','test2','test2','test2@gmail.com',NULL,'$2y$12$colIbKOvvGAQFRPViALtSeGrnvN9nQgnRcOtIrXPASYQU550Qk.2a',0,'active',NULL,NULL,NULL,NULL,NULL,NULL,'2025-01-07 10:26:04','2025-01-07 10:26:04'),(19,'sugih',NULL,NULL,'admin@gmail.com',NULL,'$2y$12$OGiTemwoz/iawCXLhXpLnuQm2FmDFgM16bHhWgz9mOhGB9EOrAUFC',0,'active',NULL,NULL,NULL,NULL,NULL,NULL,'2025-01-08 10:12:14','2025-01-08 10:12:14');
+INSERT INTO `users` VALUES (1,'admin','Admin','Admin','admin@alfabanguncipta.com','2024-10-23 09:36:35','$2y$12$XzieBVgKKRD1HCL7tFaBW.8Ae6QLfhXnspcco.FQth9qSTW8ISn8q','active','Jl. Contoh No. 1','Kota Bandung','Indonesia','12345','Administrator of the system',NULL,'2024-10-23 09:36:35','2025-01-10 10:25:48'),(21,'owner','owner','owner','owner@gmail.com',NULL,'$2y$12$6QXOS7c03BeJhbtYltif9up5sCLkm2VY9UdhJwXTo2qYpnypdTMuu','active',NULL,NULL,NULL,NULL,NULL,NULL,'2025-01-09 10:58:08','2025-01-09 10:58:08'),(22,'admin','admin','admin','admin@gmail.com',NULL,'$2y$12$3GYpsD1OlrZurNra5iLNKeXeWXXUF8gPuw37F42krnGsUnlTwe8za','active',NULL,NULL,NULL,NULL,NULL,NULL,'2025-01-10 07:53:57','2025-01-10 09:54:47');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1143,4 +1141,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-01-09 17:00:09
+-- Dump completed on 2025-01-11  0:39:00
