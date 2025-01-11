@@ -16,10 +16,32 @@ class PresenceController extends Controller
 {
     public function index()
     {
-        $presences = Presence::with('employee')->get(); // Asumsikan ada relasi dengan tabel karyawan
-        return view('pages.presence.presence', compact('presences'));
-    }
+        $presences = Presence::with('employee')->get();
+        // log::info('CEK DATA : ' . json_encode($presences, JSON_PRETTY_PRINT));
 
+        $uniqueEmployees = $presences->pluck('employee')->unique('name');
+
+        // log::info('CEK DATA : ' . json_encode($uniqueEmployees, JSON_PRETTY_PRINT));
+        return view('pages.presence.presence', compact('presences', 'uniqueEmployees'));
+    }
+    public function detailPresence($id)
+    {
+        $presences = Presence::with('employee')->where('employed_id', $id)->get();
+        $uniqueEmployees = $presences->pluck('employee')->unique('name');
+        log::info('CEK DATA employee : ' . json_encode($presences, JSON_PRETTY_PRINT));
+
+        return view('pages.presence.detailpresence', compact('presences', 'uniqueEmployees'));
+    }
+    public function filterPresences(Request $request)
+    {
+        log::info('cek tanggal :' . json_encode($request, JSON_PRETTY_PRINT));
+        $startDate = $request->query('start');
+        $endDate = $request->query('end');
+
+        $presences = Presence::whereBetween('tanggal', [$startDate, $endDate])->get();
+
+        return response()->json($presences);
+    }
     public function create()
     {
         return view('pages.presence.create');

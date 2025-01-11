@@ -39,34 +39,26 @@
                                 <tr>
                                     <th>No</th>
                                     <th>Employee Name</th>
-                                    <th>Tanggal Scan</th>
+                                    {{-- <th>Tanggal Scan</th>
                                     <th>Tanggal</th>
                                     <th>Jam Masuk</th>
                                     <th>Jam Pulang</th>
                                     <th>SN</th>
-                                    <th>Status</th>
+                                    <th>Status</th> --}}
                                     <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @php $index = 1; @endphp
-                                @foreach ($presences as $presence)
+                                @foreach ($uniqueEmployees as $presence)
                                     <tr>
                                         <td>{{ $index++ }}</td>
-                                        <td>{{ $presence->employee->name }}</td>
-                                        <td>{{ $presence->tanggal_scan }}</td>
-                                        <td>{{ $presence->tanggal }}</td>
-                                        <td>{{ $presence->jam_masuk }}</td>
-                                        <td>{{ $presence->jam_pulang }}</td>
-                                        <td>{{ $presence->sn }}</td>
-                                        <td>{{ $presence->presensi_status }}</td>
+                                        <td>{{ $presence->name }}</td>
                                         <td class="align-middle text-end">
-                                            <button type="button" class="btn btn-link text-primary mb-0"
-                                                data-bs-toggle="modal" data-bs-target="#editModal"
-                                                onclick="editPresence({{ $presence->id }})">Edit</button>
-                                            <button type="button" class="btn btn-link text-danger mb-0"
-                                                data-bs-toggle="modal" data-bs-target="#deletePresenceModal" onclick="deletePresence({{ $presence->id }})"
-                                                data-id="{{ $presence->id }}">Delete</button>
+                                            <button type="button" class="btn btn-link text-info mb-0"
+                                            onclick="window.location.href='{{ route('detailPresence.detailPresence', ['id' => $presence->id]) }}'">
+                                            Detail Presence
+                                        </button>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -408,6 +400,7 @@
         }
 
         function editPresence(id) {
+            // console.log('cek id : ', id)
             $.ajax({
                 url: "{{ url('/presence/edit') }}/" + id,
                 type: 'GET',

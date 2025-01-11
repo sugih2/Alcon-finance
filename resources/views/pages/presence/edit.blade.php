@@ -17,12 +17,12 @@
     </div>
     <div class="mb-3">
         <label for="jam_masuk" class="form-label">Jam Masuk </label>
-        <input type="time" class="form-control" id="jam_masuk" name="jam_masuk" 
+        <input type="time" step="1" class="form-control" id="jam_masuk" name="jam_masuk" 
             value="{{ $presence->jam_masuk }}" >
     </div>
     <div class="mb-3">
         <label for="jam_pulang" class="form-label">Jam Pulang </label>
-        <input type="time" class="form-control" id="jam_pulang" name="jam_pulang" 
+        <input type="time" step="1" class="form-control" id="jam_pulang" name="jam_pulang" 
             value="{{ $presence->jam_pulang }}" >
     </div>
     <div class="mb-3">
