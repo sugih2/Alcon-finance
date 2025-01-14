@@ -34,9 +34,9 @@
                                         <th
                                             class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                             Status</th>
-                                        <th
+                                        {{-- <th
                                             class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                            Payment Date</th>
+                                            Payment Date</th> --}}
                                         <th
                                             class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                             Description</th>
@@ -56,24 +56,27 @@
                                             <td>Rp {{ number_format($e->amount_transaksi, 0, ',', '.') }}</td>
                                             <td>{{ $e->total_karyawan }}</td>
                                             <td>{{ $e->status_payroll }}</td>
-                                            @foreach($getDate as $d)
-                                                <td>{{ $d->payment_date }}
-                                            @endforeach
+                                            {{-- @foreach ($getDate as $d)
+                                                <td>{{ $d->payment_date ? \Carbon\Carbon::parse($d->payment_date)->format('d F Y') : '-' }}
+                                                </td>
+                                            @endforeach --}}
+
                                             <td>{{ $e->description }}</td>
 
                                             <td class="align-middle text-end">
                                                 <button type="button" class="btn btn-link text-info mb-0"
-                                                onclick="window.location.href='{{ route('historypayrollGroup.index', ['id' => $e->id]) }}'">
-                                                Detail Group
-                                            </button>
+                                                    onclick="window.location.href='{{ route('historypayrollGroup.index', ['id' => $e->id]) }}'">
+                                                    Detail Group
+                                                </button>
                                                 {{-- <button type="button" class="btn btn-primary"
                                                     onclick="payment({{ $e->id }})"> Proces Payment
                                                 </button> --}}
-                                                @if($e->status_payroll === 'pending')
-                                                <button type="button" class="btn btn-primary"
-                                                    onclick="payment({{ $e->id }})">Process Payment</button>
+                                                @if ($e->status_payroll === 'Pending')
+                                                    <button type="button" class="btn btn-primary"
+                                                        onclick="payment({{ $e->id }})">Process Payment</button>
                                                 @else
-                                                <button type="button" class="btn btn-secondary" disabled>Sudah Payment</button>
+                                                    <button type="button" class="btn btn-secondary" disabled>Sudah
+                                                        Payment</button>
                                                 @endif
                                             </td>
 
@@ -110,7 +113,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="PaymentModalLabel">Payment Provess</h5>
+                    <h5 class="modal-title" id="PaymentModalLabel">Payment Process</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                         id="CloseBtnPay"></button>
                 </div>

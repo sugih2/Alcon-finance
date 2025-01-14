@@ -7,6 +7,8 @@ use App\Models\Employee;
 use App\Models\ParamComponen;
 use App\Models\MasterPayroll;
 use App\Models\DetailPayroll;
+use App\Models\Group;
+use App\Models\GroupMember;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -19,14 +21,31 @@ class PraPayrollController extends Controller
         $detailPayrolls = DetailPayroll::all();
         return view('pages.pra_payroll.index', compact('masterPayrolls', 'detailPayrolls'));
     }
+
     public function indexDetail()
     {
         $detailPayrolls = DetailPayroll::with(['employee', 'component'])
             ->get()
             ->groupBy('id_employee');
 
+        $detailPayrolls->each(function ($payrollGroup, $employeeId) {
+            $totalAmount = $payrollGroup->sum('amount');
+            $leaderGroups = Group::where('leader_id', $employeeId)->pluck('name');
+            $memberGroups = Group::whereHas('members', function ($query) use ($employeeId) {
+                $query->where('member_id', $employeeId);
+            })->pluck('name');
+            $groups = $leaderGroups->merge($memberGroups)->unique();
+
+            $payrollGroup->each(function ($payroll) use ($groups, $totalAmount) {
+                $payroll->groups = $groups;
+                $payroll->total_amount = $totalAmount;
+            });
+        });
+
+        Log::info("Data :" . json_encode($detailPayrolls, JSON_PRETTY_PRINT));
         return view('pages.pra_payroll.detail', compact('detailPayrolls'));
     }
+    
     public function adjusment()
     {
         return view('pages.adjusment.index');
@@ -318,4 +337,18 @@ class PraPayrollController extends Controller
             );
         }
     }
+
+    public function getEmployeeGroups($employeeId)
+    {
+        $leaderGroups = Group::where('leader_id', $employeeId)->get();
+
+        $memberGroups = Group::whereHas('members', function ($query) use ($employeeId) {
+            $query->where('member_id', $employeeId);
+        })->get();
+
+        $employeeGroups = $leaderGroups->merge($memberGroups);
+
+        return $employeeGroups;
+    }
+
 }
