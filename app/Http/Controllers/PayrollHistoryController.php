@@ -23,76 +23,26 @@ class PayrollHistoryController extends Controller
         return view('pages.payroll_history.index', compact('payrollHistories'));
     }
 
-    // public function showDetails($id)
-    // {
-    //     try {
-    //         // Ambil data payroll history dengan relasi
-    //         $payrollHistoryDetail = PayrollHistory::with(['detailPayroll.employee'])
-    //             ->findOrFail($id);
-
-    //         // Ubah allowance dan deduction menjadi array jika berbentuk JSON
-    //         foreach ($payrollHistoryDetail->detailPayroll as $detail) {
-    //             // Pastikan allowance dalam bentuk array
-    //             $allowanceData = is_string($detail->allowance)
-    //                 ? json_decode($detail->allowance, true)
-    //                 : $detail->allowance;
-
-    //             // Bersihkan nilai allowance jika ada
-    //             if (is_array($allowanceData)) {
-    //                 foreach ($allowanceData as $key => $allowance) {
-    //                     $allowanceData[$key]['nilai'] = (float) str_replace('.', '', $allowance['nilai']);
-    //                 }
-    //             }
-
-    //             // Tetapkan allowance yang sudah diperbarui kembali ke properti
-    //             $detail->allowance = $allowanceData;
-
-    //             // Lakukan hal yang sama untuk deduction jika diperlukan
-    //             $deductionData = is_string($detail->deduction)
-    //                 ? json_decode($detail->deduction, true)
-    //                 : $detail->deduction;
-
-    //             if (is_array($deductionData)) {
-    //                 foreach ($deductionData as $key => $deduction) {
-    //                     $deductionData[$key]['nilai'] = (float) str_replace('.', '', $deduction['nilai']);
-    //                 }
-    //             }
-
-    //             $detail->deduction = $deductionData;
-    //         }
-
-
-
-    //         // Log detail data untuk debugging
-    //         Log::info("Payroll History Detail: ", ['data' => $payrollHistoryDetail]);
-
-    //         // Kirim data ke view
-    //         return view('pages.payroll_history.detail', compact('payrollHistoryDetail'));
-    //     } catch (\Exception $e) {
-    //         Log::error("Error fetching payroll history detail: " . $e->getMessage());
-    //         return redirect()->back()->with('error', 'Data tidak ditemukan.');
-    //     }
-    // }
-
     public function showGroupTotals($id)
     {
         session(['id_payroll_histories' => $id]);
-        log::info('cek id cik bro : ' . json_encode($id, JSON_PRETTY_PRINT));
+        Log::info('cek id cik bro : ' . json_encode($id, JSON_PRETTY_PRINT));
+
         try {
-            //::info("Fetching group totals for payroll history ID: {$id}");
-
             $payrollHistoryDetail = PayrollHistory::findOrFail($id);
-
-            //Log::info("Payroll history detail retrieved", ['payroll_history' => $payrollHistoryDetail]);
 
             $groups = Group::with([
                 'members.member',
                 'members.member.payrollHistoryDetails' => function ($query) use ($id) {
                     $query->where('id_payroll_history', $id);
+                },
+                'leader.payrollHistoryDetails' => function ($query) use ($id) {
+                    $query->where('id_payroll_history', $id);
                 }
             ])->get();
 
-            //Log::info("Groups fetched for payroll history ID: {$id}", ['groups_count' => $groups->count()]);
+            Log::info("Data :" . json_encode($groups, JSON_PRETTY_PRINT));
+            Log::info("Groups fetched for payroll history ID: {$id}", ['groups_count' => $groups->count()]);
 
             $result = $groups->map(function ($group) {
                 $totalSalary = 0;
@@ -101,12 +51,9 @@ class PayrollHistoryController extends Controller
                 $grossSalary = 0;
                 $netSalary = 0;
 
-                //Log::info("Processing group", ['group_name' => $group->name, 'group_code' => $group->code]);
-
-                foreach ($group->members as $member) {
-                    foreach ($member->member->payrollHistoryDetails as $payroll) {
-                        //Log::info("Processing payroll for member", ['employee' => $member->member->name, 'payroll_id' => $payroll->id]);
-
+                // Include leader's payroll details
+                if ($group->leader) {
+                    foreach ($group->leader->payrollHistoryDetails as $payroll) {
                         $totalSalary += $payroll->salary;
 
                         // Decode allowance and sum 'nilai' values if it's an array
@@ -116,6 +63,26 @@ class PayrollHistoryController extends Controller
                         }, $allowance)) : 0;
 
                         // Decode deduction and sum 'nilai' values if it's an array
+                        $deduction = $payroll->deduction;
+                        $totalDeduction += is_array($deduction) ? array_sum(array_map(function ($item) {
+                            return isset($item['nilai']) ? floatval(str_replace('.', '', $item['nilai'])) : 0;
+                        }, $deduction)) : 0;
+
+                        $grossSalary += $payroll->gaji_bruto;
+                        $netSalary += $payroll->gaji_bersih;
+                    }
+                }
+
+                // Include members' payroll details
+                foreach ($group->members as $member) {
+                    foreach ($member->member->payrollHistoryDetails as $payroll) {
+                        $totalSalary += $payroll->salary;
+
+                        $allowance = $payroll->allowance;
+                        $totalAllowance += is_array($allowance) ? array_sum(array_map(function ($item) {
+                            return isset($item['nilai']) ? floatval(str_replace('.', '', $item['nilai'])) : 0;
+                        }, $allowance)) : 0;
+
                         $deduction = $payroll->deduction;
                         $totalDeduction += is_array($deduction) ? array_sum(array_map(function ($item) {
                             return isset($item['nilai']) ? floatval(str_replace('.', '', $item['nilai'])) : 0;
@@ -139,7 +106,7 @@ class PayrollHistoryController extends Controller
                 ];
             });
 
-            //Log::info("Group totals calculated", ['totals' => json_encode($result, JSON_PRETTY_PRINT)]);
+            Log::info("Group totals calculated", ['totals' => json_encode($result, JSON_PRETTY_PRINT)]);
 
             return view('pages.payroll_history.group', compact('result', 'payrollHistoryDetail'));
         } catch (\Exception $e) {
@@ -151,7 +118,7 @@ class PayrollHistoryController extends Controller
 
     public function showGroupDetails($payrollHistoryId, $groupId)
     {
-        Log::info("showGroupDetails called", ['payrollHistoryId' => $payrollHistoryId, 'groupId' => $groupId]);
+        //Log::info("showGroupDetails called", ['payrollHistoryId' => $payrollHistoryId, 'groupId' => $groupId]);
         try {
             // Fetching group with payroll history details
             $group = Group::with([
@@ -162,7 +129,7 @@ class PayrollHistoryController extends Controller
                     $query->where('id_payroll_history', $payrollHistoryId);
                 }
             ])->findOrFail($groupId);
-            Log::info("Attendance Details Data AHUY : " . json_encode($group, JSON_PRETTY_PRINT));
+            //Log::info("Attendance Details Data AHUY : " . json_encode($group, JSON_PRETTY_PRINT));
             // Prepare result to pass to the viewf
             $result = [
                 'group_name' => $group->name,
@@ -193,7 +160,7 @@ class PayrollHistoryController extends Controller
 
             Log::info("Group Details", ['Details Group' => json_encode($result, JSON_PRETTY_PRINT)]);
             // Return the result to the view
-            Log::info("Fetching group details", ['groupId' => $groupId, 'payrollHistoryId' => $payrollHistoryId]);
+            //Log::info("Fetching group details", ['groupId' => $groupId, 'payrollHistoryId' => $payrollHistoryId]);
 
             return view('pages.payroll_history.detail', compact('result'));
         } catch (\Exception $e) {

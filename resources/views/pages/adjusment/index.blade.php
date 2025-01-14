@@ -15,20 +15,8 @@
                             <div class="container-setting">
 
                                 <form>
-
-                                    <div class="form-group">
-                                        <label for="gridRadios1" class="col-form-label">Type</label>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="type" id="gridRadios1"
-                                                value="adjustment">
-                                            <label class="form-check-label" for="gridRadios1">Adjustment</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="type" id="gridRadios2"
-                                                value="expired">
-                                            <label class="form-check-label" for="gridRadios2">Expired</label>
-                                        </div>
-                                    </div>
+                                    @csrf
+                                    <input type="hidden" value="Adjusment" name="type">
 
                                     <div class="form-group">
                                         <label for="periode" class="col-form-label">Efektif Date</label>
@@ -689,7 +677,7 @@
 
 
             var data = {
-                type: $("input[name='type']:checked").val(),
+                type: $("input[name='type']").val(),
                 efektif_date: $("input[name='efektif_date']").val(),
                 description: $("textarea[name='description']").val(),
                 end_date: $("input[name='end_date']").val(),

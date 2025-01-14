@@ -37,17 +37,20 @@
                                                                 'id_transaksi' => $payroll->id_transaksi,
                                                                 'component_name' => $payroll->component->name ?? 'N/A',
                                                                 'amount' => $payroll->amount,
+                                                                'groups' => $payroll->groups,
+                                                                'total_amount' => $payroll->total_amount,
                                                             ];
                                                         }),
                                                     ) }}">
                                                     <td class="dt-control"></td>
-                                                    <td>{{ $index++ }}</td>
+                                                    <td>{{ $loop->iteration }}</td>
                                                     <td>{{ $payrolls->first()->employee->name ?? 'N/A' }}</td>
                                                     <td>{{ $payrolls->first()->employee->nip }}</td>
-                                                    <td>Dummy</td>
-                                                    <td>Dummy</td>
+                                                    <td>{{ $payrolls->first()->groups->implode(', ') }}</td>
+                                                    <td>Rp. {{ number_format($payrolls->first()->total_amount, 2) }}</td>
                                                 </tr>
                                             @endforeach
+
                                         </tbody>
                                     </table>
 

@@ -83,7 +83,7 @@
                         <div id="customDropdownMenu" class="custom-dropdown-menu">
                             <a href="#" class="custom-dropdown-item" onclick="loadForm('salary')">Salary</a>
                             <a href="#" class="custom-dropdown-item" onclick="loadForm('allowance')">Allowance</a>
-                            <a href="#" class="custom-dropdown-item" onclick="loadForm('deduction')">Deduction</a>
+                            {{-- <a href="#" class="custom-dropdown-item" onclick="loadForm('deduction')">Deduction</a> --}}
                         </div>
 
                     </div>
