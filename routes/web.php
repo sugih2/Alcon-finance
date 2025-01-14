@@ -165,6 +165,8 @@ Route::group(['prefix' => 'presence', 'middleware' => 'auth'], function () {
 	Route::delete('/delete/{id}', [PresenceController::class, 'destroy'])->name('presence.delete');
 	Route::post('/process-import', [PresenceController::class, 'processImport'])->name('presence.processImport');
 	Route::post('/store-import', [PresenceController::class, 'storeImport'])->name('presence.storeImport');
+	Route::get('/detail-presence/{id}', [PresenceController::class, 'detailPresence'])->name('detailPresence.detailPresence');
+	Route::get('/filter-presences', [PresenceController::class, 'filterPresences'])->name('filter.filter');
 });
 
 Route::group(['prefix' => 'shift', 'middleware' => 'auth'], function () {
