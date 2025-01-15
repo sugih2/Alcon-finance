@@ -69,11 +69,11 @@
                                                     <i>
                                                         {!! $e->locking
                                                             ? '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-lock-fill" viewBox="0 0 16 16">
-                                                                                                                                                                                                                                                                                                                                                                   <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2m3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2"/>
-                                                                                                                                                                                                                                                                                                                                                               </svg>'
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2m3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2"/>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       </svg>'
                                                             : '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-unlock-fill" viewBox="0 0 16 16">
-                                                                                                                                                                                                                                                                                                                                                                   <path d="M11 1a2 2 0 0 0-2 2v4a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h5V3a3 3 0 0 1 6 0v4a.5.5 0 0 1-1 0V3a2 2 0 0 0-2-2"/>
-                                                                                                                                                                                                                                                                                                                                                               </svg>' !!}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           <path d="M11 1a2 2 0 0 0-2 2v4a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h5V3a3 3 0 0 1 6 0v4a.5.5 0 0 1-1 0V3a2 2 0 0 0-2-2"/>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       </svg>' !!}
                                                     </i>
                                                 </button>
                                             </td>
@@ -84,55 +84,6 @@
                             </table>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-
-    <!-- Modal Create -->
-    <div class="modal fade" id="addEmployeeModal" tabindex="-1" aria-labelledby="addEmployeeModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addEmployeeModalLabel">Tambah Employee</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div id="createEmployee"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Edit -->
-    <div class="modal fade" id="EditEmployeeModal" tabindex="-1" aria-labelledby="EditEmployeeModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="EditEmployeeModalLabel">Edit Employee</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div id="editEmployee"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Edit -->
-    <div class="modal fade" id="DetailPayrollModal" tabindex="-1" aria-labelledby="DetailPayrollModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="DetailPayrollModalLabel">Payroll History Detail</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="CloseDetail"></button>
-                </div>
-                <div class="modal-body">
-                    <div id="detailPayroll"></div>
                 </div>
             </div>
         </div>
@@ -169,27 +120,6 @@
                 }
             });
         }
-
-        // function DetailPayroll(id) {
-        //     console.log('Detail Payroll');
-        //     $.ajax({
-        //         url: "{{ url('/history-payroll/detail') }}/" + id,
-        //         type: 'GET',
-        //         dataType: 'html',
-        //         success: function(data) {
-        //             $("#detailPayroll").html(data);
-        //             $('#DetailPayrollModal').modal('show');
-        //         },
-        //         error: function() {
-        //             Swal.fire({
-        //                 icon: 'error',
-        //                 title: 'Error',
-        //                 text: 'Failed to open Detail form. Please try again later.',
-        //                 confirmButtonText: 'OK'
-        //             });
-        //         }
-        //     });
-        // }
 
         function createEmployee() {
             $.ajax({

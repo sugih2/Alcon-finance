@@ -13,34 +13,6 @@
                     <div class="container">
                         <div class="container-setting">
 
-                            {{-- <form id=runpayroll>
-                                @csrf
-                                <div class="form-group">
-                                    <label for="periode" class="col-form-label">Periode Start</label>
-                                    <input type="date" class="col-sm-2 form-control" id="periode" placeholder="Periode"
-                                        name="start_date">
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="periode" class="col-form-label">Periode End</label>
-                                    <input type="date" class="col-sm-2 form-control" id="periode_end"
-                                        placeholder="Periode" name="end_date">
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="floatingTextarea" class="col-form-label">Description</label>
-                                    <textarea class="col-sm-5 form-control" placeholder="Optional" id="floatingTextarea" name="description"></textarea>
-                                </div>
-                                <button type="button" class="btn btn-outline-primary" onclick="showEmploySelected()">Add
-                                    Employee</button>
-                                <div id="selected-employees" class="mt-3">
-                                    <h5>Selected Employees:</h5>
-                                    <ul id="employee-list"></ul>
-                                </div>
-                                <div class="d-flex justify-content-center"><button type="button"
-                                        class="btn btn-outline-primary" onclick="runpayroll()">RunPayroll</button></div>
-
-                            </form> --}}
                             <form id="runpayroll">
                                 @csrf
                                 <div class="form-group">
@@ -245,26 +217,21 @@
                 }
             });
         }
+
         function getPreviousWeeksDates() {
-            const today = new Date(); // Tanggal hari ini
-            const currentMonth = today.getMonth(); // Bulan berjalan (0-indexed)
-            const currentYear = today.getFullYear();
+            const today = new Date(); // Current date
+            const dayOfWeek = today.getDay(); // Day of the week (0 = Sunday, 6 = Saturday)
+            const daysSinceMonday = (dayOfWeek + 6) % 7; // Days since last Monday
 
-            // Hitung bulan sebelumnya
-            let targetMonth = currentMonth - 1;
-            let targetYear = currentYear;
-            if (targetMonth < 0) {
-                targetMonth = 11; // Bulan Desember tahun sebelumnya
-                targetYear -= 1;
-            }
+            // Calculate the start (Monday) of the previous week
+            const start = new Date(today);
+            start.setDate(today.getDate() - daysSinceMonday - 7);
 
-            // Tentukan tanggal 16 bulan sebelumnya
-            const start = new Date(targetYear, targetMonth, 16);
+            // Calculate the end (Sunday) of the previous week
+            const end = new Date(start);
+            end.setDate(start.getDate() + 6);
 
-            // Tentukan akhir periode: tanggal 29
-            const end = new Date(targetYear, targetMonth, 29);
-
-            // Format tanggal sebagai YYYY-MM-DD
+            // Format dates as YYYY-MM-DD
             return {
                 start: formatDate(start),
                 end: formatDate(end),
@@ -281,11 +248,11 @@
         function setDatesForPreviousWeeks() {
             const weekDates = getPreviousWeeksDates();
 
-            // Set tanggal ke input field
             document.getElementById("start_date").value = weekDates.start;
             document.getElementById("end_date").value = weekDates.end;
-        } 
+        }
 
+        setDatesForPreviousWeeks();
     </script>
 
     <meta name="csrf-token" content="{{ csrf_token() }}" />

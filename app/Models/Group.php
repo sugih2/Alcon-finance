@@ -29,4 +29,9 @@ class Group extends Model
     {
         return $this->hasMany(GroupMember::class, 'group_id');
     }
+
+    public function deductionGroups()
+    {
+        return $this->hasMany(DeductionGroup::class, 'group_id');
+    }
 }

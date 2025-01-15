@@ -3,12 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\DB;
-
 use Illuminate\Http\Request;
 use App\Models\PayrollHistory;
 use App\Models\PayrollHistoryDetail;
 use App\Models\AttendanceDetail;
 use App\Models\Group;
+use App\Models\DeductionGroup;
 use Illuminate\Support\Facades\Log;
 
 class PayrollHistoryController extends Controller
@@ -38,35 +38,38 @@ class PayrollHistoryController extends Controller
                 },
                 'leader.payrollHistoryDetails' => function ($query) use ($id) {
                     $query->where('id_payroll_history', $id);
+                },
+                'deductionGroups' => function ($query) use ($id) {
+                    $query->where('id_payroll_history', $id);
                 }
             ])->get();
 
             Log::info("Data :" . json_encode($groups, JSON_PRETTY_PRINT));
-            Log::info("Groups fetched for payroll history ID: {$id}", ['groups_count' => $groups->count()]);
 
             $result = $groups->map(function ($group) {
                 $totalSalary = 0;
                 $totalAllowance = 0;
                 $totalDeduction = 0;
+                $totalOvertime = 0;
                 $grossSalary = 0;
                 $netSalary = 0;
+                $deductionGroupTotal = 0;
 
-                // Include leader's payroll details
                 if ($group->leader) {
                     foreach ($group->leader->payrollHistoryDetails as $payroll) {
                         $totalSalary += $payroll->salary;
 
-                        // Decode allowance and sum 'nilai' values if it's an array
                         $allowance = $payroll->allowance;
                         $totalAllowance += is_array($allowance) ? array_sum(array_map(function ($item) {
                             return isset($item['nilai']) ? floatval(str_replace('.', '', $item['nilai'])) : 0;
                         }, $allowance)) : 0;
 
-                        // Decode deduction and sum 'nilai' values if it's an array
                         $deduction = $payroll->deduction;
                         $totalDeduction += is_array($deduction) ? array_sum(array_map(function ($item) {
                             return isset($item['nilai']) ? floatval(str_replace('.', '', $item['nilai'])) : 0;
                         }, $deduction)) : 0;
+
+                        $totalOvertime += $payroll->total_overtime;
 
                         $grossSalary += $payroll->gaji_bruto;
                         $netSalary += $payroll->gaji_bersih;
@@ -88,10 +91,18 @@ class PayrollHistoryController extends Controller
                             return isset($item['nilai']) ? floatval(str_replace('.', '', $item['nilai'])) : 0;
                         }, $deduction)) : 0;
 
+                        $totalOvertime += $payroll->total_overtime;
+
                         $grossSalary += $payroll->gaji_bruto;
                         $netSalary += $payroll->gaji_bersih;
                     }
                 }
+
+                foreach ($group->deductionGroups as $deductionGroup) {
+                    $deductionGroupTotal += $deductionGroup->amount;
+                }
+    
+                $netSalaryAfterDeductionGroup = $grossSalary - $deductionGroupTotal;
 
                 return [
                     'groupid' => $group->id,
@@ -101,12 +112,17 @@ class PayrollHistoryController extends Controller
                     'total_salary' => $totalSalary,
                     'total_allowance' => $totalAllowance,
                     'total_deduction' => $totalDeduction,
+                    'total_overtime' => $totalOvertime,
                     'gross_salary' => $grossSalary,
                     'net_salary' => $netSalary,
+                    'deduction_group_total' => $deductionGroupTotal,
+                    'net_salary_after_deduction_group' => $netSalaryAfterDeductionGroup,
                 ];
             });
 
             Log::info("Group totals calculated", ['totals' => json_encode($result, JSON_PRETTY_PRINT)]);
+
+            //return response()->json($result);
 
             return view('pages.payroll_history.group', compact('result', 'payrollHistoryDetail'));
         } catch (\Exception $e) {
@@ -118,23 +134,39 @@ class PayrollHistoryController extends Controller
 
     public function showGroupDetails($payrollHistoryId, $groupId)
     {
-        //Log::info("showGroupDetails called", ['payrollHistoryId' => $payrollHistoryId, 'groupId' => $groupId]);
         try {
-            // Fetching group with payroll history details
             $group = Group::with([
-                'leader',
+                'leader.payrollHistoryDetails' => function ($query) use ($payrollHistoryId) {
+                    $query->where('id_payroll_history', $payrollHistoryId);
+                },
                 'members.member',
                 'members.member.payrollHistoryDetails' => function ($query) use ($payrollHistoryId) {
-                    // Filter payroll details by the provided payroll history ID
                     $query->where('id_payroll_history', $payrollHistoryId);
                 }
             ])->findOrFail($groupId);
-            //Log::info("Attendance Details Data AHUY : " . json_encode($group, JSON_PRETTY_PRINT));
-            // Prepare result to pass to the viewf
+
+            //Log::info("Group data", ['data' => json_encode($group, JSON_PRETTY_PRINT)]);
+
             $result = [
                 'group_name' => $group->name,
                 'group_code' => $group->code,
-                'leader' => $group->leader ? $group->leader->name : null,
+                'leader' => [
+                    'id' => $group->leader->id ?? null,
+                    'name' => $group->leader->name ?? null,
+                    'nip' => $group->leader->nip ?? null,
+                    'payroll_details' => $group->leader->payrollHistoryDetails->map(function ($payroll) {
+                        return [
+                            'salary' => $payroll->salary,
+                            'allowance' => json_decode($payroll->allowance, true) ?? [],
+                            'deduction' => json_decode($payroll->deduction, true) ?? [],
+                            'total_pendapatan' => $payroll->total_pendapatan,
+                            'total_overtime' => $payroll->total_overtime,
+                            'total_potongan' => $payroll->total_potongan,
+                            'gaji_bruto' => $payroll->gaji_bruto,
+                            'gaji_bersih' => $payroll->gaji_bersih,
+                        ];
+                    }),
+                ],
                 'members' => $group->members->map(function ($member) {
                     return [
                         'id' => $member->member->id,
@@ -142,7 +174,6 @@ class PayrollHistoryController extends Controller
                         'employee_nip' => $member->member->nip,
                         'id_transaksi_payment' => $member->member->payrollHistoryDetails->first()?->id_transaksi_payment,
                         'payroll_details' => $member->member->payrollHistoryDetails->map(function ($payroll) {
-                            log::info("cek data payroll" . json_encode($payroll, JSON_PRETTY_PRINT));
                             return [
                                 'salary' => $payroll->salary,
                                 'allowance' => json_decode($payroll->allowance, true) ?? [],
@@ -157,14 +188,12 @@ class PayrollHistoryController extends Controller
                     ];
                 }),
             ];
+            
 
-            Log::info("Group Details", ['Details Group' => json_encode($result, JSON_PRETTY_PRINT)]);
-            // Return the result to the view
-            //Log::info("Fetching group details", ['groupId' => $groupId, 'payrollHistoryId' => $payrollHistoryId]);
+            Log::info("Group details data", ['data' => json_encode($result, JSON_PRETTY_PRINT)]);
 
             return view('pages.payroll_history.detail', compact('result'));
         } catch (\Exception $e) {
-            // Log any errors that occur and redirect back with an error message
             Log::error("Error fetching group details: " . $e->getMessage());
             return redirect()->back()->with('error', 'Data tidak ditemukan.');
         }
@@ -232,5 +261,64 @@ class PayrollHistoryController extends Controller
             'message' => 'Locking status updated successfully.',
             'locking' => $transaksi->locking,
         ]);
+    }
+
+    public function createDeductionGroup($groupId, $payrollHistoryId)
+    {
+        return view('pages.payroll_history.create-deduction-group', compact('groupId', 'payrollHistoryId'));
+    }
+
+    public function storeDeductionGroup(Request $request)
+    {
+        DB::beginTransaction();
+    
+        try {
+            $request->validate([
+                'payroll_id' => 'required|exists:payroll_histories,id',
+                'group_id' => 'required|exists:groups,id',
+                'amount' => 'required|numeric',
+            ]);
+
+            $payrollHistory = PayrollHistory::findOrFail($request->payroll_id);
+    
+            $deductionGroup = DeductionGroup::where('id_payroll_history', $request->payroll_id)
+                ->where('group_id', $request->group_id)
+                ->first();
+    
+            if ($deductionGroup) {
+                $deductionGroup->amount = $request->amount;
+                $deductionGroup->save();
+            } else {
+                $deductionGroup = DeductionGroup::create([
+                    'id_payroll_history' => $request->payroll_id,
+                    'group_id' => $request->group_id,
+                    'amount' => $request->amount,
+                ]);
+            }
+    
+            $deductionAmount = $deductionGroup->amount;
+            $payrollDetails = PayrollHistoryDetail::where('id_payroll_history', $request->payroll_id)->get();
+           
+            $totalGajiBersih = $payrollDetails->sum('gaji_bersih');
+            $totalDeductions = $deductionGroup->amount;
+            $payrollHistory->amount_transaksi = $totalGajiBersih - $totalDeductions;
+            $payrollHistory->save();
+    
+            DB::commit();
+    
+            return response()->json(['message' => 'Deduction Group created or updated successfully, and Payroll History updated!'], 200);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => 'Validation error',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => 'An error occurred while processing your request.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 }
