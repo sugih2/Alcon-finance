@@ -237,6 +237,8 @@ Route::group(['prefix' => 'history-payroll', 'middleware' => 'auth'], function (
 
 Route::group(['prefix' => 'history-payroll-group', 'middleware' => 'auth'], function () {
 	Route::get('/{id}', [PayrollHistoryController::class, 'showGroupTotals'])->middleware('auth')->name('historypayrollGroup.index');
+	Route::get('/deduction-group/{groupId}/{payrollId}', [PayrollHistoryController::class, 'createDeductionGroup'])->name('historypayrollGroup.create-deduction-group');
+	Route::post('/deduction-group-store', [PayrollHistoryController::class, 'storeDeductionGroup'])->name('historypayrollGroup.store-deduction-group');
 });
 
 Route::group(['prefix' => 'history-payroll-detail', 'middleware' => 'auth'], function () {
